@@ -113,7 +113,7 @@ Let's say you've got a team of self taught developers, they've build something a
 
 Certainly, I feel I need to carve out an exception for myself here - in some future scenario where I'm working as a contractor again, I don't want to advise that 'You wouldn't get very good value out of hiring me because I'm a contractor'. 
 
-However, the key thing I would highlight here - is that you are hiring the contractor in the role of an _educator_ not as somebody to build out architecture. 
+However, the key thing I would highlight here - is that you would be hiring the contractor in the role of an _educator_ not as somebody to build out architecture. 
 
 Building out architecture might well be something that they do, but the important thing a contractor in this role should be doing explaining why they're doing they're doing and spreading the knowledge and experience as much as possible. What they shouldn't be doing is dropping a whole heap of code on your lap, as pristine as it might be, and then leaving. That won't solve your engineering maturity problem.  
 
