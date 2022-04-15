@@ -22,7 +22,7 @@ By a similar token I think stakeholders are often reluctant to assign small, sim
 
 Firstly, I would agree that the small, simple tickets that I'm talking about are suitable for juniors to pick up. However, these also make for good tickets for contractors to do. The differences are: 
 
-- The contractors should be getting through the tickets as a much faster clip than the juniors
+- The contractors should be getting through the tickets at a much faster clip than the juniors
 - The contractors should be fairly self reliant(?) in doing these tickets. 
 - With a junior, you're not just getting the work done when you assign the work to a junior, you're also giving the junior training and experience. 
 
