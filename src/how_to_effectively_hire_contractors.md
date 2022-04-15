@@ -109,11 +109,11 @@ If you agree with my argument that a contractor is less likely produce maintaina
 
 ## We want to hire a contractor because they're got the experience and our team is not particularly mature. 
 
-Let's say you've got a team of self taught developers, they've build something and it's a year or two later and things are running into the mud, and you think let's get some experts in to help us out. 
+Let's say you've got a team of self taught developers, they've build something and it's a year or two later and things are running into the mud, and you think 'let's get some experts in to help us out'. 
 
-Certainly, in some future state where I'm working as a contractor again, this is something I would I would be well suited to do. 
+Certainly, I feel I need to carve out an exception for myself here - in some future scenario where I'm working as a contractor again, I wouldn't advise 'You wouldn't get very good value out of hiring me because I'm a contractor'. 
 
-However, the key thing I would highlight here - is that you are hiring the contractor in the role of an _educator_ not somebody to build out architecture. 
+However, the key thing I would highlight here - is that you are hiring the contractor in the role of an _educator_ not as somebody to build out architecture. 
 
 Building out architecture might well be something that they do, but the important thing a contractor in this role should be doing explaining why they're doing they're doing and spreading the knowledge and experience as much as possible. What they shouldn't be doing is dropping a whole heap of code on your and then leaving. 
 
