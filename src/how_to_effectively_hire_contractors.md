@@ -115,6 +115,6 @@ Certainly, I feel I need to carve out an exception for myself here - in some fut
 
 However, the key thing I would highlight here - is that you are hiring the contractor in the role of an _educator_ not as somebody to build out architecture. 
 
-Building out architecture might well be something that they do, but the important thing a contractor in this role should be doing explaining why they're doing they're doing and spreading the knowledge and experience as much as possible. What they shouldn't be doing is dropping a whole heap of code on your and then leaving. 
+Building out architecture might well be something that they do, but the important thing a contractor in this role should be doing explaining why they're doing they're doing and spreading the knowledge and experience as much as possible. What they shouldn't be doing is dropping a whole heap of code on your lap, as pristine as it might be, and then leaving. That won't solve or engineering maturity problem.  
 
 
