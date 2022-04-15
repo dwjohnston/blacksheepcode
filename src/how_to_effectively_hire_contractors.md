@@ -6,7 +6,7 @@ Note that throughout this article I'm referring to hiring contractors within the
 There are some exceptions to the advice I'm giving here: 
 
  - When you're hiring a contractor with a specific niche speciality, to achive that one specific thing. 
- - You're hiring a experienced contractor to train your salaried engineers and bring them up to speed. 
+ - You're hiring an experienced contractor to train your salaried engineers and bring them up to speed. 
 
 # Common mistakes organisations make in hiring contractors: 
 
