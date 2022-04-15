@@ -105,7 +105,7 @@ This indicates a deeper problem within the organisation which in the long run, i
 
 For one, the organisation is apparently having trouble attracting or retaining salaried engineers who are able to build the feature. What's possibly more likely, is that the organisation does has salaried engineers, but they're reluctant to assign them away. 
 
-If you agree with my argument that a contractor is less likely produce maintainable code, and you're saying 'despite this, it's worth the risk, because we need this feature now', what you're also saying is 'we're OK having 
+If you agree with my argument that a contractor is less likely produce maintainable code, and you're saying 'despite this, it's worth the risk, because we need this feature now', what you're also saying is 'we're ok slowing down all future work to get this thing done now'. Probably a reasonable decision to make if the company is otherwise about the close the doors, but if you've got a couple of years runway - I'd reconsider. 
 
 ## We want to hire a contractor because they're got the experience and our team is not particularly mature. 
 
