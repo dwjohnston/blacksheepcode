@@ -85,7 +85,7 @@ This shouldn't be considered a small task that can happen along side the enginee
 
  Putting my pragmatic hat on, I accept that this may be the case. Perhaps there's a deadline coming up and we need to showcase this feature to investors to secure more funding. 
 
- If this is the case then the organisation needs to be very clear that this is the strategy, and the salaried engineers can be coming along for the ride too. (Or working on v2 of the feature with the plan of completely scrapping the initial feature). 
+ If this is the case then the organisation needs to be very clear that this is the strategy, and the salaried engineers can be coming along for the ride too. (Or working on v2 of the feature with the plan of potentially completely scrapping the initial feature). 
 
  What they shouldn't be doing is relying on the contractors to be creating quick and dirty fixes, while also telling the salaried engineers that 'we care about code quality and long term maintainability'. The contradictory messaging causes confusion and frustration and will have a demoralising effect on the organisation. 
 
