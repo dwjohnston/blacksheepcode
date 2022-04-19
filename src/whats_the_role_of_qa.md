@@ -233,7 +233,7 @@ I think where organisations can start struggling here is:
 - A reluctance on the part of devs to writing components with testable selectors in mind. 
   - 'It works for my purposes, so the testers should be able to work it out'. 
 - A reluctance on the part of QAs to learn a new way of doing things 
-  - 'I don't really want to learn to code, that's not what I do'. 
+  - 'I don't really want to learn to code, that's not what I do' or 'I don't want to learn about accessible selectors'. 
     - It's probably fine to have some aspect of your QA process being manual only. But in my mind it is intractable to want to automate the boring stuff, and also not want to code. 
 - Devs not having time/inclination to train QAs in working in the code base. 
   - There's definitely an amount of upfront work required to get everyone working in this style proposed. 
