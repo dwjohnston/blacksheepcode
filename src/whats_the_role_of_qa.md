@@ -34,7 +34,7 @@ A fairly standard process is that:
 2. Developers implement the requirements, write their own tests, and release the code/make a release candidate. 
 3. QAs do a 'regression suite' checking that every part of the application still works as intended. 
 
-In its most basic form, this regression suite consists of the QAs manually clicking through to explore every aspect of the application. 
+In its most basic form, this regression suite consists of the QAs manually clicking through to explore every aspect of the application. They may be following a check list of steps to follow written in a word document. 
 
 This is repetative, boring work, and prone to error. 
 
@@ -89,6 +89,12 @@ Now, lets say that the devs have agreed that it's really dumb to manually style 
 So they change the code to: 
 
 ```tsx
+export const OurButton = styled.button`
+   color: red; 
+   border: solid 1px red; 
+`; 
+
+
 export const Widget = () => {
 
   return <div>
