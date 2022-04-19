@@ -103,13 +103,13 @@ I would argue that on balance of probabilities, it is more likely to get that ou
 
 This indicates a deeper problem within the organisation which in the long run, is going to cause a lot more problems than the lack of this one feature will. 
 
-For one, the organisation is apparently having trouble attracting or retaining salaried engineers who are able to build the feature. What's possibly more likely, is that the organisation does has salaried engineers, but they're reluctant to assign them away. 
+For one, the organisation is apparently having trouble attracting or retaining salaried engineers who are able to build the feature. What's possibly more likely, is that the organisation does have salaried engineers, but they're reluctant to assign them away. 
 
-If you agree with my argument that a contractor is less likely produce maintainable code, and you're saying 'despite this, it's worth the risk, because we need this feature now', what you're also saying is 'we're ok slowing down all future work to get this thing done now'. Probably a reasonable decision to make if the company is otherwise about the close the doors, but if you've got a couple of years of runway - I'd reconsider. 
+If you agree with my argument that a contractor is less likely to produce maintainable code, and you're saying 'despite this, it's worth the risk, because we need this feature now', what you're also saying is 'we're ok slowing down all future work to get this thing done now'. Probably a reasonable decision to make if the company is otherwise about the close the doors, but if you've got a couple of years of runway - I'd reconsider. 
 
 ## We want to hire a contractor because they're got the experience and our team is not particularly mature. 
 
-Let's say you've got a team of self taught developers, they've build something and it's a year or two later, they've built the proof of concept and you've secured funding, but things are running into the mud and you're having trouble iterating. You think 'let's get some experts in to help us out'. 
+Let's say you've got a team of self taught developers, they've built something and it's a year or two later, they've built the proof of concept and you've secured funding, but things are running into the mud and you're having trouble iterating. You think 'let's get some experts in to help us out'. 
 
 Certainly, I feel I need to carve out an exception for myself here - in some future scenario where I'm working as a contractor again, I don't want to advise that 'You wouldn't get very good value out of hiring me because I'm a contractor'. 
 
