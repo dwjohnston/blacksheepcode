@@ -32,7 +32,7 @@ A contractor has different incentives to a salaried engineer.
 
 A contractor wants to be seen to delivering features quickly, this justifies their high day-rate. If the going gets tough, and the job no longer becomes fun, the contractor can just leave to their next gig. 
 
-A salaried engineer on the otherhand has the long term prospect of working on the code base to think about. The salaried engineer is also thinking about 'I need to be working on this codebase in a years time, I don't want to be a building myself a nightmare to work in'. The contractor on the otherhand, may have no such qualms and be more inclined to produce quick dirty fixes for the product owner asking for it. 
+A salaried engineer on the otherhand has the long term prospect of working on the code base to think about; the salaried engineer is also thinking 'I need to be working on this codebase in a years time, I don't want to be a building myself a nightmare to work in'. The contractor on the otherhand, may have no such qualms and be more inclined to produce quick dirty fixes for the product owner asking for it. 
 
 ## Being reluctant to assign salaried engineers away from their currently assigned work. 
 
