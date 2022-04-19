@@ -1,0 +1,246 @@
+# What is the role of QA and how should their tests fit into the development process? 
+
+This is a topic that I don't have a strong opinion to land on. 
+
+Instead I've got two contradictory ideas that I'm struggling to reconcile. 
+
+## I like having QAs in the organisations. 
+
+Some people say, 'just don't have QAs, devs should test their own work'. 
+
+I agree that devs should test their own work - and specifically be producing suites of: 
+
+- Standard unit tests
+- Frontend unit tests (eg. React testing library) 
+- API contract tests
+- Browser based frontend tests (eg. Cypress). However, how and where Cypress tests fit in will be a lot of the discussion in this article. 
+- Devs should also produce Storybook stories. These aren't an automated test in themselves, but assist in manual testing of the components that make up your app. 
+
+With all that said - I like the safety net that the QAs provide. Let's talk about how something might slip through, even if the developer is testing their own work. 
+
+- Automated tests won't catch styling issues. There are tools that can test for styling - but I think that these tools will have too much overhead for a smaller or less mature team.
+- Manually testing all paths of a possible regression is time consuming, and impractical. 
+  - Lets's say you've got component A and it's being used on Page A, B, C, D, E. The developers task is to add an optional piece of functionality to it, which is to be used on Page A. The dev writes unit tests for this, and also manually checks that it works on Page A (the functionality appears), and Page B (the functionality does not appear). However unbeknownst to the dev, Page E does something is doing something super hacky, perhaps with a direct DOM manipulation and breaks the thing. I would argue that it's quite reasonable for the dev to have missed this, and it's more in the responsibilities of the QA to be monitoring and then triaging and escalating for these kinds of breaking changes.
+  - On larger refactors, it might well be the responsiblity of the dev to test their code, but in the interests of time, pull in a QA to assist with it. 
+- As a sanity test - the dev might have already tested their code, but want a second opinion. 
+
+Additionally, I have found that often it is the QA who knows the product the best. There may be a section of the application that as a newer developer on the team, I'm not actually sure how it works/what it is meant to do. The QA is often the person who knows best. 
+
+## Should QAs write automated browser tests?
+
+A fairly standard process is that: 
+
+1. Business Analyst/Product Owner defines requirements 
+2. Developers implement the requirements, write their own tests, and release the code/make a release candidate. 
+3. QAs do a 'regression suite' checking that every part of the application still works as intended. 
+
+In its most basic form, this regression suite consists of the QAs manually clicking through to explore every aspect of the application. 
+
+This is repetative, boring work, and prone to error. 
+
+So this is where QA might propose - 'Hey we can automate this process using tools like Cypress or Selium'. 
+
+So far, no problems, the automated suites are just an extension of the manual process that the QAs are otherwise running. 
+
+### Should these automated browser tests be added to the CI pipeline? 
+
+Adding those tests to the CI pipeline is where I've seen the process breakdown. 
+
+The idea is, 'we'll run the automated browser tests when the dev submits a PR, and if they've broken anything they'll know about it sooner'. 
+
+The problem is that unless the person writing the automated test, and the developer creating the code being tested are aligned, it can be easy to for tests to fail, without actually breaking anything. 
+
+As an example, lets say we have some code like: 
+
+
+```tsx
+const StyledWidget = styled.div` 
+
+    .action-button {
+      color: red; 
+      border: solid 1px red; 
+    }
+
+`; 
+
+
+export const Widget = () => {
+
+  return <StyledWidget>
+      <button className ="action-button" onClick ={() => {
+        //does something
+      }}>Click me</button>
+  </StyledWidget>
+}
+
+```
+
+And lets say the QA has written a cypress test like: 
+
+```js
+const actionButton = cy.get('.action-button'); 
+// Do something with the action button 
+```
+
+This test is working fine. 
+
+Now, lets say that the devs have agreed that it's really dumb to manually style those buttons everywhere, instead lets create a reusable design system that adds that red text and border for us. 
+
+So they change the code to: 
+
+```tsx
+export const Widget = () => {
+
+  return <div>
+    <OurButton onClick ={() => {
+      //does something
+    }}>Click me</OurButton>
+  </div>
+}
+```
+
+The cypress tests now fail because the `.action-button` class no longer exists on the element, and the selector no longer works. 
+
+Now you might argue that 'Hey, the dev shouldn't remove that class, the class should be considered part of that components functionality, because it is relied on for tests'. 
+
+In this particular instance you might be right; especially if you've got a codebase that already has a lot of tests of this style, I _would_ suggest that when the developers do this refactor to their new design system, as a rule retain the classNames on their interactable elements. 
+
+However, let's make the example a little more complicated.  
+
+```tsx
+export const Widget = () => {
+
+  return <div className = "widget-outer">
+    <div className ="widget-inner-left">
+      <div className ="action-button-container">
+        <button className ="action-button" onClick ={() => {
+          //does something
+        }}>Click me</button>
+      </div>
+    </div>
+    <div className = "widget-inner-right">
+
+    </div>
+  </div>
+}
+```
+
+Here there are a lot of class names, and it's unclear which of these class names are safe to remove, and which are not. 
+
+There's a few rules you could go for, and none of them are particularly satisyfing: 
+
+- Never remove a className/element 
+  - The problem with this, is that you hobble your developer's ability to change anything
+- If you do remove a className/element, and the tests fail, you have to put that className back 
+  - Excruitiatingly slow and painful process. This kind of thing is what would make an otherwise 1hour task, take a day or longer. 
+- Have it specced out somewhere what classNames/elements a component should provide. Both the QA and the developer to this when developing the component/writing tests that involve it. 
+  - This adds a lot of bureaucratic overhead, and again makes developing components unncesseriliy painful. 
+
+
+## What I recommend - use testing library style accessible selectors. 
+
+I recommend going all in on the [Testing Library philosophy of testing your frontend by using accessible selectors](https://testing-library.com/docs/guiding-principles). 
+
+That is - instead of selecting by class name or data attribute, you select by aria attributes like 'role'. 
+
+As a major additional benefit is that this quite naturally guides your developers to writing an accessible application, without even intending to. This can be an important point of product differentiation. 
+
+In the above example, the cypress test could be written as: 
+
+
+```js
+cy.findByRole('button', {name: "Click me"}); 
+```
+
+Now it doesn't matter if the class name changed, or those surrounding divs changed or were removed, all that matters is that there is a button with the label "Click me". 
+
+### This still won't prevent tests from breaking. 
+
+You might be thinking 'Ah! But what if you change the text of your button, then it will break!'. And you'd be right. 
+
+On this - two points: 
+
+ - Maybe it's ok to have the test break - you've changed some copy, is that really what you want to have done? Changing the test becomes a formal acknowledgment that the application's functionality has changed, and this is what we want. 
+ - For copy changes, perhaps instead of hardcoding labels in both the application in both the code and in the tests, you refer to a collection of constants. That way - you can change the copy throughout the application all in one place. You would likely need to do this if you want to internationalise the language in your app anyway. 
+
+ eg: 
+
+```tsx
+export const Widget = () => {
+
+  return <div>
+    <OurButton onClick ={() => {
+      //does something
+    }}>{TEXT_CONSTANTS.CLICK_ME}</OurButton>
+  </div>
+}
+```
+
+```js
+cy.findByRole('button', {name: TEXT_CONTANTS.CLICK_ME}); 
+```
+
+## Devs should write examples of the accessible selectors. 
+
+I'll acknowledge that writing accessible selectors isn't always as straight forward as advertised, especially if your devs or QAs haven't done it before. 
+
+So what I suggest is that when devs write their components, they're also including a frontend unit test, that includes demonstrating the use of the accessible selector. 
+
+eg, for the `OurButton` component, the dev should write an RTL test that looks like: 
+
+```tsx
+
+describe("OurButton", () => {
+   it("has an accessible selector", () => {
+
+     const fakeHandleClick = jest.fn(); 
+
+     render(<OurButton onClick = {fakeHandleClick}>foobar</OurButton>); 
+
+     const button = screen.getByRole("button", {
+       name: "foobar"
+     }); 
+
+     userEvent.click(button); 
+     expect(fakeHandleClick).toHaveBeenCalled(); 
+   }); 
+});
+
+```
+
+Now, if someone is writing a test that needs to interact with one of these buttons - they can see how the write the selector right there. 
+
+This is especially important for things like checkboxes and radio buttons - which can actually [be quite difficult to write accessible selectors for](https://github.com/mui/material-ui/issues/20364#issuecomment-681066039).  
+
+## Maybe devs should write all the browser tests 
+
+But this brings us kind of full circle - if we're saying that only way to write automated browser tests in a practical way that keeps them aligned, is that developers and people writing the automated browser tests need to be aligned on how they write components such that they're selectable via an accessible selector, doesn't it just make sense that the developers would write the tests? 
+
+Possibly, but: 
+
+- That might be too time consuming/impractical.
+- You'd be dooming the QAs to 'no automated tools for you!', which in my mind is the bigger problem. 
+
+
+## Shift left
+
+Where this seems to take us is into the shift left philosophy - where we're getting testers to be more active in the code base, and their job resembles a developer a bit more closely. 
+
+I think where organisations can start struggling here is: 
+
+- QAs and developers having different reporting lines / different priorities 
+  - I've seen it that the QAs in a team report to a different person than the devs in a team do. This can make it hard to get alignment, as they have different priorities coming from their respective bosses. 
+- A reluctance on the part of devs to writing components with testable selectors in mind. 
+  - 'It works for my purposes, so the testers should be able to work it out'. 
+- A reluctance on the part of QAs to learn a new way of doing things 
+  - 'I don't really want to learn to code, that's not what I do'. 
+    - It's probably fine to have some aspect of your QA process being manual only. But in my mind it is intractable to want to automate the boring stuff, and also not want to code. 
+- Devs not having time/inclination to train QAs in working in the code base. 
+  - There's definitely an amount of upfront work required to get everyone working in this style proposed. 
+
+
+
+## Beyond Automated testing
+
+
+
