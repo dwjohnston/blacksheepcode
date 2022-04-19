@@ -109,7 +109,7 @@ The cypress tests now fail because the `.action-button` class no longer exists o
 
 Now you might argue that 'Hey, the dev shouldn't remove that class, the class should be considered part of that components functionality, because it is relied on for tests'. 
 
-In this particular instance you might be right; especially if you've got a codebase that already has a lot of tests of this style, I _would_ suggest that when the developers do this refactor to their new design system, as a rule retain the classNames on their interactable elements. 
+In this particular instance you might be right; especially if you've got a codebase that already has a lot of tests of this style, I _would_ suggest that when the developers do this refactor to their new design system, as a rule they retain the classNames on their interactable elements, in order to prevent breaking existing tests. 
 
 However, let's make the example a little more complicated.  
 
