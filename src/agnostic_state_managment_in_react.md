@@ -1,5 +1,6 @@
 Here's how I like to do my state/service management in React. 
 
+Code for this example is viewable [here](../projects/agnostic-state-management/).
 
 ## Part 1 - A simple application 
 
@@ -44,14 +45,14 @@ export const TodoList = () => {
 
 ```
 
-Here, we're fetching a list of todos and displaying them as a list. While the fetch is happing, we display some kind of loading indicator. 
+Here, we're fetching a list of todos and displaying them as a list. While the fetch is happening, we display some kind of loading indicator. 
 
 
 ## Part 2 - Two kinds of components - stateless and stateful. 
 
 The first thing I like to do define components that have actual UX in them, as stateless components - that is - their parent is responsible for telling them what data they have available to them. (This isn't to say that they never have a `useState` hook inside of them, but that statefulness is always considered temporary). 
 
-The stateful aspect (in this case, fetching the data from the API and storing it in to memory, also, determining the loading state), is contained in a parent component. 
+The stateful aspect (in this case, fetching the data from the API and storing it in to memory, also, determining the loading state) is contained in a parent component. 
 
 
 
@@ -77,10 +78,12 @@ export const TodoListComponent = (props: TodoListProps) => {
 
 ```
 
-The advantage of this style is that it makes testing these components dead easy. You don't need to worry about context, service mocking, any of that. 
+The advantage of this style is that it makes testing these components dead easy. You don't need to worry about context, service mocking, any of that.
+
+These are also dead easy to create storybook stories for. 
 
 
-**Stateful compoenent**
+**Stateful component**
 
 ```tsx
 export const TodoListPage = (props: TodoListPageProps) => {
@@ -110,9 +113,9 @@ export const TodoListPage = (props: TodoListPageProps) => {
 
 ```
 
-## Part 3- Removing the state management to a hook 
+## Part 3- Extracting the state management to a hook 
 
-All of the logic that determines the state (eg making the API call) should be removed to a hook. The way the parent component becomes aware of those values, is via the hook 
+All of the logic that determines the state (eg making the API call) should be pulled out to a hook. The way the parent component becomes aware of those values, is via the hook 
 
 
 
@@ -192,6 +195,7 @@ The purpose of this is have a nice simple and clean interface for API interactio
 
 The services level can also provide: 
 
+- Response validation (Check that the server response is the shape you expect it to be)
 - Authentication management (refreshing auth tokens)
 - Be returning or throwing useful errors 
 - Retry functionality 
@@ -211,7 +215,7 @@ type Services = {
 const ServicesContext = React.createContext<Services>({
 
     fetchTodos: async () => [] // This is the service that will be used if no services provider is used. 
-    // Perhaps instead of returning empty objects, you want to throw errors instead. 
+    // Perhaps instead of returning empty objects, you could throw errors instead. 
 })
 
 export const ServicesProvider = (props: React.PropsWithChildren<Services>) => {
