@@ -1,3 +1,5 @@
+# Agnostic state and service management in React 
+
 Here's how I like to do my state/service management in React. 
 
 Code for this example is viewable [here](../projects/agnostic-state-management/).
