@@ -1,3 +1,5 @@
+# How to effectively utilise contractors
+
 
 The main thrust of the arguments I'll make here is that the most effective way to utilise contractors is to assign them simple, well defined, well contained units of work that they can plough through. Organisations should avoid delegating architectual decisions to contractors. 
 
@@ -10,15 +12,15 @@ There are some exceptions to the advice I'm giving here:
  - When you're hiring a contractor with a specific niche speciality, to achive that one specific thing. 
  - You're hiring an experienced contractor to train your salaried engineers and bring them up to speed. 
 
-# Common mistakes organisations make in hiring contractors: 
+## Common mistakes organisations make in hiring contractors: 
 
-## Thinking that more pay = better work. 
+### Thinking that more pay = better work. 
 
 I think that, even if just subconciously, stakeholders can believe that because they're paying contractors usually significantly more than their salaried engineers, that the contractors are more effective or are producing high quality work. 
 
 But to give a simple example as to why this is a logical fallacy - I've worked as both a contractor and a salaried engineer in Melbourne. As a contractor I was earning $850/day, and as a salaried engineer I was earning $135k/year + super. Just because you're paying me a daily rate doesn't magically make me a more experienced or better engineer. 
 
-## Not assigning contractors simple work 'because we've got to get our money's worth'. 
+### Not assigning contractors simple work 'because we've got to get our money's worth'. 
 
 By a similar token I think stakeholders are often reluctant to assign small, simple tickets to contractors, as 'this is something we could get our juniors to do' and 'we're paying the contractor so much, we might as well get them to do something difficult'. 
 
@@ -28,7 +30,7 @@ Firstly, I would agree that the small, simple tickets that I'm talking about are
 - The contractors should be fairly self reliant(?) in doing these tickets. 
 - With a junior, you're not just getting the work done when you assign the work to a junior, you're also giving the junior training and experience. 
 
-## Not understanding the contractor's incentives 
+### Not understanding the contractor's incentives 
 
 A contractor has different incentives to a salaried engineer. 
 
@@ -45,11 +47,11 @@ Also, reassigning engineers can be demoralising, I would certainly encourage som
 Reality is - there are probably plenty of engineers in the organisation who are chomping at bit to the architect a solution.  
 
 
-# How I recommend managaging contractors 
+## How I recommend managaging contractors 
 
 Unfortunately, what I propose is subject to [Brook's Law](https://en.wikipedia.org/wiki/Brooks%27s_law) - "adding manpower to a late software project makes it later". 
 
-## Define a set of constraints that the contractor works within. 
+### Define a set of constraints that the contractor works within. 
 
 Don't give the contractor free reign to 'do what you need to get the job done'. 
 
@@ -70,7 +72,7 @@ As for a task a list:
 
 
 
-## Work needs to be done upfront, to get most effective use out of a contractor 
+### Work needs to be done upfront, to get most effective use out of a contractor 
 
 Your senior salaried engineers will need to spend time building or defining the constraints the contractor works under. 
 
@@ -81,9 +83,9 @@ This shouldn't be considered a small task that can happen along side the enginee
 
 
 
- # Addressing objections
+ ## Addressing objections
 
- ## The quick dirty fixes are what the organisation wants 
+ ### The quick dirty fixes are what the organisation wants 
 
  Putting my pragmatic hat on, I accept that this may be the case. Perhaps there's a deadline coming up and we need to showcase this feature to investors to secure more funding. 
 
@@ -91,7 +93,7 @@ This shouldn't be considered a small task that can happen along side the enginee
 
  What they shouldn't be doing is relying on the contractors to be creating quick and dirty fixes, while also telling the salaried engineers that 'we care about code quality and long term maintainability'. The contradictory messaging causes confusion and frustration and will have a demoralising effect on the organisation. 
 
- ## You're being cynical and distrustful about the quality of code that contractors produce
+ ### You're being cynical and distrustful about the quality of code that contractors produce
 
 You might be right that it's possible for an organisation to hire just the right contractor, assign to them to architectual work, and they do an outstanding job of it. 
 
@@ -101,7 +103,7 @@ If it's not equally possible, then I would suggest that the organisation needs t
 
 I would argue that on balance of probabilities, it is more likely to get that outstanding job from a salaried engineer. 
 
-## Hiring salaried engineers takes time, and we need someone to build this feature now. 
+### Hiring salaried engineers takes time, and we need someone to build this feature now. 
 
 This indicates a deeper problem within the organisation which in the long run, is going to cause a lot more problems than the lack of this one feature will. 
 
@@ -109,7 +111,7 @@ For one, the organisation is apparently having trouble attracting or retaining s
 
 If you agree with my argument that a contractor is less likely to produce maintainable code, and you're saying 'despite this, it's worth the risk, because we need this feature now', what you're also saying is 'we're ok slowing down all future work to get this thing done now'. Probably a reasonable decision to make if the company is otherwise about the close the doors, but if you've got a couple of years of runway - I'd reconsider. 
 
-## We want to hire a contractor because they're got the experience and our team is not particularly mature. 
+### We want to hire a contractor because they're got the experience and our team is not particularly mature. 
 
 Let's say you've got a team of self taught developers, they've built something and it's a year or two later, they've built the proof of concept and you've secured funding, but things are running into the mud and you're having trouble iterating. You think 'let's get some experts in to help us out'. 
 
