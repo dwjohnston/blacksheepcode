@@ -3,6 +3,8 @@ The main thrust of the arguments I'll make here is that the most effective way t
 
 Note that throughout this article I'm referring to hiring contractors within the context of general software development.
 
+Note also - you don't need to be hiring contractors to get value out of the advice I'm giving here. The suggestions I make will be helpful in structuring and breaking down the work in any software development organisation. 
+
 There are some exceptions to the advice I'm giving here: 
 
  - When you're hiring a contractor with a specific niche speciality, to achive that one specific thing. 
