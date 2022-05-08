@@ -151,7 +151,7 @@ export function useTodos(): {
 
 In the real world there's a good chance that you're using a tool like Redux, React-Query or Apollo to do your state management. 
 
-A big advantage of putting your state logic into hooks like this, is that you hide the details of your state management solution from your react components. Your react components don't need to know which state management solution you're using, and if you decide to change, you only need to make the changes the hook. 
+A big advantage of putting your state logic into hooks like this, is that you hide the details of your state management solution from your react components. Your react components don't need to know which state management solution you're using, and if you decide to change, you only need to make changes to the hook. 
 
 
 **Stateful parent component**
