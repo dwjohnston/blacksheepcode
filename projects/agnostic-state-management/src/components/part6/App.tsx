@@ -1,9 +1,12 @@
 import { ServicesProvider } from "./ServicesProvider"
 import { fetchAllTodos } from "./services/TodosService"
-import { StateHookedTodoList, TodoList } from "./TodoList"
+import { TodoList } from "./TodoList"
+import { ApplicationStateProvider } from "./StateProvider"
 
 export const App = () => {
     return <ServicesProvider fetchTodos={fetchAllTodos}>
-        <StateHookedTodoList />
+        <ApplicationStateProvider>
+            <TodoList />
+        </ApplicationStateProvider>
     </ServicesProvider>
 }
