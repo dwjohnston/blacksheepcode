@@ -1,30 +1,27 @@
 
 import React, { useEffect, useState } from 'react';
+import { useServices } from './ServicesProvider';
+import { Todo } from './services/TodosService';
 
 export type TodoListProps = {
 };
 
-type Todo = {
-    userId: string;
-    id: number;
-    title: string;
-    completed: boolean;
-}
+
 
 export const TodoList = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [todos, setTodos] = useState([] as Todo[]);
+    const { fetchTodos } = useServices();
 
     useEffect(() => {
 
         setIsLoading(true);
-        fetch('https://jsonplaceholder.typicode.com/todos')
-            .then(response => response.json())
-            .then(json => setTodos(json as Todo[]))
-            .finally(() => {
-                setIsLoading(false);
-            })
+        fetchTodos().then((data) => {
+            setTodos(data);
+        }).finally(() => {
+            setIsLoading(false);
+        });
     }, [])
 
     return (
