@@ -2,7 +2,7 @@
 
 This post concerns approaches to create managing the value of state of form elements in React. 
 
-Fully working examples of these approaches are available here. (TODO ADD LINK).
+Fully working examples of these approaches are [available here](../projects/form-element-approaches).
 
 Primarily, we are concerned about elements where the user is selecting from a list of pre-determined options, eg 
 
