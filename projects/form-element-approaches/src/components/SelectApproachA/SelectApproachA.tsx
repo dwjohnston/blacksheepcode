@@ -37,6 +37,8 @@ export const SelectApproachA = <T extends Record<string, unknown>>(props: Select
                 onChange(e.target.value);
             }} name={name}>
 
+
+                <option value ="" disabled>(None Selected)</option>
                 {availableOptions.map((v) => {
                     const optionLabel = generateLabelFn(v);
                     const optionValue = generateValueFn(v);
