@@ -75,11 +75,11 @@ eg. We this is likely an 'edit' form, and we have some intitial data that might 
 }
 ```
 
+And when we finish editing the data, we're saving a similar object. 
+
 ### Scenario 3 - Browser native form submission 
 
 We have a `<form>` and we are catching the form's submission event, and retreiving the values that way. 
-
-
 
 ## Approach A - Provide a list of items, determine which one is selected by some kind of 'value' key. 
 
