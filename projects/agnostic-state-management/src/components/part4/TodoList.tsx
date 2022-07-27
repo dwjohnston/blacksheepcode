@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTodos } from './hooks/useTodos';
-import { fetchAllTodos, Todo } from './services/TodosService';
 
 export type TodoListProps = {
 };

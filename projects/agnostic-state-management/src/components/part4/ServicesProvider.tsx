@@ -8,7 +8,7 @@ type Services = {
 }
 const ServicesContext = React.createContext<Services>({
 
-    fetchTodos: () => {
+    fetchTodos: () => { // nb. It's important to make this a synchronous function - because RTL doesn't appear to have a wait to catch async errors
         throw new Error("Service not initialised");
     }
 });
