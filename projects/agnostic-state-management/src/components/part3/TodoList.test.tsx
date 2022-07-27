@@ -35,3 +35,17 @@ describe(TodoList, () => {
 
     });
 });
+
+
+export const Header = (props) => {
+    return <></>
+}
+
+describe(Header, () => {
+
+    it("Has the page title", ()=> {
+        render(<Header title ="Foo"/>); 
+
+        expect(screen.getByText("Foo")).toBeInTheDocument(); 
+    })
+})
