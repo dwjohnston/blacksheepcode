@@ -1,54 +1,55 @@
 import './App.css';
 import { SelectApproachA } from './components/SelectApproachA/SelectApproachA';
 import { useMemo, useState } from 'react';
+import { ApproachAScenario1Demo, ApproachAScenario2Demo, ApproachAScenario3Demo } from './demos/ApproachA';
+import { ApproachBScenario1Demo, ApproachBScenario2Demo, ApproachBScenario3Demo } from './demos/ApproachB';
+import { ApproachCScenario1Demo, ApproachCScenario2Demo, ApproachCScenario3Demo, ApproachCScenario4aDemo, ApproachCScenario4bDemo } from './demos/ApproachC';
 
 
 const availableOptions = [
   {
-    foo: "a", 
+    foo: "a",
     bar: 1
-  }, 
+  },
   {
-    foo: "b", 
+    foo: "b",
     bar: 2
   },
   {
-    foo: "c", 
+    foo: "c",
     bar: 3
   }
 
-]; 
+];
+
+const existingForm = {
+
+
+  selectedFoo: "a"
+};
 
 function App() {
 
-  const [selectedOption, setSelectedOption] = useState(null as null | string)
 
-  const fullSelectedOption = useMemo(() => {
-    return availableOptions.find((v) => v.foo === selectedOption); // Or we could create a map first, which would be a bit more efficient
-  }, [selectedOption]);
-
-  return (
-    <div className="App">
-
-      <div>
-        <h2>Select Approach A</h2>
+  return <>
+    <ApproachAScenario1Demo availableOptions={availableOptions} />
+    <ApproachAScenario2Demo availableOptions={availableOptions} existingForm={existingForm} />
+    <ApproachAScenario3Demo availableOptions={availableOptions} />
 
 
-        <h3>Scenario 1 - Parent wants the full selected object</h3>
+    <ApproachBScenario1Demo availableOptions={availableOptions} />
+    <ApproachBScenario2Demo availableOptions={availableOptions} existingForm={existingForm} />
+    <ApproachBScenario3Demo availableOptions={availableOptions} />
 
-        <p>The problem with this approach is that in the parent we need to write additional logic to look up the full selected object again</p>
 
-        <SelectApproachA availableOptions={availableOptions} selectedOption={selectedOption} onChange ={setSelectedOption} label ="Scenario 1" name = "approach-a-scenario-1"
-        generateLabelFn={(v) => v.foo}
-        generateValueFn={(v) => v.foo}
-        />
 
-        <pre>{JSON.stringify({selectedOption}, null, 2)}</pre>
-        <pre>{JSON.stringify({fullSelectedOption}, null, 2)}</pre>
+    <ApproachCScenario1Demo availableOptions={availableOptions} />
+    <ApproachCScenario2Demo availableOptions={availableOptions} existingForm={existingForm} />
+    <ApproachCScenario3Demo availableOptions={availableOptions} />
+    <ApproachCScenario4aDemo availableOptions={availableOptions} />
+    <ApproachCScenario4bDemo availableOptions={availableOptions} />
 
-      </div>
-    </div>
-  );
+  </>
 }
 
 export default App;
