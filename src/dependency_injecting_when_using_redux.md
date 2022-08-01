@@ -4,6 +4,14 @@ In this post I'm discussing the use of this strategy with redux.
 
 Our context is this - our application uses timestamps about the place, and it requires allowing the user to easily change the timezone that the timestamps display in. 
 
+## The Code
+
+The code for this example is [../projects/redux-dependency-injection](available here).
+
+
+
+## Our App
+
 So we have two components, our timezone selector: 
 
 ```tsx
