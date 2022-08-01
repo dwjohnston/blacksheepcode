@@ -1,0 +1,382 @@
+In a previous post I outlined my strategy for [agnostic state management in React](./agnostic_state_managment_in_react.md). 
+
+In this post I'm discussing the use of this strategy with redux. 
+
+Our context is this - our application uses timestamps about the place, and it requires allowing the user to easily change the timezone that the timestamps display in. 
+
+So we have two components, our timezone selector: 
+
+```tsx
+export const PreferredTimeZoneSelector = (props: PreferredTimeZoneSelectorProps) => {
+    const {
+        preferredTimeZone,
+        onChange
+    } = props;
+
+    return (
+        <div>
+            <select value={preferredTimeZone || ""} onChange={(e) => {
+                onChange(e.target.value);
+            }}>
+
+                <option value="" disabled>(None selected)</option>
+                {allTimeZones.map((v) => {
+                    return <option
+                        value={v}
+                        key={v}
+                    >{v}</option>
+                })}
+            </select>
+        </div>
+    );
+};
+```
+
+This component is not state hooked, we pass the selected timezone and onChange handler in as props, we'll allow the parent to hook into state and pass these values in. 
+
+Our time display: 
+
+```tsx
+export const TimeDisplay = (props: TimeDisplayProps) => {
+  const {time  } = props;
+
+  const {preferredTimezone} = useTimezone(); 
+
+  return (
+    <div>
+      <p >{new Date(time).toLocaleString("en-GB", {
+        timeZone: preferredTimezone || undefined
+      })} ({JSON.stringify(preferredTimezone)}) </p>
+    </div>
+  );
+};
+```
+
+This component _is_ state hooked - the reason being, we're going to be using timestamps all about the place, and we don't want to be doing the same `useTimezone` call in every parent that uses this component. 
+
+Note that we allow the preferred timezone to be `null` and in this case the display reverts to using the browser's locale for the timezone. 
+
+Now note also that in accordance to advice I give about making your components be agnostic to your state management solution, we've abstracted the implementation of our setting and retreiving our preferred timezone to a `useTimezone` hook. 
+
+
+## Our useTimezone implementation
+
+So lets look at a straight forward implementation of that `useTimezone` hook, using redux. 
+
+```tsx
+export const useTimezone = () => {
+
+    const dispatch = useDispatch(); 
+    const preferredTz = useSelector(selectPreferredTimezone);
+
+    return {
+        setPreferredTimezone: (newTz: string) => dispatch(createSetPreferredTimezoneAction(newTz)), 
+        preferredTimezone: preferredTz
+    }
+}
+```
+
+Pretty straight forward. We won't delve into the implementation of the reducers and selectors, but we can see here we access our redux store via the `useDispatch` and `useSelector` hooks, and we wire in the correct selector and action creators to use. 
+
+## Full application solution 
+
+Here's what a full application looks like: 
+
+```tsx
+const App = () => {
+
+    const { preferredTimezone, setPreferredTimezone } = useTimezone();
+    return <>
+        <PreferredTimeZoneSelector preferredTimeZone={preferredTimezone} onChange={setPreferredTimezone} />
+        <TimeDisplay time="2022-07-29T02:14:10.910Z" />
+    </>
+}
+
+export const Solution2App1 = (props: Solution1App1Props) => {
+    const { } = props;
+
+    return (
+        <Provider store={store}>
+            <App />
+        </Provider>
+    );
+};
+
+```
+
+Again, pretty straight forward. At the application root we instantiate our redux provider, and our components sit within that context and so when they use `useTimezone` everything works fine. 
+
+## But in a testing context it's a different story 
+
+For this example I'll use Storybook stories, but it's the exact same issue if you were writing RTL tests. 
+
+### First, the not-a-problem example
+
+Our `PreferredTimeZoneSelector` component is not a problem, it's dead-easy to write tests and stories for, because it's not state hooked. 
+
+```tsx
+export const Default = () => {
+
+    const [tz, setTz] = useState(null as null | string);
+    return <div>
+        <pre>{tz}</pre>
+        <PreferredTimeZoneSelector
+            preferredTimeZone={tz}
+            onChange={setTz}
+        />
+    </div>;
+};
+
+```
+
+### State-hooked components won't work off the bat though, because they require the redux context
+
+For example say we try write our stories like this: 
+
+```tsx
+export const InvalidDate = () => {
+  return <TimeDisplay time="invaliddate" />;
+};
+
+
+export const IsoStringDate = () => {
+  return <TimeDisplay time="2022-07-29T02:14:10.910Z" />;
+};
+```
+
+These will just error with the message 
+
+```
+Error: could not find react-redux context value; please ensure the component is wrapped in a <Provider>
+```
+
+### We add the Provider to our tests
+
+```tsx
+export const InvalidDateWithProvider = () => {
+
+  return <Provider store={store}>
+    <TimeDisplay time="invaliddate" />
+   </Provider>;
+};
+```
+
+And note that we could render the redux provider for all stories in storybook's [preview.js](https://storybook.js.org/docs/react/configure/overview#configure-story-rendering) or for RTL with a [custom render](https://testing-library.com/docs/react-testing-library/setup/#custom-render).
+
+### Why I don't like adding Provider to the tests 
+
+#### 1. We're using a 'production' store in our tests. 
+
+In the simple redux store we're using here, there's not much to go wrong. 
+
+However, in the real world: 
+
+- The store may instantiate itself non-determinsitically (eg. if there was a Date.now() in any of the initial data values)
+- The action handlers (sagas, thunks) are making API calls.
+- We're bringing our entire data model in, just to test this one component.
+- Often the state won't be correctly instantiated until some kind of authentication flow has completed.  
+
+#### 2. If we're not using our production store, then we need to maintain a seperate 'test' store. 
+
+Ok, so maybe instead of using the production store, we instantiate that provider like: 
+
+```tsx
+export const InvalidDateWithProvider = () => {
+
+  return <Provider store={testStore}>
+    <TimeDisplay time="invaliddate" />
+   </Provider>;
+};
+```
+
+The problem with this kind of approach is that now, as I add slices to the store, I need to make sure to be adding them to two different places. Perhaps I fail to do that, no problems at first, but latter down the track I'm trying to write a test and we start getting a 'could not find 'value' of undefined' type error. 
+
+## A dependency injected redux solution
+
+Here is a fully agnostic/dependency injected solution. 
+
+The basic strategy is that we have an agnostic `useTimezone` provider interface, and in our production usage we implement it with a redux store, but in testing we can implement it with our own implementation. 
+
+```tsx
+import React, { useState } from "react";
+import { createSetPreferredTimezoneAction, selectPreferredTimezone } from "./store";
+import {useDispatch, useSelector} from "react-redux"; 
+
+
+// We define the properties provided by our context
+type TimeZoneContextType = {
+    preferredTimezone: string | null;
+    setPreferredTimezone: (tz: string) => void;
+}
+
+// Define default values (what happens if no context is provided)
+const TimeZoneProviderContext = React.createContext<TimeZoneContextType>({
+    preferredTimezone: null,
+    setPreferredTimezone: () => {
+        console.warn("TimezoneProvider not implemented, this is a noop");
+    }
+})
+
+// Fully flexible generic provider
+// It's behaviour will be whatever you pass in as props
+export const TimeZoneProvider = (props: React.PropsWithChildren<TimeZoneContextType>) => {
+
+    const { children, ...rest } = props;
+    return <TimeZoneProviderContext.Provider value={rest}>{children}</TimeZoneProviderContext.Provider>
+}
+
+// Hook to use the context
+export const useTimezone = () => {
+    return React.useContext(TimeZoneProviderContext);
+}
+
+
+// Our 'production' provider
+// This is where we wire in our redux specific code
+export const ReduxTimeZoneProvider = (props: React.PropsWithChildren<{}>) => {
+    const dispatch = useDispatch();
+    const preferredTz = useSelector(selectPreferredTimezone);
+
+
+    return <TimeZoneProvider
+        preferredTimezone={preferredTz}
+        setPreferredTimezone={(tz) => dispatch(createSetPreferredTimezoneAction(tz))}
+        >
+        {props.children}
+    </TimeZoneProvider>;
+}
+```
+
+
+Now, when we write our story like: 
+
+```tsx
+export const IsoStringDate = () => {
+  return <TimeDisplay time="2022-07-29T02:14:10.910Z" />;
+};
+```
+
+The default behaviour of the context will occur. 
+
+We can also customise the context by instantiating our own provider: 
+
+```tsx
+export const IsoStringDateWithMelbourneTimezone = () => {
+  return <><TimeZoneProvider
+    preferredTimezone="Australia/Melbourne"
+    setPreferredTimezone={() => { }}
+  >
+    <Info>We no longer have the problem that solution 2 has, because we can now use the default values on the context</Info>
+    <TimeDisplay time="2022-07-29T02:14:10.910Z" />
+  </TimeZoneProvider>
+  </>;
+};
+```
+
+And nothing prevents us from using our production provider as well
+
+```tsx
+export const UsingReduxProvider = () => {
+  return <ReduxTimeZoneProvider>
+        <TimeDisplay time="2022-07-29T02:14:10.910Z" />
+  </ReduxTimeZoneProvider>
+}
+
+```
+
+This approach gives ultimate flexibility. 
+
+
+## Is a sensible approach? Or are we over engineering things? 
+
+I want to take a step back here and consider whether this is genuinely a good approach, or if it's unnecessery complexity. 
+
+I think that it's true that this approach provides ultimate flexiblity, in choosing the behaviour of these injected dependencies. 
+
+However, is that really useful? 
+
+Let's take a look at list of objections I had again: 
+
+- The action handlers (sagas, thunks) are making API calls.
+
+Arguably there other ways you could inject your non-deterministic functions into your redux store. 
+
+For example, see this [Stack Overflow answer.](https://stackoverflow.com/questions/36375208/dependency-injection-in-a-redux-ac) 
+
+The idea being, your redux store will essentially a determinstic reducer (deterministic because in test, you'll be passing in deterministic services). 
+
+We're arguably doing the same thing in the approach I've suggested, where we pass in our own `setPreferredTimezone` function. 
+
+I think what I don't like about the redux approach is the cerebral overhead of understanding what the redux store is doing. 
+
+Here's a picture: 
+
+```
+
+    ┌─────────────────────────────────────────────────────────────┐
+    │ OUR COMPONENT                                               │
+    │                                                             │
+    │ Uses functions/data from a hook                             │
+    │                                                             │
+    ├─────────────────────────────────────────────────────────────┤
+    ├─────────────────────────────────────────────────────────────┤
+    │ Redux store                                                 │
+    │                                                             │
+    │ ??? - As a developer we have to look in at how this behaves │
+    │                                                             │
+    ├─────────────────────────────────────────────────────────────┤
+    ├─────────────────────────────────────────────────────────────┤
+    │ Deterministic services                                      │
+    │                                                             │
+    │ Defined in test                                             │
+    │                                                             │
+    │                                                             │
+    └─────────────────────────────────────────────────────────────┘
+```
+
+```
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ OUR COMPONENT                                               │
+  │                                                             │
+  │ Uses functions/data from a hook                             │
+  │                                                             │
+  ├─────────────────────────────────────────────────────────────┤
+  ├─────────────────────────────────────────────────────────────┤
+  │ Generic Provider                                            │
+  │                                                             │
+  │ Services/data is passed straight through                    │
+  │                                                             │
+  ├─────────────────────────────────────────────────────────────┤
+  ├─────────────────────────────────────────────────────────────┤
+  │ Deterministic services                                      │
+  │                                                             │
+  │ Defined in test                                             │
+  │                                                             │
+  │                                                             │
+  └─────────────────────────────────────────────────────────────┘
+
+
+````
+
+- 'Maintaining two sets of state management' 
+
+You could make the argument that we're doing the same thing here. For each test we need to define the behaviour of our services/data. 
+
+But this doesn't really bother me, at least in the example we've got. If anything, I'd consider it a _feature_, that when writing tests you need to consider how the component interacts with injected dependencies. 
+
+However, I could see a scenario where say you are testing quite a large/higher level component, you don't want to reproduce your state managment logic in the test. However, in this scenario, there would be nothing preventing you from using a your redux store. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
