@@ -6,7 +6,7 @@ Our context is this - our application uses timestamps about the place, and it re
 
 ## The Code
 
-The code for this example is [../projects/redux-dependency-injection](available here).
+The code for this example is [available here](../projects/redux-dependency-injection).
 
 
 
