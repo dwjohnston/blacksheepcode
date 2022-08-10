@@ -6,11 +6,10 @@ type Services = {
     fetchTodos: () => Promise<Array<Todo>>
 
 }
-
 const ServicesContext = React.createContext<Services>({
 
     fetchTodos: () => {
-        throw new Error("Service not initialised")
+        throw new Error("Service not initialised");
     }
 });
 

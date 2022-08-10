@@ -10,6 +10,7 @@ describe(TodoList, () => {
     it("Displays a list of todos", async () => {
 
 
+        //@ts-ignore
         fetchAllTodos.mockResolvedValue([
             {
                 userId: "1",
