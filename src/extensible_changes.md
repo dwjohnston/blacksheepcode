@@ -270,7 +270,7 @@ type UserEnrichmentData  = {
 }
 ```
 
-Now the `user` property that comes from `getSomeData()` will clobber the existing `user` property, which is likely not intended behaviour. 
+Now the `name` property that comes from `getSomeData()` will clobber the existing `name` property, which is likely not intended behaviour. 
 
 To resolve, consumers of the API should either selectively pick values off the return value, or always do the spread first. 
 
