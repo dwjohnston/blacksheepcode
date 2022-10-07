@@ -172,7 +172,7 @@ Reasoning: The calling code will already be handling the scenario where this pro
 
 **You can not:** 🛑
 
-- Remove mandatory properties
+### Remove mandatory properties
 ```diff
 type Foo = {
     name: string;
@@ -189,7 +189,7 @@ foo.value.split(''); // Value not longer exists to do .split on
 
 ```
 
-- Widen existing properties 
+### Widen existing properties 
 ```diff
 type Foo = {
     name: string;
@@ -205,7 +205,7 @@ foo.value.split(''); // .split doesn't exist on a number type
 
 ```
 
-- Make mandatory properties optional 
+### Make mandatory properties optional 
 ```diff
 type Foo = {
     name: string;
