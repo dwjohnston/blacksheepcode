@@ -256,6 +256,8 @@ const enrichedUser = {
     ...userEnrichmentData 
 }
 
+assert(enrichedUser.name === "foo"); 
+
 ```
 
 The potential problem here is what if we change UserEnrichementData like: 
@@ -264,7 +266,7 @@ The potential problem here is what if we change UserEnrichementData like:
 type UserEnrichmentData  = {
      favouriteColor: string;  
      favouriteAnimal: string; 
-+    user: string; 
++    name: string; 
 }
 ```
 
