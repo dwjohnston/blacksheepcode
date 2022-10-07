@@ -16,7 +16,7 @@ You can not:
 - Narrow existing properties 
 
 
-# When _returning_ data (eg. reponse bodies, function return values) 
+## When _returning_ data (eg. reponse bodies, function return values) 
 
 You can always: 
 
