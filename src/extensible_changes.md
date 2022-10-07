@@ -38,7 +38,7 @@ type Foo = {
 }
 ```
 
-Reasoning: Existing code can continue passing this property in. 
+Reasoning: Existing code can continue always passing this property in. 
 
 ### Remove mandatory or optional properties
 
