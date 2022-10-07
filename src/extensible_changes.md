@@ -66,7 +66,7 @@ See: [Example 1 - no flag](https://www.typescriptlang.org/play?suppressExcessPro
 type Foo = {
     name: string;
     value: string;
-+    color: string;  
++   color: string;  
 }
 ```
 
