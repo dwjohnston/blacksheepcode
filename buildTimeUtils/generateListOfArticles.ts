@@ -20,6 +20,14 @@ async function generateListOfArticles() {
             if (!file.endsWith(".mdx")){
                 console.warn(`Found a non-mdx file in ${PATH_TO_BLOG_POSTS}: ${file}`)
             }
+
+
+            // TODO proper handling of illegal characters
+            else if (file.includes(' ')) {
+                console.warn(`Found a space in file: ${file}`)
+            }
+
+
             else {
                 const fileName = file.split('.mdx')[0]; 
 
