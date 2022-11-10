@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import styles from 'highlight.js/styles/vs2015.css';
+import ourStyles from "~/styles/styles.css";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -17,7 +18,9 @@ export const meta: MetaFunction = () => ({
 
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles }];
+  return [{ rel: "stylesheet", href: styles }, {
+    rel: "stylesheet", href: ourStyles
+  }];
 };
 
 export default function App() {
