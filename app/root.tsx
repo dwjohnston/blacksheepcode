@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,12 +7,18 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import styles from 'highlight.js/styles/vs2015.css';
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "New Remix App",
+  title: "Black Sheep Code - The Personal Blog of David Johnston",
   viewport: "width=device-width,initial-scale=1",
 });
+
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+};
 
 export default function App() {
   return (
