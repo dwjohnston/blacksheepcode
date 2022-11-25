@@ -5,8 +5,28 @@
     border: solid 1px black;
 
     padding: 2em;
+
+
+
 }
 
 .open-source {
     text-align: center;
+}
+
+
+body {
+    background-color: #aab; 
+
+
+  font-family: 'Open Sans';
+}
+
+.main-column {
+    background-color: white; 
+    max-width: 800px;
+    margin:0 auto; 
+    padding: 2em; 
+
+    box-shadow: 2px 2px 2px #555;
 }

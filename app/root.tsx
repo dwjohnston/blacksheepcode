@@ -18,9 +18,15 @@ export const meta: MetaFunction = () => ({
 
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles }, {
-    rel: "stylesheet", href: ourStyles
-  }];
+  return [{ rel: "stylesheet", href: styles },
+   {
+    rel: "stylesheet", href: ourStyles, 
+  }, 
+  {
+    rel: "stylesheet", 
+    href: "https://fonts.googleapis.com/css2?family=Open Sans"
+  }
+];
 };
 
 export default function App() {
@@ -31,10 +37,13 @@ export default function App() {
         <Links />
       </head>
       <body>
+
+        <div className ="main-column">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        </div>
       </body>
     </html>
   );
