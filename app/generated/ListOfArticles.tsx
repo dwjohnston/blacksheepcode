@@ -13,13 +13,6 @@
                 
                 <li>
                 <a
-                    href="/posts/blog ideas"
-                >
-                    blog ideas        </a>
-            </li>
-                
-                <li>
-                <a
                     href="/posts/dependency_injecting_when_using_redux"
                 >
                     dependency_injecting_when_using_redux        </a>
@@ -37,6 +30,13 @@
                     href="/posts/extensible_changes"
                 >
                     extensible_changes        </a>
+            </li>
+                
+                <li>
+                <a
+                    href="/posts/generating_apps_from_openapi_part1"
+                >
+                    generating_apps_from_openapi_part1        </a>
             </li>
                 
                 <li>

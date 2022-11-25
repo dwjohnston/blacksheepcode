@@ -1,0 +1,66 @@
+# Generating apps from OpenAPI specs - Part 1 - Why use OpenAPI? 
+
+This is the start of a multipart series about using OpenAPI to generate application boilerplate. 
+
+[OpenAPI](https://www.openapis.org/) (also known as Swagger for versions 1 and 2) is [JSON Schema](https://json-schema.org/) based spec for describing REST APIs.
+
+Specs can be written in either YAML or JSON. 
+
+The spec can then be taken to automatically generate boiler plate that a REST API needs - common use cases are: 
+
+- Generating API documentation
+- Generating server boiler plate
+- Generating client functions to make API calls
+- Generating validators to validate request and response bodies. 
+- Generating tests against an API. 
+- Generating stub APIs. 
+
+## But why? 
+
+The advantages I see are as follows: 
+
+### 1. Utilising a 'design first' approach to API development. 
+
+Although not necessary to get value out of OpenAPI specs, I advocate a 'design first' approach for developing APIs. The idea is the first thing you create is the OpenAPI spec and solicit feedback on that spec alone.  
+
+Once the spec is finalised, then all producers and and consumers of that API have a common understanding of the contract they will be interacting on. 
+
+The converse approach is a 'design as you implement it approach' - whereby the producers of the API define the endpoints and their request and response bodies, etc, as they create the API. 
+
+The problem with this approach is that the consumers of the API can't be sure of what the final shape of the API will be, until it is complete. Essentially they have to either wait for the API to be finished before chang+
+
+A design first approach allows all producers and consumers of the API to work asynchronously.  
+
+### 2. Reduce grind work. 
+
+For each endpoint there is going to be a bit of code declaring the path and method a handler handles, this looks the same for each endpoint. Similarly, for clients consuming the endpoints, the code for each endpoint is going to look repetative. 
+
+Generators will write this boilerplate for you. 
+
+### 3. Reduce making changes in more than one place. 
+
+Say you're adding a new endpoint. You can implement the endpoint, but you also need to the documentation to reflect the new endpoint. The generator 
+
+### 4. Consistency of code and documentation. 
+
+Points 2 & 3 point to the same problem - these repetative, do-it-in-multiple-places type tasks are prone to error. At some point someone may modify and endpoint and forget to update the documentation, or make an error when copy pasting over a property name, for example. 
+
+### 5. Quick wins in functionality.
+
+For example, if you can use your OpenAPI spec to quite easily generate client SDKs in multiple programming languages for external users to use, that'll likely provide of a lot of value to the business for little effort.
+
+### 6. Standards are good. 
+
+This final point is arguably less pragmatic and more ideological than the other points; when a technical standard is sucessfully widely adopted, then there are network effects from having developers and organisations accross the industry being on the same page. Tooling can be created with that standard as a basis; because the standard is widely used, the effort in creating the tooling is worthwhile, and because there is tooling, using the standard is worthwhile. An organisation can hire a new developer, and there's a good chance they're already familiar with the standard. 
+
+
+## Next Steps
+
+In the next post we will start with a spec and generate an API and client code from it. 
+
+
+
+
+
+
+
