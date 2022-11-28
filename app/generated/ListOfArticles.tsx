@@ -41,9 +41,23 @@
                 
                 <li>
                 <a
+                    href="/posts/generating_apps_from_openapi_part2"
+                >
+                    generating_apps_from_openapi_part2        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/how_to_effectively_hire_contractors"
                 >
                     how_to_effectively_hire_contractors        </a>
+            </li>
+                
+                <li>
+                <a
+                    href="/posts/i_am_playing_with_remix"
+                >
+                    i_am_playing_with_remix        </a>
             </li>
                 
                 <li>
