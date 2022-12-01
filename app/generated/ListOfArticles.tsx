@@ -69,6 +69,13 @@
                 
                 <li>
                 <a
+                    href="/posts/user_experience_reflects_data_structures"
+                >
+                    user_experience_reflects_data_structures        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/whats_the_role_of_qa"
                 >
                     whats_the_role_of_qa        </a>
