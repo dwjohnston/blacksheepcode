@@ -32,9 +32,9 @@ type User = {
 
 With a data model like this, a user could enter all their details on the one page, and then submit the form, we `POST /user`,  and we're done. 
 
-Or if we wanted, we could split the flow into two pages, having the user select their favourite genres after they've entered their details, but this just being as frontend facade, we don't actually submit the data until they've finished selecting the genres. 
+Or if we wanted, we could split the flow into two pages, having the user select their favourite genres after they've entered their details, but this just being a frontend facade, we don't actually submit the data until they've finished selecting the genres. 
 
-However, this approach does have a little more friction from a development perspective, there's that little bit of extra logic required to split the form accross two pages and then join the data again for form submission. 
+However, this approach does have a little more friction from a development perspective, there's that little bit of extra logic required to split the form across two pages and then join the data again for form submission. 
 
 
 ### Approach 2 - Genres are a collection belonging to users 
