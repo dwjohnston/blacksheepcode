@@ -1,0 +1,380 @@
+# Why I don't like API mocking as a necessary frontend testing strategy
+
+It seems that API mocking, usually using Mock Service Workers (msw) is the default approach for frontend testing these days. 
+
+- Redux explicitly recommend this. Their [docs suggest writing tests that include a real store provider](https://redux.js.org/usage/writing-tests), and mocking the behaviour of API calls with either msw or by injecting the services.
+- React-query recommends API mocking, [docs](https://tanstack.com/query/v4/docs/guides/testing#testing-network-calls). 
+
+Code for these examples can be found [here](https://github.com/dwjohnston/query-play/commit/e7ccd094ff18658aff192ee9fb141d61b587eeb5). 
+
+I'm using react-query for these examples, but I believe that these patterns apply to all state management tools (arguably, with the exception of GraphQL). 
+
+
+
+## API mocking - the trivial case 
+
+To start, let's demonstrate how we would write tests in the recommend manner - by mocking API calls. 
+
+This example will be a simple todo list - we fetch a list of todos from an endpoint, and display them as a list. 
+
+```tsx
+export const TodoList = () => {
+  const query = useQuery({queryKey: ['todos'], queryFn: fetchTodos});
+  return (
+    <div>
+      {query.isLoading && <>loading...</>}
+      {query.data?.map((v) => {
+        return <div key={v.id}>
+          <span>{v.content} </span><span className = "label">{v.label}</span>
+
+        </div>
+      })}
+    </div>
+  );
+};
+```
+
+And a test: 
+
+```tsx
+const server = setupServer(
+    rest.get('/todos', async (req, res, ctx) => {
+        return res(
+            ctx.json([
+                {
+                    id: "foo",
+                    label: "label1",
+                    content: "aaaa"
+                }
+            ])
+        )
+    }),
+)
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+
+const queryClient = new QueryClient();
+const TestWrapper = (props: React.PropsWithChildren<{}>) => {
+    return <QueryClientProvider client={queryClient}>
+        {props.children}
+    </QueryClientProvider>
+}
+
+
+describe(TodoList, () => {
+    it("works fine", async () => {
+        render(
+            <TestWrapper>
+                <TodoList />
+            </TestWrapper>)
+
+        // Doesn't exist at first
+        expect(screen.queryByText("aaaa")).not.toBeInTheDocument();
+
+        //Exists after some time 
+        expect(await screen.findByText("aaaa")).toBeInTheDocument();
+    });
+});
+
+```
+
+Ok, pretty straightforward, nothing really bothers me here. 
+
+
+## What about a more complex case?
+
+Now let's make a more complex example. 
+
+In this, the user can set some preferences about what todos they want to see. Specifically, they can set preferences of the type 'I only want to see todos with the label X', or 'I only want to see todos that have labels with a priority value of greater than Y';
+
+
+### Naive Example
+
+
+A service function for might look like this: 
+
+```typescript 
+async function getUserPreferredTodos() {
+  const [ todos,userPreferences, labels] = await Promise.all([fetchTodos(), fetchUserPreferences(), fetchLabels()]); 
+  const preferredLabels = labels.filter((v) => v.priority >= userPreferences.preferredPriority || userPreferences.preferredLabels.some((w) => v.id === w)); 
+  return todos.filter((v) => preferredLabels.some((w) => w.id === v.label))
+}
+```
+
+And our use of `useQuery` is basically the same, we just use function instead of the old `fetchTodos`. 
+
+So lets write a test for this in the manner we did above. 
+
+
+```typescript
+const server = setupServer(
+    rest.get('/todos', async (req, res, ctx) => {
+        return res(
+            ctx.json([
+                {
+                    id: "foo",
+                    label: "label1",
+                    content: "aaaa"
+                }, 
+                {
+                    id: "bar",
+                    label: "label2",
+                    content: "bbbb"
+                }
+            ])
+        )
+    }),
+    rest.get('/labels', async (req, res, ctx) => {
+        return res(
+            ctx.json([
+                {
+                    id: "label1",
+                    name: "label1",
+                    priority: 1, 
+                }, 
+                {
+                    id: "label2",
+                    name: "label2",
+                    priority: 2, 
+                }
+            ])
+        )
+    }),
+    rest.get('/userPreferences', async (req, res, ctx) => {
+        return res(
+            ctx.json({
+                preferredLabels: ["label1"], 
+                preferredPriority: 3, 
+            })
+        )
+    }),
+)
+
+//Snip other code which remains the same
+
+describe(TodoList, () => {
+    it("works fine", async () => {
+        render(
+            <TestWrapper>
+                <TodoList />
+            </TestWrapper>)
+
+
+        // Doesn't exist at first
+        expect(screen.queryByText("aaaa")).not.toBeInTheDocument();
+        
+        //Exists after some time      
+        expect(await screen.findByText("aaaa")).toBeInTheDocument();
+        // bbbb never appears as it does not satisfied the 'preferred' critera
+        expect(screen.queryByText("bbbb")).not.toBeInTheDocument();
+    });
+});
+
+```
+
+
+The problem with this, in order to write this test, understand that joining logic. 
+
+In order to read the test, and understand which of the todos will actually be displayed, I similarly need to go in and understand that joining logic. 
+
+As a developer, I don't want to be concerned with this! I'm likely more concerned with what text appears on the screen, the placement of a button etc, and I want to say 'here's my todos, how does it look'. 
+
+#### Potential Solution  - Do service injection instead of API mocking
+
+In this case we provide all of our API services via a context provider, and our hook uses the service provided from context, rather that using it directly. 
+
+This means that we can easily change out that service in tests. 
+
+```tsx
+
+export const ServiceContext = React.createContext({
+  getUserPreferredTodos: getUserPreferredTodosFn
+}); 
+
+export const TodoList = () => {
+  
+  const getUserPreferredTodos = React.useContext(ServiceContext).getUserPreferredTodos; 
+  const query = useQuery({queryKey: ['preferredTodos'], queryFn: getUserPreferredTodos});
+
+  //Snip the rest
+
+```
+
+The test: 
+
+```tsx
+describe(TodoList, () => {
+    it("works fine", async () => {
+        render(
+            <TestWrapper>
+
+                <ServiceContext.Provider value={{
+                    getUserPreferredTodos: async () => {
+                        return [{
+                            id: "foo", 
+                            content: "content", 
+                            label: "label1"
+                        }]
+                    }
+                }}>
+                <TodoList />
+                </ServiceContext.Provider>
+            </TestWrapper>)
+
+
+        expect(screen.queryByText("content")).not.toBeInTheDocument();
+        expect(await screen.findByText("content")).toBeInTheDocument();
+    });
+});
+
+```
+
+I like this, this test is nice and easy to understand. 
+
+However, the problem with this apporach is that it doesn't take advantage of react-queries caching mechanism; if we had already loaded all of our todos, labels, and user preferences code would still refetch all of them. 
+
+
+### Optimised example 
+
+In this approach we'll write some smarter react-query logic, to take advantage of that we've likely already fetched the user preferences, todos and labels. 
+
+
+```tsx
+function determineUserPreferredTodos(todos?: Array<Todo>, labels?: Array<Label>, userPreferences?: UserPreferences) {
+  if(!todos || !labels || !userPreferences) {
+    return []; 
+  }
+
+  const preferredLabels = labels.filter((v) => v.priority >= userPreferences.preferredPriority || userPreferences.preferredLabels.some((w) => v.id === w)); 
+  return todos.filter((v) => preferredLabels.some((w) => w.id === v.label))
+}
+
+export const TodoList = () => {
+
+  const todosQuery = useQuery({queryKey: ['todos2b'], queryFn: fetchTodos});
+  const userPrefsQuery = useQuery({queryKey: ['userPreferences2b'], queryFn: fetchUserPreferences});
+  const labelsQuery = useQuery({queryKey: ['labels2b'], queryFn: fetchLabels});
+
+
+  const todosToShow = determineUserPreferredTodos(todosQuery.data, labelsQuery.data, userPrefsQuery.data);
+
+  //Snip
+  ```
+
+The service injection pattern now won't work, as we've got a hard reference to the `determineUserPreferredTodos`. 
+
+We could still use such a pattern, but we would still need to know how to do that joining logic.
+
+(I guess technically we could inject `determineUserPreferredTodos` itself, and have it ignore its inputs). 
+
+
+## General solutions or objections
+
+### Use a presentational and container component pattern
+
+In this approach we just pass the list of todos in as props in a _presentational_ component. 
+
+The data fetching call is done in a _container_ component. 
+
+```tsx
+//Wrapper
+export const WrappedTodoList = () => {
+
+  const todosQuery = useQuery({queryKey: ['todos2b'], queryFn: fetchTodos});
+  const userPrefsQuery = useQuery({queryKey: ['userPreferences2b'], queryFn: fetchUserPreferences});
+  const labelsQuery = useQuery({queryKey: ['labels2b'], queryFn: fetchLabels});
+
+
+  const todosToShow = determineUserPreferredTodos(todosQuery.data, labelsQuery.data, userPrefsQuery.data);
+
+
+  return (<TodoList todos={todosToShow} isLoading={[todosQuery, userPrefsQuery, labelsQuery].some((v) => v.isLoading)}/>
+  );
+};
+
+
+//Presentational
+export const TodoList = (props: TodoListProps) => {
+  return (
+    <div>
+
+      {props.isLoading && <>loading...</>}
+      {props.todos.map((v) => {
+        return <div key={v.id}>
+          <span>{v.content} </span><span className = "label">{v.label}</span>
+
+        </div>
+      })}
+    </div>
+  );
+};
+
+```
+
+
+Test: 
+
+```tsx
+describe(TodoList, () => {
+    it("works fine", () => {
+        render(
+                <TodoList isLoading={false} todos={[
+                    {
+                        id: "foo",
+                        label: "label1",
+                        content: "aaaa"
+                    }
+                ]}/>); 
+
+        expect(screen.getByText("foo")).toBeInTheDocument();
+
+    });
+});
+```
+
+This absolutely works, and I advocate for using presentational components as much as possible. 
+
+However, this doesn't actually solve the problem, it just shifts it - as likely you are using one of those container components somewhere else in the application, and then, how do you test that component? 
+
+For example: 
+
+```tsx
+export function TodoListPage() {
+
+
+    return <>
+
+        <TodoListAdder/>
+        <WrappedTodoList/>
+    </>;
+}
+
+```
+
+### This complex joining logic is a code smell / the backend should be returning the correct data
+
+This may well be the case, but it's not particularly helpful.
+
+It's the norm to be working in imperfect codebases, the solution to any engineering challenge can't be 'only work in pristine codebases'. 
+
+It's possible that this 'user preferred todos' feature is an experiemental feature we're building a proof of concept for, and we're building a quick non-optimal to prove the concept, before building a first class backend solution.
+
+ This actually brings up a second point - it should easy for us to switch out our data retreival logic, potentially, even allow for A/B testing it or feature flagging it. 
+
+### Including the state management logic under test is actually a good thing, because then you're getting a complete story of how the loading behaviour plays. 
+
+For example, 'First I click the button, THEN I see a loading spinner AND then the loading spinner disappears and see the todos'. 
+
+Whereas if you're using presentational components you don't actually typically test this kind of experience, the test is more going to be 'isLoading is true, and so I see the loading spinner', 'there are three todos in the array, and I see the name of each of them'. 
+
+I actually find this quite a convincing argument. 
+
+A couple of points though: 
+
+- In Storybook you might want to show items in a persistent loading state, rather than requiring the developer to click or refresh each time the need to see how the loading state looks. 
+- Using a presentational pattern doesn't preclude you from having the state behaviour be tested. You could still write tests for your `WrappedTodoList` using the API mocking methods. 
+
+
