@@ -1,11 +1,11 @@
 # Why I don't like API mocking as a necessary frontend testing strategy
 
-It seems that API mocking, usually using Mock Service Workers (msw) is the default approach for frontend testing these days. 
+It seems that API mocking, using tools like msw are the default approach for frontend testing these days.  
 
 - Redux explicitly recommend this. Their [docs suggest writing tests that include a real store provider](https://redux.js.org/usage/writing-tests), and mocking the behaviour of API calls with either msw or by injecting the services.
 - React-query recommends API mocking, [docs](https://tanstack.com/query/v4/docs/guides/testing#testing-network-calls). 
 
-Code for these examples can be found [here](https://github.com/dwjohnston/query-play/commit/e7ccd094ff18658aff192ee9fb141d61b587eeb5). 
+Code for these examples can be found [here](https://github.com/dwjohnston/query-play/blob/ee9b0d927887bfa395ef3f538ff4daa7e60ba4ca/README.md). 
 
 I'm using react-query for these examples, but I believe that these patterns apply to all state management tools (arguably, with the exception of GraphQL). 
 
@@ -104,7 +104,7 @@ async function getUserPreferredTodos() {
 }
 ```
 
-And our use of `useQuery` is basically the same, we just use function instead of the old `fetchTodos`. 
+And our use of `useQuery` is basically the same, we just use this function instead of the old `fetchTodos`. 
 
 So lets write a test for this in the manner we did above. 
 
@@ -176,11 +176,13 @@ describe(TodoList, () => {
 ```
 
 
-The problem with this, in order to write this test, understand that joining logic. 
+The problem with this, in order to write this test, we need to understand that joining logic. 
 
-In order to read the test, and understand which of the todos will actually be displayed, I similarly need to go in and understand that joining logic. 
+In order to read the test, we similarly need to understand the the joining logic in order to know which todos will be displayed. 
 
-As a developer, I don't want to be concerned with this! I'm likely more concerned with what text appears on the screen, the placement of a button etc, and I want to say 'here's my todos, how does it look'. 
+This adds a lot of cognitive overhead to reading and writing our tests. 
+
+We want to minimise friction in writing tests as much as possible - the easier tests are to read and write, the more likely people are to write them, and the more useful they are in understanding a codebase. 
 
 #### Potential Solution  - Do service injection instead of API mocking
 
@@ -234,7 +236,7 @@ describe(TodoList, () => {
 
 I like this, this test is nice and easy to understand. 
 
-However, the problem with this apporach is that it doesn't take advantage of react-queries caching mechanism; if we had already loaded all of our todos, labels, and user preferences code would still refetch all of them. 
+However, the problem with this approach is that it doesn't take advantage of react-queries caching mechanism; if we had already loaded all of our todos, labels, and user preferences, this code would still refetch all of them. 
 
 
 ### Optimised example 
@@ -337,22 +339,22 @@ describe(TodoList, () => {
 
 This absolutely works, and I advocate for using presentational components as much as possible. 
 
-However, this doesn't actually solve the problem, it just shifts it - as likely you are using one of those container components somewhere else in the application, and then, how do you test that component? 
-
-For example: 
+However, this doesn't actually solve the problem, it just shifts it - as likely you are using one of those container components somewhere else in the application:
 
 ```tsx
 export function TodoListPage() {
 
 
     return <>
-
         <TodoListAdder/>
         <WrappedTodoList/>
     </>;
 }
 
 ```
+
+How do we write a test for this component? 
+
 
 ### This complex joining logic is a code smell / the backend should be returning the correct data
 
@@ -362,7 +364,10 @@ It's the norm to be working in imperfect codebases, the solution to any engineer
 
 It's possible that this 'user preferred todos' feature is an experiemental feature we're building a proof of concept for, and we're building a quick non-optimal to prove the concept, before building a first class backend solution.
 
- This actually brings up a second point - it should easy for us to switch out our data retreival logic, potentially, even allow for A/B testing it or feature flagging it. 
+ This actually brings up a second point - it should easy for us to switch out our data retrieval logic, potentially, even allow for A/B testing it or feature flagging it. 
+
+ For example, maybe we're upgrading to version 2 of an API, simplifies the retrieval of those user preferred todos, requiring only a single endpoint. It's likely we would still want to support retrieval from from the v1 API, and be able to easily switch between the two modes of retrieval without code changes.  
+
 
 ### Including the state management logic under test is actually a good thing, because then you're getting a complete story of how the loading behaviour plays. 
 
