@@ -22,10 +22,6 @@ export default function Index() {
           <ul>
             <li><a href="http://new.geoplanets.io/" target="_blank">GeoPlanets</a> - My first foray in to geometric art.
             </li>
-            <li><a href="https://tinymassive.herokuapp.com/" target="_blank">Rider on the Waves</a> - A submission for
-              the Tiny Massive light show at the
-              Reykavik Lights Festival, Iceland. (Hosted on Heroku, I'm suprised it's still running)</li>
-
           </ul>
         </div>
 
