@@ -30,3 +30,20 @@ body {
 
     box-shadow: 2px 2px 2px #555;
 }
+
+.logo-container {
+    width: 100px; 
+    height: 100px; 
+}
+
+.logo-container>img {
+    object-fit: contain;
+    height: 100%; 
+    width: 100%; 
+}
+
+.headline {
+    display: flex; 
+    align-items: center;
+    gap: 2em;
+}

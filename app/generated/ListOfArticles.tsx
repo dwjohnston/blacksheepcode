@@ -48,6 +48,13 @@
                 
                 <li>
                 <a
+                    href="/posts/generating_apps_from_openapi_part3"
+                >
+                    generating_apps_from_openapi_part3        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/how_to_effectively_hire_contractors"
                 >
                     how_to_effectively_hire_contractors        </a>
@@ -65,6 +72,13 @@
                     href="/posts/the_case_for_splitting_tests_into_multiple_it_blocks"
                 >
                     the_case_for_splitting_tests_into_multiple_it_blocks        </a>
+            </li>
+                
+                <li>
+                <a
+                    href="/posts/thoughts_about_json_api"
+                >
+                    thoughts_about_json_api        </a>
             </li>
                 
                 <li>

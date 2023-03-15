@@ -1,14 +1,20 @@
 import { ListOfArticles } from "~/generated/ListOfArticles";
-
+import mainIcon from "../assets/bsc2.png";
 export default function Index() {
   return (
 
     <>
       <div className="main">
 
-        <h1>Black Sheep Code</h1>
-        <p>Personal Website of David Johnston</p>
-
+        <div className="headline">
+          <div className="logo-container">
+            <img src={mainIcon} alt="A nerdy looking sheep" />
+          </div>
+          <div>
+          <h1>Black Sheep Code</h1>
+          <p>Personal Website of David Johnston</p>
+          </div>
+        </div>
         <div>
           <h2>Work</h2>
           <ul>
@@ -28,13 +34,13 @@ export default function Index() {
 
       </div>
 
-      <div className ="main">
+      <div className="main">
 
         <h2>Blog</h2>
         <ListOfArticles />
       </div>
 
-      <p className ="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>
+      <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>
       </p>
     </>
   );
