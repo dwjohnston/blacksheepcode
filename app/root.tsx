@@ -38,6 +38,11 @@ export default function App() {
       </head>
       <body>
 
+        <header>
+          <div>
+            <a href = "/">Black Sheep Code</a>
+          </div>
+        </header>
         <div className ="main-column">
         <Outlet />
         <ScrollRestoration />

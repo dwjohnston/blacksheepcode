@@ -22,10 +22,35 @@ body {
   font-family: 'Open Sans';
 }
 
+header {
+    background-color: #222; 
+    padding: 0.25em;
+
+}
+header>div {
+    max-width: 800px;
+    margin: 0 auto; 
+
+}
+
+header a {
+    color: white; 
+    text-decoration: none;
+}
+header a:hover {
+    text-decoration: underline;
+}
+
+header a:visited {
+    color: white; 
+}
+
+
+
 .main-column {
     background-color: white; 
     max-width: 800px;
-    margin:0 auto; 
+    margin:0.5em auto; 
     padding: 2em; 
 
     box-shadow: 2px 2px 2px #555;
