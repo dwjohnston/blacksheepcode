@@ -72,3 +72,11 @@ header a:visited {
     align-items: center;
     gap: 2em;
 }
+
+.edit-with-github {
+    text-align: right;
+}
+
+a, a:hover {
+    color: black; 
+}
