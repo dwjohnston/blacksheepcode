@@ -80,3 +80,29 @@ header a:visited {
 a, a:hover {
     color: black; 
 }
+
+
+
+.game-of-life-cell {
+    width: 20px; 
+    height: 20px; 
+    border: solid 1px black;
+}
+
+.game-of-life-cell:hover {
+    cursor: pointer; 
+}
+
+.game-of-life-row {
+    display: flex; 
+    flex-flow: row nowrap;
+
+}
+
+.game-of-life-cell.live {
+    background-color: green;
+}
+
+.game-of-life-cell.dead {
+    background-color: grey;
+}
