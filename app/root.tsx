@@ -9,11 +9,12 @@ import {
 } from "@remix-run/react";
 import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
-
+import bscImage from "./assets/bsc3.png";
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Black Sheep Code - The Personal Blog of David Johnston",
   viewport: "width=device-width,initial-scale=1",
+  'og:image': bscImage
 });
 
 
