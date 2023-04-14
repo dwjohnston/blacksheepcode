@@ -1,5 +1,5 @@
 import { ListOfArticles } from "~/generated/ListOfArticles";
-import mainIcon from "../assets/bsc2.png";
+import mainIcon from "../assets/bsc3.png";
 export default function Index() {
   return (
 
