@@ -1,0 +1,14 @@
+# The case for blackbox tests
+
+Unit tests are good, and that's a whole conversation. The primary value of unit tests as I see it is: 
+
+1. They run fast, and in a single process, so they're easy for developers and build servers to run.
+2. Writing unit tests nudges you toward writing testable code, and testable code tends to be easier to consume, extend and maintain. 
+
+Where it's a selling point of unit tests that they nudge you toward writing extendable code, this can also be their Achilles' heel. In an inherited codebase, without any unit tests, it can be a difficult task writing unit tests without either significant refactoring, or extensive use of mocking which can have it's own problems (blog post to come). 
+
+Blackbox tests on the other hand do not need to know any of the implementation details of your application. They don't need to know what language your application is written in! Blackbox tests allow us to draw wide circles around large areas of our application, without looking inside and getting distracted by the details. 
+
+This is the level of detail that a consumer of your API (say you were building a product that had an externally available API) would be seeing, and so writing these tests can be a very useful exercise in experiencing what external consumers will be experiencing. 
+
+Additionally, there's the potential that the tooling your build to test your own API can also be given to those external consumers. For example, say you set up test data for scenarios to reflect a user being unauthorized, or a particular service being down, etc, these scenarios are also ones that your users may want to test for, and you could be saving them a lot of work by providing these mocks for them. 

@@ -1,0 +1,100 @@
+# Using Postman as a contract/blackbox tests - Part 2 - Setting up some tests 
+
+In this scenario, here's what I want to do
+
+1. Run a real server (ideally with an in memory database... which is what we already have)
+2. Use the Postman tooling to define queries to run against this server
+3. Ideally reset the server between tests 
+4. We want to be able to run these tests from a command line - we want these tests running in a build pipeline
+
+## Two example tests 
+
+We're going to start small, nice and easy tests, and we can work them up to be more complex. 
+
+**Test 1** - Create a pet, get all pets, and expect to see our pet there. 
+
+**Test 2** - Create a pet, create a pet with the same id, expect to get a HTTP 409. 
+
+## Newman
+
+My google of 'run postman tests from command line' points us to [this article from postman](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/) suggests using a tool called [Newman](https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/). Let's give that a go. 
+
+This [commit](https://github.com/dwjohnston/open-api-go-and-typescript/commit/5ce51db21ef0c5657e25d34fa624a2b735b22efe) implements basic usage of Newman. 
+
+This works fine, but it really isn't want we want. 
+
+This will run the whole collection, including any tests on them, (which we currently don't have any). 
+
+But: 
+
+1. It doesn't look like we have an ability to do some imperative logic (eg. clear down the server) between runs. I've looked at [the docs](https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter) and there appears to be no ('before each') type functionality. 
+
+2. Newman itself isn't for defining tests, it just runs your collection. 
+
+
+## Tests on Collections 
+
+Let's explore the basic test functionality of the [tests feature of collections](https://learning.postman.com/docs/writing-scripts/test-scripts/). 
+
+To be honest, I'm struggling a bit to see how these tests are useful. 
+
+Basically you can write assertions after each request, so if we know that `GET /widget/123` is always going to return the same object (perhaps because we've seeded our server with test data as such), then sure we can make assertions on it. 
+
+But against a live server, I struggle to find this useful. 
+
+Let's try something anyway. 
+
+Ok, so what we can do is use folders within the collection, to the requests will run in order. 
+
+We can then use the technique of randomising values to ensure uniqueness. 
+
+This [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/commit/072fc0e079c2b4cead06be0868d3b9597d4d9cf3) adding the two tests. 
+
+I can't say I enjoy the developer experience of this. 
+
+I don't want to write significant amounts of code in the browser, as good as Postman's browser experience is.
+
+Also, this technique necessarily involves copy pasting requests. Were we to update requests later... that would be a huge pain. I want my queries to be reusable, and just configure them with variables. 
+
+## Flows 
+
+Flows appear to be a new feature by Postman. Let's give it a go. 
+
+Ok, so flow appear to be a way to do a series of requests, including forking logic. 
+
+However, it's not suitable for our needs. 
+
+1. Firstly, Flows can't access the collection that is our version controlled API. We have to copy the API to the main collections area, and then we lose the synchronisation. 
+
+2. Secondly, it appears that it doesn't have test functionality. You only do control and make more requests with it. 
+
+3. I definitely don't want to be generating significant amounts of logic with a drag and drop tool.
+
+## Conclusions 
+
+So far I'm not that impressed with Postman as far as a testing tool goes.
+
+1. I don't want to write large amounts of logic in a browser. 
+   - I do like _viewing_ data/results in a browser. 
+   - It is nice to be able to make a quick edit in the browser.
+   - But for the most part, I prefer to be doing my writing in a text editor like VSCode. 
+   - Technically I could be editing the Postman files in my VSCode. But they are ugly JSON files, and I would lose syntax highlighting, autocomplete etc. 
+
+2. Postman AFAICT doesn't have a mechanism for reusing queries, say I wanted to compose a collection that executes queries in a certain order (for example, GET then POST then GET), the only way to achieve would be to copy post the queries. 
+
+3. Generally I think where a lot of people get a lot use from Postman, is for making adhoc queries, and so it's always good to still have a tool to do that. Any otherway can be a bit fiddly.
+
+Feels like I might need to go for something that I'm a bit more familiar with, Jest or Cypress or Playwright perhaps. 
+
+
+
+
+
+
+
+
+
+
+
+
+
