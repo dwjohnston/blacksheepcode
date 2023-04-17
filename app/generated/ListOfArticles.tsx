@@ -55,6 +55,20 @@
                 
                 <li>
                 <a
+                    href="/posts/generating_apps_from_openapi_part4a"
+                >
+                    generating_apps_from_openapi_part4a        </a>
+            </li>
+                
+                <li>
+                <a
+                    href="/posts/generating_apps_from_openapi_part4b"
+                >
+                    generating_apps_from_openapi_part4b        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/how_to_effectively_hire_contractors"
                 >
                     how_to_effectively_hire_contractors        </a>
@@ -69,9 +83,23 @@
                 
                 <li>
                 <a
+                    href="/posts/the_case_for_blackbox_tests"
+                >
+                    the_case_for_blackbox_tests        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/the_case_for_splitting_tests_into_multiple_it_blocks"
                 >
                     the_case_for_splitting_tests_into_multiple_it_blocks        </a>
+            </li>
+                
+                <li>
+                <a
+                    href="/posts/this_blog_now_features_comments"
+                >
+                    this_blog_now_features_comments        </a>
             </li>
                 
                 <li>
