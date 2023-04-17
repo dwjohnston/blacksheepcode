@@ -69,13 +69,6 @@
                 
                 <li>
                 <a
-                    href="/posts/generating_apps_from_openapi_part5a"
-                >
-                    generating_apps_from_openapi_part5a        </a>
-            </li>
-                
-                <li>
-                <a
                     href="/posts/how_to_effectively_hire_contractors"
                 >
                     how_to_effectively_hire_contractors        </a>
