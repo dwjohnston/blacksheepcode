@@ -1,0 +1,177 @@
+# Contract Testing With Jest - Set up against a server we can control
+
+In this series I'm going to explore a contract testing solution using test alone. 
+
+The requirements are the same as I've outlined in [this post](./generating_apps_from_openapi_part4a.md), that is I want: 
+
+- Basic contract tests
+- Ideally I can do performance test too
+- Potentially I want to be able to executive imperitive logic between tests runs, eg. to clear down a server. 
+
+## Some tooling I'm considering 
+
+This [closed jest issue](https://github.com/facebook/jest/issues/2694) requests performance snapshots. 
+
+There are a couple of tools people have mentioned: 
+
+- [async-benchmark-runner](https://github.com/JeffRMoore/async-benchmark-runner)
+- [jest-bench](https://github.com/pckhoi/jest-bench)
+
+So I might have a look at these. 
+
+One of the problems I think that a jest based solution might have is in reporting. But perhaps this is just a matter of configuring a custom reporter that can display the result in a nicer manner. 
+
+
+
+
+## First Pass - just a basic set up. 
+
+This [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/pull/5/commits/568f68fd43382875edf647cd91b350dbe7b23713#diff-ebfc1fd0493bbc68d53112ebae60f67247e3550e5d5b1f5e4948b2da075c7261) adds an example use case of the test runner. 
+
+(Note a large amount of generated boilerplate exists in the commit. This is the generated code that comes from the openapi-generator tooling. I could gitignore that stuff, but for ease of sharing I'm committing it so people don't perhaps struggle with setting that up)
+
+What we've done: 
+
+1. We set up basic jest boilerplate
+2. We used the openapi-generator to generate client code. This might be uneccesary, but hey, if it's helping us. 
+3. We write our tests. 
+
+Here's an example test: 
+```typescript 
+    it("Can create and retrieve a pet OK", async () => {
+        const initialResult = await petsApi.findPetsRaw({});
+        expect(initialResult.raw.status).toBe(200);
+        const initialResultBody = await initialResult.value();
+        expect(initialResultBody).toHaveLength(0);
+
+        const apiResult1 = await petsApi.addPetRaw({
+            pet: {
+                id: 123,
+                name: "Fido"
+            }
+        });
+
+        expect(apiResult1.raw.status).toBe(201);
+        const apiResultBody = await apiResult1.value();
+        expect(apiResultBody.id).toBe(123);
+        expect(apiResultBody.name).toBe("Fido");
+
+        const newState = await petsApi.findPetsRaw({});
+        expect(newState.raw.status).toBe(200);
+        const newStateBody = await newState.value();
+        expect(newStateBody).toHaveLength(1);
+    });
+```
+
+To run: 
+
+1. Start the local server running with `go run main.go`
+2. In a seperate process run the tests with `yarn test`. 
+
+The tests pass! Great!
+
+But: run the tests again. Now the tests fail! Oh no!
+
+The problem is that the application still retains the state from the previous test run. 
+
+## Second pass - let's control the server from our test runner. 
+
+For this, instead of starting our server manually in a seperate terminal window, we'll start the server before each test case, and kill at the end of each test case. 
+
+The boilerplate for this is as follows, the comments explain what is happening: 
+
+```typescript
+let serverProcess: ChildProcess;
+
+beforeEach(() => {
+    // We can execute asynchronous code in a beforeEach and afterEach blocks of jest
+    // by returning a promise see: https://jestjs.io/docs/setup-teardown#repeating-setup:~:text=can%20handle%20asynchronous%20code%20in%20the%20same%20ways%20that%20tests%20can%20handle%20asynchronous%20code
+    // What we're doing is we'll resolve the promise when we see that the server is running
+    return new Promise(res => {
+
+        // We start our application running 
+        // Note that we need to run the compiled binary! 
+        // If trying to run `go run` you run into this issue: https://stackoverflow.com/questions/76051959/node-child-processes-why-does-kill-not-close-a-go-run-process-but-will
+        serverProcess = exec(`./main`, {
+            cwd: `${process.cwd()}/../backend`
+        });
+        
+        // We wait for the 'Server started' message to come, and we resolve the promise then
+        // 🤔 Why is it on stderr though?
+        serverProcess.stderr?.on("data", (chunk) => {
+            if (typeof chunk === "string" && chunk.includes("Server started")) {
+                res(null);
+            }
+        })
+        serverProcess.stdout?.on("data", (chunk) => {
+            console.log(chunk)
+        })
+    });
+});
+
+
+// After each test, we similarly return a promise
+// We send a signal to kill the process we spawn, and wait for that to close completely before resolving the promise. 
+afterEach(() => {
+    return new Promise((res) => {
+        serverProcess.kill();
+        serverProcess.on("close", () => {
+            res(null); 
+        })
+    });
+});
+```
+
+Now, run the tests twice, they pass! Hooray!
+
+## Somethings I don't like 
+
+I'm happy with how the 'reset the server between test cases' functionality is working. 
+
+I'm not especially happy with the semantics of writing these tests, particularly when checking for 400/500 responses. 
+All of these criticisms are based on the usage of the openapi-generator client code, not with this contract testing approach generally. 
+
+A couple of examples: 
+
+```typescript
+        expect(apiResult1.raw.status).toBe(201);
+        const apiResult1Body = await apiResult1.value();
+        expect(apiResult1Body.id).toBe(321);
+```
+
+I don't like to retrieve the body as a seperate await call - although that does line up with how HTTP requests work, so I guess I shouldn't complain. 
+
+```typescript
+        try {
+            const apiResult2 = await petsApi.addPetRaw({
+                pet: {
+                    id: 321,
+                    name: "Charles"
+                }
+            });
+        } catch (err) {
+
+            if (validateErr(err)) {
+                expect(err.response.status).toBe(409);
+                const body = await err.response.json();
+                // Unfortunately these are untyped
+                expect(body.id).toBe(321);
+                expect(body.name).toBe("Fido")
+            }
+            else {
+                throw err;
+            }
+
+        }
+```
+
+When checking for 400/500 responses we have to wrap a try catch, and then similarly examine the headers and await the response body. 
+My preference would be to just not have the function throw an error on a 400/500 response, or allow this to be configurable. I can't see a configuration property that allows this. 
+
+Worse still, the response body for an error response is untyped, even though we have defined a response body in our OpenAPI spec (commit)[https://github.com/dwjohnston/open-api-go-and-typescript/pull/5/commits/36139316ae583fe4621aafe5a3ccf30f79f730c4]. 
+
+Do take these criticisms with a scoop of salt, they're based on a very quick set up and get going with it, it's possible that I've missed configuration options that would solve it. 
+
+## Next Steps 
+
+Performance monitoring and third party API mocking/substitution. 
