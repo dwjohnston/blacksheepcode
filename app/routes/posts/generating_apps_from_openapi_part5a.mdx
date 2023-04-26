@@ -1,4 +1,4 @@
-# Contract Testing With Jest - Set up against a server we can control
+# Contract Testing With Jest - Set up against a server we can reset between test cases
 
 In this series I'm going to explore a contract testing solution using test alone. 
 
@@ -168,7 +168,7 @@ I don't like to retrieve the body as a seperate await call - although that does 
 When checking for 400/500 responses we have to wrap a try catch, and then similarly examine the headers and await the response body. 
 My preference would be to just not have the function throw an error on a 400/500 response, or allow this to be configurable. I can't see a configuration property that allows this. 
 
-Worse still, the response body for an error response is untyped, even though we have defined a response body in our OpenAPI spec (commit)[https://github.com/dwjohnston/open-api-go-and-typescript/pull/5/commits/36139316ae583fe4621aafe5a3ccf30f79f730c4]. 
+Worse still, the response body for an error response is untyped, even though we have defined a response body in our OpenAPI spec [(commit)](https://github.com/dwjohnston/open-api-go-and-typescript/pull/5/commits/36139316ae583fe4621aafe5a3ccf30f79f730c4). 
 
 Do take these criticisms with a scoop of salt, they're based on a very quick set up and get going with it, it's possible that I've missed configuration options that would solve it. 
 
