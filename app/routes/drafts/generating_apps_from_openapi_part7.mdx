@@ -1,0 +1,12 @@
+# Black box contract testing - third party API mocking 
+
+What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albiet with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
+
+## Updating our application to include a third party application. 
+
+Let's update our application to include some kind of third party interaction. 
+
+Our silly, arbritrary, (and most imporantantly, easy for me to implement) third party interaction will be with the [JSON Placeholder API](https://jsonplaceholder.typicode.com/). 
+
+What we'll do is get the [list of users](https://jsonplaceholder.typicode.com/users), and when creating a pet, if the pet's name is included in the list of usernames provided by JSON Placeholder, we'll reject the request. 
+
