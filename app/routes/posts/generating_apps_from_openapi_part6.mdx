@@ -1,0 +1,111 @@
+# Black box contract tests with jest - adding peformance metrics to our 
+
+In this post we'll investigate adding peformance tests to our previous contract tests. 
+
+## Step 1 - Let's make the application slow. 
+
+First, we'll make it so that when we `GET /pets` it'll take 1000ms per pet that exists. 
+
+The [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/pull/6/commits/56088855b0bfaa2a2756f2efa50ae1ab36fa8507) achieves this. 
+
+```diff
+func (s *DefaultApiService) FindPets(ctx context.Context, tags []string, limit int32) (ImplResponse, error) {
+	// TODO - update FindPets with the required logic for this service method.
+	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	values := []*Pet{}
+	for _, value := range pets {
+		values = append(values, value)
+	}
+
++	time.Sleep(time.Duration(len(values) * 1000 * int(time.Millisecond)))
+	return Response(200, values), nil
+
+}
+```
+
+
+
+## Write a performance test - jest-bench
+
+Let's try [jest-bench](https://github.com/pckhoi/jest-bench) first. 
+
+This [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/commit/a97f0e7515282aeab359c201a221013bc50b6905) sets up jest-bench in the repo, but I don't implement performance tests. 
+
+Basically jest-bench looks like it is more for performance testing micro optimisations of JavasScript, rather than this black box contract tests that we're trying to do here.
+
+Also, see [this Github issue](https://github.com/pckhoi/jest-bench/issues/16), very helpful interaction with the package maintainer. 
+
+## An interlude - a Jest based solution for load testing might not be appropriate. 
+
+Just a looking at the [K6 documentation](https://k6.io/docs/#what-k6-does-not): 
+
+>JavaScript is not generally well suited for high performance. To achieve maximum performance, the tool itself is written in Go, embedding a JavaScript runtime allowing for easy test scripting.
+
+This is a pretty good point. No doubt that in fake scenario that I'm manufacturing here, I'm going to be able to demonstrate some kind of 'performance test', regardless of tool used. 
+
+But in a real world, designed-for-scale application, jest tests might not be able to simulate the load required to demonstrate performance issues. 
+
+Let's give it a go anyway. 
+
+## Write a performance test - jest-timing-action
+
+[jest-timing-action](https://github.com/javierfernandes/jest-timing-action) is a tool that will create a PR showing the performance diff in a given PR. It's based on [jest-timing-reporter](https://github.com/javierfernandes/jest-timing-reporter) by the same author, which is custom jest reporter.
+
+So it's not quite a 'performance snapshot, fail if the performance has degraded' tool, although it looks very likely that this is possible, given that the tool does generate snapshots!
+
+This [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/pull/7/commits/073eabfa186048e02ca1b6c09529bd8ef9e0fb89) adds jest-timing-reporter and commits the snapshot. 
+
+Next, we add the jest-timing-action as a Github action ([commit](https://github.com/dwjohnston/open-api-go-and-typescript/commit/6a5aae68dab98008870156a42cbfd26b4c960142)).
+
+We'll now create a performance test [(commit)](https://github.com/dwjohnston/open-api-go-and-typescript/pull/9/commits/6ef49c5fbc5d6cf2e1a2a387a7cbea08eb3c4a83). This test looks much the same as other tests, we're just making more API calls: 
+
+(This PR also reduces the delay to 100ms, just for my own experience writing these).
+
+```typescript
+describe("A performance test, get when there are 10 pets", () => {
+
+    it("Works as expected", async () => {
+
+        const initialResult = await petsApi.findPetsRaw({});
+        expect(initialResult.raw.status).toBe(200);
+        const initialResultBody = await initialResult.value();
+        expect(initialResultBody).toHaveLength(0);
+
+        const proms = new Array(10).fill(true).map(async (v,i) => {
+            const apiResult1 = await petsApi.addPetRaw({
+                pet: {
+                    id: i+1,
+                    name: "Fido"
+                }
+            });
+
+            expect(apiResult1.raw.status).toBe(201);
+            const apiResultBody = await apiResult1.value();
+            expect(apiResultBody.id).toBe(i+1);
+            expect(apiResultBody.name).toBe("Fido");
+        }); 
+
+
+        await Promise.all(proms); 
+
+        const newState = await petsApi.findPetsRaw({});
+        expect(newState.raw.status).toBe(200);
+        const newStateBody = await newState.value();
+        expect(newStateBody).toHaveLength(10);
+    }); 
+}); 
+```
+
+We'll now create a [PR that worsens performance](https://github.com/dwjohnston/open-api-go-and-typescript/pull/10), and voila! The github actions reports on the degraded performance. 
+
+## Conclusions 
+
+I'm really happy with the approach of jest-timing-reporter. What I particularly like about it is that it doesn't require us to write our performance tests in a different way.
+
+It's possible that in a real application the limits of this approach will quickly become apparent. But until then, this is a _very easy_ solution to implement. 
+
+
+
+
+
+
