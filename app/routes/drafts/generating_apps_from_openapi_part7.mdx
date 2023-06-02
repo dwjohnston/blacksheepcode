@@ -10,3 +10,67 @@ Our silly, arbritrary, (and most imporantantly, easy for me to implement) third 
 
 What we'll do is get the [list of users](https://jsonplaceholder.typicode.com/users), and when creating a pet, if the pet's name is included in the list of usernames provided by JSON Placeholder, we'll reject the request. 
 
+Here is our [commit that adds the third party interaction](https://github.com/dwjohnston/open-api-go-and-typescript/pull/11/commits/c0bd8669bc5143c441f03c2844908f245689a5a8).
+
+And [here we have a test that demonstrates this functionality](https://github.com/dwjohnston/open-api-go-and-typescript/pull/11/commits/5628163cf407a2a61c5853fe2d57b60fa1e25698) by simply using the third party. 
+
+## We don't want to use a real third party application. 
+
+There are a lot of reasons we don't want to use a third party application. 
+
+- We might get rate limited / we might annoy the third party if we make too many calls from our tests. 
+- We don't control the third party, we can't guarantee that it's always going to return the same results. 
+- In some network conditions we might not be able to access the third party, if our test environment can't access the wider environment for example. 
+- Real network calls could be slow. 
+
+There are several tools that I could use the achieve API mocking, some that allow for self hosting are: 
+
+- Mockbin 
+- MITM-proxy 
+- HTTPBin 
+
+## Mockbin solution 
+
+I'm going to try Mockbin - the reason being because it supports defining responses using [HAR files](https://en.wikipedia.org/wiki/HAR_(file_format)). Where possible I prefer using standardised specs to define data/contracts, because that tends to allow for tool interoperability. (I will note that, according to the Wikipedia article, W3C abandoned the spec, so 😕). 
+
+Mockbin does require also running a Redis container, which is one more container than I'd like, (HTTPBin runs a single docker container), but let's do it. 
+
+I first manually start Mockbin running, [as per their docs](https://github.com/Kong/mockbin/blob/master/docs/install.md#install-with-docker)[(permalink)](https://github.com/Kong/mockbin/blob/0e1719667e1e3aece9eec0f848fb81fee936c507/docs/install.md), just check that it's going to do what I want. 
+
+There does seem to currently be an issue with the Mockbin docker container, as per [this GitHub issue](https://github.com/Kong/mockbin/issues/77), code snippet below reflects using the alternative image. 
+
+```
+docker run -d --name mockbin_redis redis
+docker run -d -p 8080:8080 --link mockbin_redis:redis brianlow/mockbin
+```
+
+I can then make some requests against the Mockbin instance using Postman. 
+
+- [Create bin](https://www.postman.com/blacksheepcode/workspace/team-workspace/request/1791783-9706fdf4-22bd-4a75-89c5-1f0f461b29d9)
+- [Make a request against the bin](https://www.postman.com/blacksheepcode/workspace/team-workspace/request/1791783-0ac472fe-871f-4d9c-853b-5ea77c2a0422)
+- [See a log of the requests](https://www.postman.com/blacksheepcode/workspace/team-workspace/request/1791783-fa4876e4-7253-46e4-8b24-3845e360dc15)
+
+So now lets do this programatically.
+
+The first thing is, I need a HAR file for that endpoint, so for this case, let's generate from the browser. 
+
+1. Open browser dev tools -> Network tab
+2. Navigate to [https://jsonplaceholder.typicode.com/users](https://jsonplaceholder.typicode.com/users)
+3. Click 'disable cache' ‼️ this is an important step. Otherwise you will get a cached result ([304](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/304)), and client behaviour is to not stream that data.
+4. Refresh page 
+5. Click the download icon to save the HAR file. 
+
+For many third party APIs generating HAR files from the browser will probably be a bit cumbersome, but let's cross that bridge later. 
+
+Our HAR file is here. 
+
+
+
+
+
+
+
+
+
+
+
