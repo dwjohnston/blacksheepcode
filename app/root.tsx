@@ -13,10 +13,16 @@ import bscImage from "./assets/bsc3.png";
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Black Sheep Code - The Personal Blog of David Johnston",
+  description: "A nice blog", 
   viewport: "width=device-width,initial-scale=1",
+  "og:type": "website",
   'og:image': `https://blacksheepcode.com/${bscImage}`,
   'og:image:width': '841',
   'og:image:height': '842',
+  'twitter:image': `https://blacksheepcode.com/${bscImage}`,
+  'twitter:image:width': '841',
+  'twitter:image:height': '842',
+
 });
 
 export const links: LinksFunction = () => {

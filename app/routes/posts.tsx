@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "@remix-run/react"
 import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
 import PostComments from "~/components/PostComments/PostComments";
+import {getMDXComponent} from 'mdx-bundler/client'
 
 export default () => {
 
