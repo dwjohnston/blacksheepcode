@@ -9,14 +9,20 @@ import {
 } from "@remix-run/react";
 import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
-import bscImage from "./assets/bsc3.png";
+import bscImage from "./assets/blacksheep_fb_wide.webp";
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Black Sheep Code - The Personal Blog of David Johnston",
   viewport: "width=device-width,initial-scale=1",
   'og:image': `https://blacksheepcode.com/${bscImage}`,
-  'og:image:width': '841',
-  'og:image:height': '842',
+  'og:image:width': '409',
+  'og:image:height': '214',
+  'twitter:image': `https://blacksheepcode.com/${bscImage}`,
+  'twitter:image:width': '409',
+  'twitter:image:height': '214',
+  'twitter:card': "summary_large_image",
+  'twitter:domain': "blacksheepcode.com", 
+
 });
 
 export const links: LinksFunction = () => {
