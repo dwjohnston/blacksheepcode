@@ -13,7 +13,9 @@ import bscImage from "./assets/blacksheep_fb_wide.webp";
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Black Sheep Code - The Personal Blog of David Johnston",
+  description: "A nice blog", 
   viewport: "width=device-width,initial-scale=1",
+  "og:type": "website",
   'og:image': `https://blacksheepcode.com/${bscImage}`,
   'og:image:width': '409',
   'og:image:height': '214',
@@ -22,6 +24,7 @@ export const meta: MetaFunction = () => ({
   'twitter:image:height': '214',
   'twitter:card': "summary_large_image",
   'twitter:domain': "blacksheepcode.com", 
+
 
 });
 
