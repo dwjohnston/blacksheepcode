@@ -1,0 +1,47 @@
+# The horseshoe theory of the software development life cycle
+
+The conventional view of software development, even if one buys into the devops ethos is that the software development lifecycle looks like this: 
+
+![Typical business processes workflow](../../assets/horseshoe1.png)
+
+Where: 
+
+- A business analyst will identify what the customers/users need.
+- The project manager priorities what is worked on. 
+- A designer designs the solution.
+- The developer codes up the solution.
+- QA tests the solution. 
+- The solution is released. 
+
+If we've adopted the popular devops mantra, then all of this happens within one team, we don't have inter-team walls that we're throwing an artifact over the fence for. 
+
+## What happens in practise
+
+The above diagram shows a blue sky scenario of a feature being built. 
+
+In practise, it looks more like this 
+
+![What happens in practise](../../assets/horseshoe2.png)
+
+Whereby the QA raises something that doesn't exactly match the ticket requirements (perhaps there was ambiguity in the ticket and the developer and QA interpreted them differently!), and then the develop as a messenger between the project manager and designer, and the QA. 
+
+## An observation - QA often knows the product best
+
+Something I've noticed as developer, is that often it's the QA that knows how the product is meant to work the best. If I'm working on some unfamiliar part of the application, say some obscure settings page, I've found that the business analyst or product owner often can't tell me how it's meant to work, but QA does; I usually go to the QA first to answer questions about 'how should this thing work'. 
+
+## The designer and the QA should be one and the same 
+
+The suggestion I make is that release cycle should look more like this: 
+
+![I suggest a horseshoe model](../../assets/horseshoe3.png)
+
+The key thing is in this model, is that the designer the QA are one and same person. 
+
+The idea here being, is that the when wearing the QA hat, the QA has the context to understand _why_ the requirements are the way they are, and that while wearing the designer hat, the designer is making sure that the important parts are being achieved. 
+
+Now I'm not strictly suggesting that a team has one person that is both a designer and tester, I accept that both of these roles have technical skills that don't necessarily overlap. It could be two people, but they work as a team and are in constant communication with each other. 
+
+The other part of this is suggesting that the business analyst also is involved in the release process - observing how real users use the feature. 
+
+The idea here is similar to point above, that when a business analyst identifies a problem to be solved, that they're validating that the problem is solved within the release cycle. 
+
