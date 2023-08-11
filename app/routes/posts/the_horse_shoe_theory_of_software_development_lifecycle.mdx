@@ -1,8 +1,21 @@
+---
+meta:
+  twitter:title: The horseshoe model for software development 
+  twitter:description: I propose that the designer and the QA should be one and the same
+  title: The horseshoe model for software development 
+  description: I propose that the designer and the QA should be one and the same
+
+---
+import horseshoe1 from "../../assets/horseshoe1.png"
+import horseshoe2 from "../../assets/horseshoe2.png"
+import horseshoe3 from "../../assets/horseshoe3.png"
+
 # The horseshoe theory of the software development life cycle
 
 The conventional view of software development, even if one buys into the devops ethos is that the software development lifecycle looks like this: 
 
-![Typical business processes workflow](../../assets/horseshoe1.png)
+
+<img src={horseshoe1} alt="Typical business processes workflow" className="blog-image"/>
 
 Where: 
 
@@ -21,7 +34,9 @@ The above diagram shows a blue sky scenario of a feature being built.
 
 In practise, it looks more like this 
 
-![What happens in practise](../../assets/horseshoe2.png)
+
+<img src={horseshoe2} alt="What happens in practise" className="blog-image"/>
+
 
 Whereby the QA raises something that doesn't exactly match the ticket requirements (perhaps there was ambiguity in the ticket and the developer and QA interpreted them differently!), and then the develop as a messenger between the project manager and designer, and the QA. 
 
@@ -33,7 +48,7 @@ Something I've noticed as developer, is that often it's the QA that knows how th
 
 The suggestion I make is that release cycle should look more like this: 
 
-![I suggest a horseshoe model](../../assets/horseshoe3.png)
+<img src={horseshoe3} alt="I suggest a horseshoe model" className="blog-image"/>
 
 The key thing is in this model, is that the designer the QA are one and same person. 
 
