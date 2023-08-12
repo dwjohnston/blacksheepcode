@@ -1,3 +1,13 @@
+---
+meta:
+  twitter:title: Black box contract testing - third party API mocking using Mockbin
+  twitter:description: We have an API that makes calls out to a third party - how do we test it? 
+  title: Black box contract testing - third party API mocking using Mockbin
+  description: We have an API that makes calls out to a third party - how do we test it? 
+
+---
+
+
 # Black box contract testing - third party API mocking 
 
 What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albiet with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
