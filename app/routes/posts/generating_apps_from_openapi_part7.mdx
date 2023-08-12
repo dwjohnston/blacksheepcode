@@ -52,6 +52,8 @@ I can then make some requests against the Mockbin instance using Postman.
 
 So now lets do this programatically.
 
+### Step 1. Create a har file 
+
 The first thing is, I need a HAR file for that endpoint, so for this case, let's generate from the browser. 
 
 1. Open browser dev tools -> Network tab
@@ -62,7 +64,113 @@ The first thing is, I need a HAR file for that endpoint, so for this case, let's
 
 For many third party APIs generating HAR files from the browser will probably be a bit cumbersome, but let's cross that bridge later. 
 
-Our HAR file is here. 
+Our HAR file is [here](https://github.com/dwjohnston/open-api-go-and-typescript/pull/11/commits/872cdd368a3e9d3b70eeb33f40f828ab05cc8f1a). 
+
+### Step 2. Start Mockbin and configure - (manual)
+
+Configuring mockbin is pretty straightforward.
+
+1. Start a redis docker image. 
+2. Start a mockbin docker image. 
+3. Configure the behaviour mockbin by [POSTing a request to `/bin/create`.](https://mockbin.org/docs#:~:text=Bins-,Create%20Bin,-POST%20/bin/create)
+
+Let's do this manually now: 
+
+**Start Redis**
+```
+ run -d --name mockbin_redis redis
+```
+
+**Start mockbin**
+
+```
+ run -d --name mockbin -p 8081:8080 --link mockbin_redis:redis brianlow/mockbin
+```
+
+**Configure mockbin**
+
+Nb. assumes the har file is on the file system. 
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d @./api-test-runner-jest/harfiles/jsonplaceholder.har.json \
+  http://localhost:8081/bin/create
+```
+
+This returns us a bin id like: 
+
+```
+"6ce92e34-6a60-4553-b551-a4d3a7473102"
+```
+**Test that the mocked response is happening properly**
+
+```
+curl http://localhost:8081/bin/6ce92e34-6a60-4553-b551-a4d3a7473102
+```
+
+And we get our response body as defined in the HAR file. 
+
+### Step 2 - Start mockbin and configure (programatic) 
+
+So now we're going to follow these steps, but make these programatic steps that happen as part of running our tests. 
+
+The steps will be: 
+
+
+Before all tests: 
+
+1. Start the redis container
+2. Start the mockbin container
+3. Configure mockbin and get the response 
+4. As a sanity test, check that the mockbin is returning the expected response
+5. Start the backend, configured to use the mockbin endpoint
+6. Run our tests
+
+After the tests
+
+1. Kill mockbin
+2. Kill redis
+
+Before each test: 
+
+1. Start the server
+
+After each test: 
+
+1. Kill the server
+
+(We want to clear the server state between test runs.) 
+
+We do all of this [here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/f114886e21b20e7b5574f43d8efd1d984e686c4a/api-test-runner-jest/src/petstore.test.ts#L20-L130).
+
+We write a test for it [here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/f114886e21b20e7b5574f43d8efd1d984e686c4a/api-test-runner-jest/src/petstore.test.ts#L256-L297). 
+
+I'm not going to paste the code here. The code snippets are well commented, and I'd basically just be copy pasting them here. (As an aside, I would absoultely love some kind of library or plugin that creates code snippets from Github permalinks, just it does if you paste them as a Github comment, for example [see here](https://github.com/dwjohnston/blacksheepcode/issues/40#issuecomment-1590455651).)
+
+Brilliant!
+
+### What I like and don't like about this 
+
+I like that this runs, technically not a single process, but in a single terminal, and cleans up after it self. That is, I don't have to open seperate terminal windows, or run seperate commands before running my tests. 
+
+But, as clever as I feel doing this, I suspect it's a bad idea. 
+
+For one, the five or so second wait for Mockbin to be ready wouldn't be scalable for multiple test suits. Possibly we could configure it in [Jest's globalSetup](https://jestjs.io/docs/configuration#globalsetup-string). 
+
+It also has your node script assuming things about the environment (eg. Docker existing), perhaps it is just tidier to have the 'Start mockbin running' part of the process running as a shell script. 
+
+That said, the actual configuration of how should Mockbin respond (ie. what HAR file to use) I think does belong to the test - because that's where we are going to be making assertions about the behaviour. It's an awful experience writing tests that depend on behaviour of some magic configuration elsewhere. 
+
+
+
+
+
+
+
+
+
+
 
 
 
