@@ -10,13 +10,13 @@ meta:
 
 # Black box contract testing - third party API mocking 
 
-What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albiet with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
+What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albeit with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
 
 ## Updating our application to include a third party application. 
 
 Let's update our application to include some kind of third party interaction. 
 
-Our silly, arbritrary, (and most imporantantly, easy for me to implement) third party interaction will be with the [JSON Placeholder API](https://jsonplaceholder.typicode.com/). 
+Our silly, arbitrary, (and most importantly, easy for me to implement) third party interaction will be with the [JSON Placeholder API](https://jsonplaceholder.typicode.com/). 
 
 What we'll do is get the [list of users](https://jsonplaceholder.typicode.com/users), and when creating a pet, if the pet's name is included in the list of usernames provided by JSON Placeholder, we'll reject the request. 
 
@@ -60,7 +60,7 @@ I can then make some requests against the Mockbin instance using Postman.
 - [Make a request against the bin](https://www.postman.com/blacksheepcode/workspace/team-workspace/request/1791783-0ac472fe-871f-4d9c-853b-5ea77c2a0422)
 - [See a log of the requests](https://www.postman.com/blacksheepcode/workspace/team-workspace/request/1791783-fa4876e4-7253-46e4-8b24-3845e360dc15)
 
-So now lets do this programatically.
+So now lets do this programmatically.
 
 ### Step 1. Create a har file 
 
@@ -130,9 +130,9 @@ curl http://localhost:8081/bin/6ce92e34-6a60-4553-b551-a4d3a7473102
 
 And we get our response body as defined in the HAR file. 
 
-### Step 2 - Start mockbin and configure (programatic) 
+### Step 2 - Start mockbin and configure (programmatic) 
 
-So now we're going to follow these steps, but make these programatic steps that happen as part of running our tests. 
+So now we're going to follow these steps, but make these programmatic steps that happen as part of running our tests. 
 
 The steps will be: 
 
@@ -165,13 +165,13 @@ We do all of this [here](https://github.com/dwjohnston/open-api-go-and-typescrip
 
 We write a test for it [here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/f114886e21b20e7b5574f43d8efd1d984e686c4a/api-test-runner-jest/src/petstore.test.ts#L256-L297). 
 
-I'm not going to paste the code here. The code snippets are well commented, and I'd basically just be copy pasting them here. (As an aside, I would absoultely love some kind of library or plugin that creates code snippets from Github permalinks, just it does if you paste them as a Github comment, for example [see here](https://github.com/dwjohnston/blacksheepcode/issues/40#issuecomment-1590455651).)
+I'm not going to paste the code here. The code snippets are well commented, and I'd basically just be copy pasting them here. (As an aside, I would absolutely love some kind of library or plugin that creates code snippets from Github permalinks, just it does if you paste them as a Github comment, for example [see here](https://github.com/dwjohnston/blacksheepcode/issues/40#issuecomment-1590455651).)
 
 Brilliant!
 
 ### What I like and don't like about this 
 
-I like that this runs, technically not a single process, but in a single terminal, and cleans up after it self. That is, I don't have to open seperate terminal windows, or run seperate commands before running my tests. 
+I like that this runs, technically not a single process, but in a single terminal, and cleans up after it self. That is, I don't have to open separate terminal windows, or run separate commands before running my tests. 
 
 But, as clever as I feel doing this, I suspect it's a bad idea. 
 
