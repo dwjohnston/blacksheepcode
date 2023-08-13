@@ -74,7 +74,16 @@ The first thing is, I need a HAR file for that endpoint, so for this case, let's
 
 For many third party APIs generating HAR files from the browser will probably be a bit cumbersome, but let's cross that bridge later. 
 
-Our HAR file is [here](https://github.com/dwjohnston/open-api-go-and-typescript/pull/11/commits/872cdd368a3e9d3b70eeb33f40f828ab05cc8f1a). 
+Our HAR file is [here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/23c48792194e0de95cabd87d10956822d4603c87/api-test-runner-jest/harfiles/jsonplaceholder.nocache.har.json#L1-L441). 
+
+**Important Note - this doesn't work** 
+
+The above HAR file doesn't work with Mockbin. It runs into some kind of decompression issue, [I've raised a Github issue on Mockbin here](https://github.com/Kong/mockbin/issues/128). 
+
+To resolve it, I manually munged the HAR file until it works - we remove the headers and set `headerSize` to 0. [The file I use is here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/23c48792194e0de95cabd87d10956822d4603c87/api-test-runner-jest/harfiles/jsonplaceholder.har.json#L1-L15), this is actually just the response part we need, it's not a complete HAR file. 
+
+Possibly removing the headers is going to be problematic for your solution - we might be identify which specific header is causing the trouble. 
+
 
 ### Step 2. Start Mockbin and configure - (manual)
 
@@ -171,24 +180,3 @@ For one, the five or so second wait for Mockbin to be ready wouldn't be scalable
 It also has your node script assuming things about the environment (eg. Docker existing), perhaps it is just tidier to have the 'Start mockbin running' part of the process running as a shell script. 
 
 That said, the actual configuration of how should Mockbin respond (ie. what HAR file to use) I think does belong to the test - because that's where we are going to be making assertions about the behaviour. It's an awful experience writing tests that depend on behaviour of some magic configuration elsewhere. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
