@@ -1,11 +1,14 @@
 ---
 meta:
-  twitter:title: Today I learned: The Etc/GMT+x timezones actually mean UTC-x  
+  twitter:title: "Today I learned: The Etc/GMT+x timezones actually mean UTC-x"  
   twitter:description: Well that's counter intuitive
-  title: The Etc/GMT+x timezones actually mean UTC-x 
+  title: "Today I learned: The Etc/GMT+x timezones actually mean UTC-x" 
   description: Well that's counter intuitive
   
 ---
+
+import anger from "../../assets/anger.webp"
+
 
 There are multiple ways to represent timezones - we can talk in terms of their GMT/UTC offset, which is helpful as developers, but as humans we often want to talk in location 'What ever the time is in New York'. 
 
@@ -22,6 +25,8 @@ Unbeknownst to me - the Etc/GMT+6 timezone, actually means UTC-6!
 According to Wikipedia:
 
 >The special area of "Etc" is used for some administrative zones, particularly for "Etc/UTC" which represents Coordinated Universal Time. In order to conform with the POSIX style, those zone names beginning with "Etc/GMT" have their sign reversed from the standard ISO 8601 convention. In the "Etc" area, zones west of GMT have a positive sign and those east have a negative sign in their name (e.g "Etc/GMT-14" is 14 hours ahead of GMT).
+
+<img src ={anger} alt="The character 'Anger' from the movie 'Inside Out'" className="blog-image" style={{height: 400, display: "block", margin: "40px auto"}}/>
 
 Well that's just nice and confusing. 
 
