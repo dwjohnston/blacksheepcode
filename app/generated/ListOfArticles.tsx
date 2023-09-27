@@ -97,6 +97,13 @@
                 
                 <li>
                 <a
+                    href="/posts/testing_strategies"
+                >
+                    testing_strategies        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/the_case_for_blackbox_tests"
                 >
                     the_case_for_blackbox_tests        </a>
