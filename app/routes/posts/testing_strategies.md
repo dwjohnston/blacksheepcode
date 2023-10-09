@@ -1,6 +1,6 @@
 # Testing strategies for SPAs involving state management. 
 
-In my experience it is the presence of global state management that causes the most difficulty when it comes to testing React applications. 
+In my experience the presence of global state management is a common cause of friction in testing React applications.
 
 ## Tooling 
 
@@ -16,7 +16,6 @@ There are three kinds of environments that we might write tests:
 
 
 ## Some disparate caveats and philosophies
-
 
 **1. Writing new code to be testable, and writing tests for an existing codebase with low test coverage are two completely different practices**
 
@@ -46,6 +45,8 @@ Some of the problems I'll mentioned may be solved with GraphQL. However let's ju
 
 TanStack [does have a dedicated testing section in their docs](https://tanstack.com/query/latest/docs/react/guides/testing). [Permalink](https://web.archive.org/web/20230926233441/https://tanstack.com/query/latest/docs/react/guides/testing). 
 
+Note though, their examples don't include tests. 
+
 
 **6. If I had a codebase with zero tests, I would start with end-to-end tests**
 
@@ -53,11 +54,7 @@ E2E tests serve as an implicit test of a bunch of functionality, giving you test
 
 **7. Any technical strategy is going to vary on business context**
 
-There's a big difference in what your testing strategy will be for a mature 200 person organisation, vs a five person start up vs a 10,000 person multinational. 
-
-**8. Renders - worth mentioning but also maybe it doesn't matter**
-
-(TODO)
+There's a big difference in what your testing strategy will be for a mature 200 person organisation, vs a five person start up,  vs a 10,000 person multinational. 
 
 ## The application we are testing
 
@@ -74,6 +71,39 @@ When we create an issue or view, here are some of the user interactions availabl
 
 Clearly a non-trivial application, and that kind of thing that we really do want some automated tests on. 
 
+In this post we'll explore two ways of writing the code: 
+
+First, we use hooks into global state, where the state is used: 
+
+```jsx
+function GithubMarkdownEditor(props) {
+
+    const availableUsersResult = useUsers(); 
+    const availableIssuesAndPrsResult = useIssuesAndPrs();
+    const addFileToMarkdown = useAddFileToMarkdown(); 
+
+
+    return <>
+        implementation here 
+    </>
+}
+```
+
+The other approach is that we provide our state via props: 
+
+```jsx
+function GithubMarkdownEditor(props) {
+    const {availableUsers, availableIssuesAndPrs, addFileToMarkdown} = props; 
+
+    return <>
+        implementation here 
+    </>
+}
+```
+
+
+
+
 ## How the state management tools suggest you test
 
 The state management library commonly recommend using MSW to Mock API calls, and state that you should include the logic of your state management layer within the unit under test. 
@@ -88,13 +118,9 @@ See:
 
 >Do not try to mock selector functions or the React-Redux hooks! Mocking imports from libraries is fragile, and doesn't give you confidence that your actual app code is working.
 
-To be clear - I think the reasoning here is sound - often what we want when it comes to testing, isn't just 'when this data exists' - we also want to see the behaviour while the data is loading, etc. 
+I think the reasoning here is sound - often what we want when it comes to testing, isn't just 'when this data exists' - we also want to see the behaviour while the data is loading, etc. 
 
-So here's how this might look: 
-
-(Image)
-
-And with MSW mocking
+So here's how we might write a test using MSW mocking:
 
 ```jsx
 import { rest } from 'msw'
@@ -131,16 +157,9 @@ describe(GithubMarkdownEditor, () => {
 
 ## One improvement/amendment - MSW not necessary - Service injection instead
 
-One thing I might suggest, is that instead of using MSW to mock API endpoints, we use service functions that we provide via what I call a service injection pattern. 
+One thing I might suggest, is that instead of using MSW to mock API endpoints, we use service functions that we provide via what I call a service injection pattern, which is a dependency injection pattern. 
 
-
-
-
-
-
-ie. instead of something like: 
-
-```typescript 
+```diff
 //services/users.ts
 async function getUsers() {
     // But actually, we have more logic here re: authentication refresh, headers etc
@@ -149,11 +168,14 @@ async function getUsers() {
 
 
 // serviceHooks/users.ts
-import {getUsers} from "services/users";
+-import {getUsers} from "services/users";
 function useUsers() {
+
++   const {getUsers} = useServices(); 
     return useQuery({
         queryKeys: ['users'], 
-        queryFn: async () => {
+        queryFn: async () => {c
+
             const result = await getUsers(); 
             return result; 
         }
@@ -162,32 +184,10 @@ function useUsers() {
 
 ```
 
-We do this: 
+Below is all of the boilerplate to set up the service injection context provider. 
 
 
 ```typescript 
-//services/users.ts
-
-// Untouched 
-async function getUsers() {
-    return fetch('/users'); 
-}
-
-
-// serviceHooks/users.ts
-function useUsers() {
-    // Rather than importing getUsers directly 
-    // We get it from context
-    const {getUsers} = useServices(); 
-    return useQuery({
-        queryKeys: ['users'], 
-        queryFn: async () => {
-            const result = await getUsers(); 
-            return result; 
-        }
-    })
-}
-
 // providers/ServiceProvider 
 import React, { PropsWithChildren } from "react";
 import * as allServices from "../services/index";
@@ -233,30 +233,27 @@ export function App() {
 ```
 
 
-And then we'd have a test like: 
+Now we can have a test like this:
 
-```typescript
+```jsx
 describe("Some Component", () => {
     it("Happy path", () => {
         render(<ServiceProvider getUsers={async () => {
-            return [ 
-                {
-                    userId: "1", 
-                    name: "Fooby"
-                }
-            ]   
-        }}>
-            <SomeComponent/>
+                return [ 
+                    {
+                        userId: "1", 
+                        name: "Fooby"
+                    }
+                ]   
+            }}
+        >
+            <GithubMarkdownEditor/>
         </ServiceProvider>);
     })
 })
 ```
 
 For configuring Redux to accept dependency injection, see this [thread here](https://www.reddit.com/r/reactjs/comments/13vyitw/dependency_injection_into_rtk_query_createapi/).  [Permalink](https://web.archive.org/web/20230927003644/https://www.reddit.com/r/reactjs/comments/13vyitw/dependency_injection_into_rtk_query_createapi/?rdt=40091)
-
-
-
-
 
 In my opinion this is less cumbersome than setting up MSW and we get the advantages of the TypeScript providing hints at what the return value of each of our service functions should be. 
 
@@ -266,57 +263,54 @@ Of course, caveat #1 applies here, if we didn't already have code configured, th
 
 Whether you use a tool like MSW or you use a service injection pattern, the picture we've currently got is a nice simple blue sky. 
 
-Let's say we're building that markdown editor for Github and we've got something like this
+But what if our state management is more convoluted? 
 
-```typescript 
-function GithubMarkdownEditor(props) {
+What if the bit of state management that got the available users looked more like: 
 
-    const availableUsersResult = useUsers(); 
-    const availableIssuesAndPrsResult = useIssuesAndPrs();
-    const addFileToMarkdown = useAddFileToMarkdown(); 
+```diff
+function useUsers() {
+    const {getUsers} = useServices(); 
++   const getDisplayNameFormat = useDisplayNameFormatLazy(); 
+    
+    return useQuery({
+        queryKeys: ['users'], 
+        queryFn: async () => {
+           
+            const users = await getUsers(); 
++            const displayNameFormat = await getDisplayNameFormat();
 
-
-    return <>
-        implementation here 
-    </>
+            return users.map((v) => {
++                // somekind of transformation logic based on the displayname format here
+            })
+        }
+    })
 }
 ```
 
-And we'd write our test like: 
+Then ok, we can write a test like this: 
 
-```jsx
-describe(GithubMarkdownEditor, () => {
-    it("pressing @ will open the users menu", () => {
+```diff
+describe("Some Component", () => {
+    it("Happy path", () => {
         render(<ServiceProvider getUsers={async () => {
-            return [ 
-                {
-                    userId: "1", 
-                    name: "Fooby"
-                }
-            ];    
+                return [ 
+                    {
+                        userId: "1", 
+                        name: "Fooby"
+                    }
+                ]   
             }}
-            getPrsAndIssues={async () => {
-            return [ 
-            ];    
-            }}
-            >
++            getDisplayNameFormat={async () => {
++                return "$firstName $lastName"
++            }}
+        >
             <GithubMarkdownEditor/>
         </ServiceProvider>);
-
-        userEvent.type(screen.getByRole("textbox"), "@"); 
-        expect(...)
-    })   
+    })
 })
-
 ```
 
-But what if our state management is more convoluted? 
-
-What if the state management more looked like this? 
-
-(Image) 
-
-What if the bit of state management that got the available users looked more like: 
+But what if it was _really_ convoluted?
 
 ```typescript
 function useUsers(projectId: string) {
@@ -351,11 +345,9 @@ function useUsers(projectId: string) {
 }
 ```
 
-This is an obviously arbitrary and convoluted example, and it might be just what happens to be in your codebase. 
+Writing a test that encompasses all of this logic sounds painful! All just to populate a dropdown when we press the `@` key!
 
-All of a sudden there's all of this filtering and joining logic that we need to be aware of in order to write our test. 
-
-But probably, for the purpose of writing our test, all we want is to a list of users to display!
+The point here is that whatever business logic exists in your state management, will also need to be understand and replicated in your tests using that logic. 
 
 At this point, let's address some potential objections. 
 
@@ -409,7 +401,9 @@ And this would work fine, but:
 2. You're no longer testing things like loading states, or you'd have to declare mock implementations for these as well, and that would be tedious. 
 3. Jest module mocking will only work for Jest. How would you render this component in Storybook? 
 
-You can do a kind of module mocking in Storybook by hacking the webpack config, [see this part of their documentation](https://storybook.js.org/docs/react/writing-stories/build-pages-with-storybook#mocking-imports). [Permalink](https://web.archive.org/web/20230927053111/https://storybook.js.org/docs/react/writing-stories/build-pages-with-storybook#mocking-imports). This the [`storybook-addon-manual-mocks`](https://storybook.js.org/addons/storybook-addon-manual-mocks) possibly does the same thing though I haven't used it. 
+You can do a kind of module mocking in Storybook by hacking the webpack config, [see this part of their documentation](https://storybook.js.org/docs/react/writing-stories/build-pages-with-storybook#mocking-imports). <sup>[Permalink](https://web.archive.org/web/20230927053111/https://storybook.js.org/docs/react/writing-stories/build-pages-with-storybook#mocking-imports)</sup> 
+
+The [`storybook-addon-manual-mocks`](https://storybook.js.org/addons/storybook-addon-manual-mocks) addon possibly does the same thing though I haven't used it. 
 
 I have used the former technique, and it works, and it allowed me to write Storybooks for components that were otherwise too complicated. 
 
@@ -423,12 +417,13 @@ So let's take a different approach.
 
 Instead of using those hooks directly in our component, we pass that data we need in as props. 
 
-Something like: 
-
-
-```jsx 
+```diff 
 function GithubMarkdownEditor(props) {
-    const {availableUsers, availableIssuesAndPrs, addFileToMarkdown} = props; 
+-    const availableUsersResult = useUsers(); 
+-    const availableIssuesAndPrsResult = useIssuesAndPrs();
+-    const addFileToMarkdown = useAddFileToMarkdown(); 
+
++    const {availableUsers, availableIssuesAndPrs, addFileToMarkdown} = props; 
 
     return <>
         implementation here 
@@ -479,9 +474,7 @@ export function GitMarkdownEditorContainer() {
 
 ```
 
-
 But what about when this component sits inside another component? 
-
 
 ```jsx
 export function NewGithubIssueForm(props) {
@@ -501,7 +494,7 @@ export function NewGithubIssueForm(props) {
 }
 ```
 
-We'll have the same problem. We can't render this component without having to provide all the state that is required. 
+We'll have the same problem. We can't render this component without having to provide all the state that is required, and for that we'll need to one of the strategies like API mocking, module mocking, or dependency injection. 
 
 
 ## We could use prop drilling 
@@ -509,8 +502,6 @@ We'll have the same problem. We can't render this component without having to pr
 
 ```jsx
 export function NewGithubIssueForm(props) {
-
-
     return <div className="some-layout-type-stuff">
         <div className="more-layout-stuff1">
             <GithubIssueTitle
@@ -556,7 +547,7 @@ export function NewGithubIssuePage() {
 }
 ```
 
-(I'll concede that this example a little redundant as actually it does seem like `NewGithubIssueForm` is the top level component. However one can imagine a complex component that sits further down the tree)
+I'll concede that this example a little redundant as actually it does seem like `NewGithubIssueForm` is the top level component. However one can imagine a complex component that sits further down the tree.
 
 And at this point - I would say 'You know what? Prop drilling really isn't so bad if it means that your code is testable'. 
 
@@ -565,8 +556,6 @@ But one thing to note is that prop drilling can be potentially bad for performan
 ## Ah hah! But what about component composition? 
 
 Component composition would suggest that rather than passing props through multiple layers, we just pass rendered JSX as children (or in to slots). 
-
-ie.
 
 ```jsx
 export function NewGithubIssueForm(props) {
@@ -621,7 +610,7 @@ With this approach, whether you are doing component composition or not, you do g
 
 Note that the the component composition approach isn't going to prevent rerenders, (assuming no components are memoised), the top level object still rerenders when any of the hooks fire, and this causes all components rendered by the top level component to render. 
 
-Or while still using containers: 
+If we're using the containers + slots: 
 
 ```jsx
 
@@ -634,12 +623,19 @@ export function NewGithubIssuePage() {
 
 ```
 
+This will prevent additional renders and we no longer have a god object at the top.
+
+## So is container components and slots the answer? 
+
+I'm not sure it's practical or realistic to say 'container components will only ever exist at the top of our component tree'. 
+
+Take our markdown editor for example, probably we want to use it in a form. It makes sense that we would have a component call `SomethingARatherForm` and all of the logic required is in it. Maybe there's some custom logic with refs that relate to the markdown editor, and we just want to contain it in that component. If we require passing the the markdown editor in a slot, then we can no longer keep that logic bundled in nice spot. 
 
 ## Depending on your state management, sometimes you need to have your hooks in side inner components. 
 
-
 For example using Tanstack Query. 
-Basic example of what we want to do: 
+
+In this scenario we have a list of resturants and we want to have a button on each item to favourite the resturant. 
 
 https://codesandbox.io/p/sandbox/tanstack-query-demo-forked-n83w43?file=%2Fsrc%2FRestaurantList.tsx%3A13%2C23
 
@@ -647,12 +643,18 @@ If we try refactor it to to a container/presentational pattern:
 
 https://codesandbox.io/p/sandbox/tanstack-query-demo-forked-pdssfz?file=%2Fsrc%2FRestaurantList.tsx%3A52%2C17-52%2C36
 
-
 We can do it, but note that we need to manually add our own loading flags, the result of `mutateAsync` won't include the loading flags. 
 
 https://github.com/TanStack/query/discussions/4613
 
-## Micro error boundaries
+## Micro Error Boundaries
+
+React's [error boundaries](https://legacy.reactjs.org/docs/error-boundaries.html) can be used to catch runtime errors and display an error message, instead of blowing up the whole app. 
+
+The typical use of error boundaries is to put one at the top of the application and show a 'Something went wrong' type message if any runtime error is encountered. 
+
+However, we can put an error boundary at any level of the application, and we can put them around our components to have calls into global state.
+
 
 ```jsx
 function UserDisplayByIdInner(props) {
@@ -679,35 +681,42 @@ export function UserDisplayById(props) {
 
 ```
 
+Now we can use these components inside a regular component
+
 ```jsx
-
-
-
 function GitHubIssueLine(props){
     const {issue} = props; 
 
     return <div> 
-        <h3>{issue.title}</h3>
+        <a>{issue.title}</a>
         {issue.assigneeId && <UserDisplayById userId={issue.assigneeId}>}
     </div>
 }
-
-<GithubIssueLine issue ={{
-    issueNumber: "37", 
-    title: "posts/dependency_injecting_when_using-redux", 
-    assigneeId: "user-abc",
-    tags: ["tag-1"], 
-    comments: ["comment-id1"] 
-}}/>
-
-
-
 ```
 
+And in our tests, we don't need to provide the requisite global state, we just allow the component to error out, if we're not testing that part of the functionality. 
+
+```jsx
+describe(GithubIssueLine, () => {
+    it("Displays the issue title", () => {
+        render(<GithubIssueLine issue ={{
+            issueNumber: "37", 
+            title: "posts/dependency_injecting_when_using-redux", 
+            assigneeId: "user-abc",
+            tags: ["tag-1"], 
+            comments: ["comment-id1"] 
+        }}/>);
+
+        expect(screen.getByText("posts/dependency_injecting_when_using-redux")).toBeInTheDocument(); 
+    })
+}); 
+```
+
+Note that Create React App and Storybook does not play nicely with this. Storybook will still detect an error and show its error overlay. See [this Github issue](https://github.com/storybookjs/storybook/issues/23165).  
 
 ## End To End Tests
 
-Let's now shift tack and discuss end to end tests. ![Alt text](image.png)
+Let's now shift tack and discuss end to end tests.
 
 A key characteristic of E2E tests is that they're blackbox tests - they don't know or need to know about how the code is written in order to test it. Your Cypress E2E tests don't need to know if it's a React application, or what state management solution you're using, or whether it's frontend or backend rendered. 
 
@@ -733,16 +742,25 @@ Some downsides of E2E tests:
 
 
 
-
-
-
-
-
 ## Conclusions 
 
 Simplifying your data model is going to go a long way to simplifying your testing process. 
 
 Pure prop driven components are definitely the easiest to test. 
+
+Testing components that otherwise have global state anywhere in their component tree are otherwise going to require knowledge of any business logic inside the state management.
+
+Techniques like prop drilling or component composition can be used to avoid having provide stateful context for components further down the tree. 
+
+Error boundaries can used to prune components down the tree that otherwise would require stateful context. 
+
+Module mocking can be used to prune the cascade into the state management. Module mocking can be brittle, particularly if your components are being used in multiple contexts. 
+
+
+
+
+
+
 
 
 
