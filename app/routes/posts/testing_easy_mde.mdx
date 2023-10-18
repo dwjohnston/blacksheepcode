@@ -1,0 +1,538 @@
+
+# A comprehensive guide to testing with Easy-Markdown-Editor
+
+[Easy Markdown Editor](https://github.com/Ionaru/easy-markdown-editor) is a handy tool that provides a markdown editor. 
+
+The tool is built for vanilla JavaScript, but it's very easy to use with React.
+
+Writing tests can be a little bit difficult, so this is a guide to writing tests. 
+
+I'm writing this guide for testing with React Testing Library and Cypress. I've actually gone off RTL, but given that a lot of people are likely using RTL it's still worth writing a guide for. 
+
+## The code
+
+All of the code can be found in this repository here: [https://github.com/dwjohnston/easymde-test-examples](https://github.com/dwjohnston/easymde-test-examples).
+
+## The TL;DR
+
+If you just want the working code: 
+
+[See here for textarea usage](https://github.com/dwjohnston/easymde-test-examples/tree/main/src/examples/04_use_within_a_form) 
+
+[See here for contenteditable usage.](https://github.com/dwjohnston/easymde-test-examples/tree/main/src/examples/07_use_within_a_form_contenteditable)
+
+## What we want to do in a test
+
+These are the kind of interactions we might want to have with a markdown editor component: 
+
+<table>
+<thead>
+    <tr>
+        <td>Task</td>
+        <td>Example Scenario</td>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Enter some text</td>
+        <td>Everything</td>
+    </tr>
+    <tr>
+        <td>Assert that some text exists</td>
+        <td>Viewing an existing item, and then clicking 'edit' and expecting to see the markdown editor prepopulated.</td>
+    </tr>
+    <tr>
+        <td>Clear the text</td>
+        <td>When editing an existing item, it's handy to clear the field before adding the edited value.</td>
+    </tr>
+    <tr>
+        <td>Get the markdown editor's value from a form submission event</td>
+        <td>
+            <p>Pretty standard to use a markdown editor within a form.</p>
+            <p>For performance reasons I think it's always better to use uncontrolled components in a form, than controlled components that have to make state change on every keystroke.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>Get the markdown editor's value from a form reset event</td>
+        <td>You have a modal with the textarea button - clicking the 'close' button will trigger a form reset - and you use that to detect changes to show a 'Do you wish to abandon your changes?' message.</td>
+    </tr>
+    <tr>
+        <td>Submit a form with cmd/ctrl+enter</td>
+        <td>For an ordinary textfield (and most other form controls) the enter key will submit the form. For a textarea there is no browser standard for form submission, however by convention most websites will submit the form with cmd/ctrl+enter.</td>
+    </tr>
+    <tr>
+        <td>Use keyboard shortcuts (eg. cmd/ctrl+b)</td>
+        <td>If you've added the above cmd/ctrl+enter functionality you may have broken keyboard shortcuts, so it's useful to have a test for it.</td>
+    </tr>
+</tbody>
+</table>
+
+Ideally - we can interact with the component the exact same way we would with a standard `<textarea>` element. 
+
+
+## ContentEditable Vs Text Area 
+
+A lot of drama comes down to whether you want to the [`inputStyle`](https://github.com/Ionaru/easy-markdown-editor#configuration:~:text=CodeMirrorSpellChecker%2Dcompliant%20function.-,inputStyle,-%3A%20textarea%20or) configuration property - `"textarea"` or `"contenteditable"`. 
+
+Below is a summary table that outlines the pros and cons. 
+
+Ultimately - I think using the contenteditable approach is more reliable - as there is less interference with EasyMDE's magic. 
+However, if you're using React Testing Library or any JSDOM based solution, then you're going to need to use the textarea approach and so be aware of the pitfalls it has. 
+
+<table>
+<thead>
+    <tr>
+        <td></td>
+        <td>`contenteditable`</td>
+        <td>`textarea`</td>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+        <td>Cypress</td>
+            <p>✅No need to use force</p>
+            <p>✅Clear will work with initial values</p>
+            <p>🫤Can't use `have.value` assertions, we use `have.text` assertions.</p> 
+        <td>
+            <p>🫤Need to use `force:true`</p>
+            <p>❌Initial values play badly.</p>
+            <p>✅Can assert on value with `have.value`</p> 
+        </td>
+    </tr>
+    <tr>
+        <td>React Testing Library</td>
+        <td>
+            <p>Won't work.</p>
+            <p> 
+                <a href="https://github.com/jsdom/jsdom/issues/1670">JSDOM does not support `contenteditable`</a>
+            </p>
+        </td>
+        <td>
+            <p>❌Initial values play badly.</p>
+            <p>✅Can assert on value with `toHaveValue`</p> 
+        </td>
+    </tr>
+</tbody>
+</table>
+
+
+
+## Getting started - Textarea Method
+
+To start let's create our very basic React component. 
+
+Note that by default we are using `inputStyle: "textarea"`. 
+
+```tsx
+import { useEffect, useRef } from "react"
+
+import EasyMDE from "easymde";
+import "easymde/dist/easymde.min.css";
+
+export function MyMarkdownEditor() {
+
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const easyMdeRef = useRef<EasyMDE | null>(null);
+
+    useEffect(() => {
+
+        if(!textareaRef.current){
+            throw new Error("Textarea ref not found.")
+        }
+
+        // We only ever want EasyMDE to instantiate itself once.
+        // ie. We're doing this to avoid double render problems that show themselves in React 18. 
+        if(!easyMdeRef.current){
+            easyMdeRef.current= new EasyMDE({element: textareaRef.current});
+        }
+
+    }, [])
+
+    return <textarea ref={textareaRef}/>
+}
+```
+
+(I told you using EasyMDE with React was easy!)
+
+Our tests: 
+
+**Cypress**
+
+```jsx
+it("Sanity test - textarea", () => {
+    cy.mount(<textarea/>);
+    cy.findByRole("textbox").type("Hello World!");
+    cy.findByRole("textbox").should("have.value", "Hello World!")
+}); 
+
+it('Can find by role and type - if we use force', () => {
+    cy.mount(<MyMarkdownEditor/>);
+
+    cy.findByRole("textbox").type("Hello World!", {force: true});
+    cy.findByRole("textbox").should("have.value", "Hello World!")
+
+    cy.findByRole("textbox").clear().type("Goodbye World!", {force: true});
+    cy.findByRole("textbox").should("have.value", "Goodbye World!")
+});
+```
+
+**React Testing Library** 
+
+```jsx
+test("Sanity test - textarea", async () => {
+    render(<input />);
+    await userEvent.type(screen.getByRole("textbox"), "Hello World!");
+    expect(screen.getByRole("textbox")).toHaveValue("Hello World!")
+});
+
+test("MyMarkdownEditor", async () => {
+
+    render(<MyMarkdownEditor />)
+    await userEvent.type(screen.getByRole("textbox"), "Hello World!");
+    expect(screen.getByRole("textbox")).toHaveValue("Hello World!")
+
+    await userEvent.clear(screen.getByRole("textbox"))
+    await userEvent.type(screen.getByRole("textbox"), "Goodbye World!");
+    expect(screen.getByRole("textbox")).toHaveValue("Goodbye World!");
+})
+```
+
+☝️nb. Note for React Testing Library we also need to add some mock configuration to add a `getBoundingClientRect` function to the document. 
+This is exactly the reason why I don't like React Testing Library 
+
+So this all looks straightforward enough. The one thing that bugs me is that we need to use `force:true` when using Cypress. 
+
+This is because the textarea is actually hidden behind an element and Cypress by default will error in these scenarios.
+
+
+## Adding a label attribute 
+
+We probably don't want to select by role only, we probably want to select by role + label. 
+
+We can achieve this by adding this bit of code in our use effect: 
+
+```jsx
+const codeMirrorCodeEl = easyMdeRef.current.codemirror.getInputField()
+if (props.label) {
+    codeMirrorCodeEl.setAttribute("aria-label", props.label);
+}
+```
+
+Now we can write our tests with role + label selectors like: 
+
+```jsx
+it('Can find by role and label - if we use force', () => {
+    cy.mount(<MyMarkdownEditor label ="Enter Markdown"/>);
+
+    cy.findByRole("textbox", {name: "Enter Markdown"}).type("Hello World!", {force: true});
+    cy.findByRole("textbox", {name: "Enter Markdown"}).should("have.value", "Hello World!")
+
+    cy.findByRole("textbox", {name: "Enter Markdown"}).clear().type("Goodbye World!", {force: true});
+    cy.findByRole("textbox", {name: "Enter Markdown"}).should("have.value", "Goodbye World!")
+});
+```
+
+## Initial Value 
+
+Let's add an `initialValue` property so that we can mount the component with some text already entered. 
+
+We can try this: 
+
+```diff
+if(!easyMdeRef.current){
+    easyMdeRef.current= new EasyMDE({
+        element: textareaRef.current,
++       initialValue: props.initialText
+    });
+}     
+```
+
+But this doesn't actually work - the textarea that cypress finds won't actually have the value. 
+```js
+cy.mount(<MyMarkdownEditor initialText='Foo'/>);
+
+// Fails - expected '<textarea>' to have value 'Foo', but the value was ''
+cy.findByRole("textbox").should("have.value", "Foo")
+```
+
+Our RTL test fails with a similar error. 
+
+We can fix this hacking a set of the textarea value in our useEffect. 
+
+```js
+const codeMirrorCodeEl = easyMdeRef.current.codemirror.getInputField();
+codeMirrorCodeEl.value = props.initialText ?? ''; 
+```
+
+Our RTL test now runs fine, but our Cypress test now has issues. 
+Firstly, it starts giving us a 
+
+>cy.clear() failed because the center of this element is hidden from view:
+
+warning, so let's put force on that. 
+
+However, we now run into an odd edge case with cypress functionality. Essentially Cypress's [`clear`](https://docs.cypress.io/api/commands/clear) command appears to only remove the first letter from the editor. 
+
+```js
+  it('Can find by role and type - if we use force', () => {
+    cy.mount(<MyMarkdownEditor initialText='Foo'/>);
+
+    cy.findByRole("textbox").should("have.value", "Foo")
+
+    cy.findByRole("textbox").clear({force:true}).type("Goodbye World!", {force: true});
+    // These are fine, the text in the textarea is clear and entered fine. 
+    // The text that remains is in easymde, but is not part of the text area
+    cy.findByRole("textbox").should("have.value", "Goodbye World!")
+    cy.findByRole("textbox").should("not.have.value", "Goodbye World!oo")
+
+    // Errors because there is an additional 'oo' in the texteditor
+    cy.get(".CodeMirror-line").should("have.text", "Goodbye World!")
+    cy.get(".CodeMirror-line").should("not.have.text", "Goodbye World!oo")
+
+  });
+```
+
+I don't know of a fix for this problem, other than to use the contenteditable approach which I'll outline later. 
+
+
+## Making available in a form 
+
+Ignoring the above problem about clearing a form, let's continue with form submission. 
+
+We can make the textarea be accessible as part of the form by adding the `name` property: 
+
+```jsx
+if (props.name) {
+    codeMirrorCodeEl.setAttribute("name", props.name);
+}
+```
+
+In Cypress we can use a spy to detect our form submissions: 
+
+```jsx  
+it("Can be submitted in a form", () => {
+
+    const submitSpy = cy.spy().as("submitSpy");
+    cy.mount(<form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const markdownValue = formData.get("markdown");
+        submitSpy(markdownValue);
+      }}
+    >
+      <MyMarkdownEditor name="markdown" />
+      <button type="submit">Submit</button>
+    </form>);
+
+    cy.findByRole("textbox").type("Hello World!", {force:true});
+    cy.findByRole("textbox").should("have.value", "Hello World!")
+    cy.findByRole("button", { name: "Submit" }).click();
+
+    cy.get("@submitSpy").should("have.been.calledWith", "Hello World!")
+
+  });
+```
+
+And in RTL we can use a jest.fn or vi.fn similarly 
+
+```jsx
+test("MyMarkdownEditor - form submission", async  () => {
+    const submitHandler = vi.fn();
+    render(<form onSubmit = {(e) => {
+        e.preventDefault(); 
+        const formData = new FormData(e.currentTarget); 
+        const markdown = formData.get("markdown");
+
+        submitHandler(markdown);
+    }}><MyMarkdownEditor name ="markdown" label ="Enter Markdown"/>
+        <button type ="submit">Submit</button>
+    </form>)
+
+    await userEvent.type(screen.getByRole("textbox", {name: "Enter Markdown"}), "Hello World!"); 
+    await userEvent.click(screen.getByRole("button", {name: "Submit"})); 
+
+    expect(submitHandler).toHaveBeenCalledWith("Hello World!")
+}); 
+```
+
+So far, so good. 
+
+We also need to check that if we submit the form immediately without making any changes, that the intial value will be submitted: 
+
+```jsx
+  it("Initial Value Works", () => {
+
+    const submitSpy = cy.spy().as("submitSpy");
+    cy.mount(<form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const markdownValue = formData.get("markdown");
+        submitSpy(markdownValue);
+      }}
+    >
+      <MyMarkdownEditor name="markdown" initialValue='Foo Bar' label ="Enter Text"/>
+      <button type="submit">Submit</button>
+    </form>);
+
+    cy.findByRole("button", { name: "Submit" }).click();
+    cy.get("@submitSpy").should("have.been.calledWith", "Foo Bar")
+  });
+```
+
+This works fine. 
+
+```jsx
+  it("Initial Value + extra text works", () => {
+
+    const submitSpy = cy.spy().as("submitSpy");
+    cy.mount(<form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const markdownValue = formData.get("markdown");
+        submitSpy(markdownValue);
+      }}
+    >
+      <MyMarkdownEditor name="markdown" initialValue='Foo Bar' label ="Enter Text"/>
+      <button type="submit">Submit</button>
+    </form>);
+
+    cy.findByRole("textbox", {name: "Enter Text"}).type("Hello World!", {force:true});
+    cy.findByRole("button", { name: "Submit" }).click();
+
+
+    // expected submitSpy to have been called with arguments "Hello World!Foo Bar"
+    // The following calls were made:
+    // submitSpy("Hello World!") at submitSpy
+    cy.get("@submitSpy").should("have.been.calledWith", "Hello World!Foo Bar")
+
+  });
+``` 
+
+This does not. The problem is, what we can see in the text editor shows the combination of both the intial text and the new entered text, but the textarea element itself only has the newly entered text. 
+
+At this point we need to go down the path of hacking the textarea's value on submission, which I won't get into right now, but I'll mention in the next section. 
+
+I'll note though - won't have these problems with the contenteditable approach. 
+
+## Reseting forms 
+
+With form resetting, there are a couple of gnarls we need to work out. 
+
+Essentially we want be able to write these tests: 
+
+```jsx
+  it("Reset works - resets the text, calls reset with current value", () => {
+
+    const submitSpy = cy.spy().as("submitSpy");
+    const resetSpy = cy.spy().as("resetSpy");
+    cy.mount(<form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const markdownValue = formData.get("markdown");
+        submitSpy(markdownValue);
+      }}
+
+      onReset={(e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.currentTarget);
+        const markdownValue = formData.get("markdown");
+        resetSpy(markdownValue);
+      }}
+    >
+      <MyMarkdownEditor name="markdown" label="My Label" />
+      <button type="submit">Submit</button>
+      <button type="reset">Reset</button>
+    </form>);
+
+    cy.findByRole("textbox", {name: "My Label"}).type("Hello World!", {force:true});
+    cy.findByRole("textbox", {name: "My Label"}).should("have.value", "Hello World!")
+
+    cy.findByRole("button", { name: "Reset" }).click();
+    cy.get("@resetSpy").should("have.been.calledWith", "Hello World!")
+    
+    //Errors here: 
+    //expected '<textarea>' not to have value 'Hello World!'
+    cy.findByRole("textbox", {name: "My Label"}).should("not.have.value", "Hello World!")
+    cy.findByRole("textbox", {name: "My Label"}).should("have.value", "")
+});
+
+```
+
+This appears to be a bug on EasyMDE. We can fix it by adding this a reset handler to our form. 
+
+```js
+function findNearestFormAncestor(element: HTMLElement) {
+    let currentElement = element as HTMLElement | null;
+
+    while (currentElement) {
+        if (currentElement.tagName === 'FORM') {
+            return currentElement; // Found a form element, return it
+        }
+
+        currentElement = currentElement.parentElement; // Move up to the parent element
+    }
+
+    return null; // No form element found in the ancestor chain
+}
+
+const formElement = findNearestFormAncestor(textareaRef.current);
+
+if (formElement) {
+    // As promised - the fix for intial value + new data on form submission. 
+    // Note that this means that the textarea won't have it's updated value until form submission
+    // So you can't make assertions until then.
+    formElement.addEventListener("submit", () => {
+        codeMirrorCodeEl.value= easyMdeRef.current?.value() ?? '';
+    }); 
+
+    // Fix for: https://github.com/Ionaru/easy-markdown-editor/issues/559
+    formElement.addEventListener("reset", () => {
+        codeMirrorCodeEl.value= easyMdeRef.current?.value() ?? '';
+
+        setTimeout(() => {
+            easyMdeRef.current?.value(props.initialValue ??'')
+            codeMirrorCodeEl.value = props.initialValue ??''
+        }, 0)
+    })
+
+
+}
+```
+
+Essentially what we need to do is: 
+
+1. We need to find the form element that the markdown editor is in, so we can add an event listener to its reset events. 
+2. On reset, we first set the textarea to have the current value of the text editor. The reset event then propagates as normal. 
+3. In the next event loop, we now set the value of both the EasyMDE editor, and the textarea back to the initial value. 
+
+## ContentEditable approach
+
+Now let's talk through the contenteditable approach. 
+
+I won't walk through it step by step. 
+
+Here is the full solution. 
+
+Here are the key highlights. 
+
+1. We're not going to be able to use RTL to test this. 
+2. We'll just add a data-testid to the textarea so we can interact with it that way. We don't need to use `force:true`.
+3. We don't assert value with `have.value`. Instead we use `have.text`. 
+4. We now have a hidden input inside the markdown editor that contains the value for form submission. 
+
+
+
+
+
+
+
+
