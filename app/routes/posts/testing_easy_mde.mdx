@@ -21,6 +21,8 @@ If you just want the working code:
 
 [See here for contenteditable usage.](https://github.com/dwjohnston/easymde-test-examples/tree/main/src/examples/07_use_within_a_form_contenteditable)
 
+I recommend using the `contenteditable` approach - but note that this is not possible for RTL. 
+
 ## What we want to do in a test
 
 These are the kind of interactions we might want to have with a markdown editor component: 
@@ -165,7 +167,7 @@ it("Sanity test - textarea", () => {
     cy.findByRole("textbox").should("have.value", "Hello World!")
 }); 
 
-it('Can find by role and type - if we use force', () => {
+it('Can find by role - if we use force', () => {
     cy.mount(<MyMarkdownEditor/>);
 
     cy.findByRole("textbox").type("Hello World!", {force: true});
@@ -197,12 +199,47 @@ test("MyMarkdownEditor", async () => {
 })
 ```
 
-☝️nb. Note for React Testing Library we also need to add some mock configuration to add a `getBoundingClientRect` function to the document. 
-This is exactly the reason why I don't like React Testing Library 
+☝️nb. Note for React Testing Library we also need to add some mock configuration to add a `getBoundingClientRect` function to the document. [See this here.](https://github.com/dwjohnston/easymde-test-examples/blob/3f61c7912efaade81c68a7e96eb6914582c1f1b6/src/setupTests.js)
+This is exactly the reason why I don't like React Testing Library.  
 
 So this all looks straightforward enough. The one thing that bugs me is that we need to use `force:true` when using Cypress. 
 
 This is because the textarea is actually hidden behind an element and Cypress by default will error in these scenarios.
+
+## Two textareas 
+
+It's important to note that in `textarea` mode there are two textareas that are rendered. 
+
+One is the base textarea that we declared ourself: 
+
+```jsx
+    return <textarea ref={textareaRef}/>
+```
+
+EasyMDE puts a `display:none` on this element. 
+
+The other is one that the EasyMDE library inserts into the DOM. This is the one that will be returned with from the `easyMdeRef.current.codemirror.getInputField()` call. 
+
+It is this second textarea that the user ends up interacting with, though it's actually hidden from view. 
+
+If you want to really understand it - it can be helpful to add this code: 
+
+```js
+const widthToBe = easyMdeRef.current.codemirror.getWrapperElement().clientWidth;
+const existingStyle = easyMdeRef.current.codemirror.getInputField().getAttribute("style")
+easyMdeRef.current.codemirror.getInputField().setAttribute('style', existingStyle + `width: ${widthToBe}px; z-index:100; border: solid 1px red;`)
+const parent =  easyMdeRef.current.codemirror.getInputField().parentElement
+const parentStyle = parent?.getAttribute("style"); 
+parent?.setAttribute("style", parentStyle + "overflow: visible;");
+```
+
+This will make the textarea visible. 
+
+Importantly note that it this textarea _doesn't always contain the complete value of the markdown editor_. 
+
+As an example, add an initialValue and then click the textarea - note that it doesn't contain the intialValue. Now press cmd/ctrl + a - note that it does! 
+
+This is important because it means in our tests when we go to submit a form, or assert on the value of an element it won't necessarily contain the value of what is visible in the editor.
 
 
 ## Adding a label attribute 
@@ -247,7 +284,9 @@ if(!easyMdeRef.current){
 }     
 ```
 
-But this doesn't actually work - the textarea that cypress finds won't actually have the value. 
+But this doesn't actually work - the textarea that cypress finds won't actually have the value. This comes back to the point about two textareas - the interactable textarea doesn't contain the initial value. 
+
+
 ```js
 cy.mount(<MyMarkdownEditor initialText='Foo'/>);
 
@@ -274,7 +313,7 @@ warning, so let's put force on that.
 However, we now run into an odd edge case with cypress functionality. Essentially Cypress's [`clear`](https://docs.cypress.io/api/commands/clear) command appears to only remove the first letter from the editor. 
 
 ```js
-  it('Can find by role and type - if we use force', () => {
+  it('Can find by role - if we use force', () => {
     cy.mount(<MyMarkdownEditor initialText='Foo'/>);
 
     cy.findByRole("textbox").should("have.value", "Foo")
@@ -359,7 +398,7 @@ test("MyMarkdownEditor - form submission", async  () => {
 
 So far, so good. 
 
-We also need to check that if we submit the form immediately without making any changes, that the intial value will be submitted: 
+We also need to check that if we submit the form immediately without making any changes, that the initial value will be submitted: 
 
 ```jsx
   it("Initial Value Works", () => {
@@ -414,13 +453,36 @@ This works fine.
   });
 ``` 
 
-This does not. The problem is, what we can see in the text editor shows the combination of both the intial text and the new entered text, but the textarea element itself only has the newly entered text. 
+This does not. The problem is, what we can see in the text editor shows the combination of both the initial text and the new entered text, but the textarea element itself only has the newly entered text. 
 
 At this point we need to go down the path of hacking the textarea's value on submission, which I won't get into right now, but I'll mention in the next section. 
 
 I'll note though - won't have these problems with the contenteditable approach. 
 
-## Reseting forms 
+
+I will note that instead of doing this: 
+
+```jsx
+if (props.name) {
+    codeMirrorCodeEl.setAttribute("name", props.name);
+}
+```
+
+We could put a `name` property on the base text area 
+
+ie. 
+
+```jsx
+    return <textarea ref={textareaRef} name={props.name}/>
+```
+
+I haven't explored this, and likely it has will have it's own set of problems. 
+
+The problem I see it with this approach is that we'd need to use two different sets of selectors - one for interacting (eg. typing) and another for getting the value and also containing the value for form submission.
+This seems a bit confusing, though I guess you could add testids like 'markdown-editor-for-typing' and 'markdown-editor-for-reading'.  
+
+
+## Resetting forms 
 
 With form resetting, there are a couple of gnarls we need to work out. 
 
@@ -518,9 +580,7 @@ Essentially what we need to do is:
 
 Now let's talk through the contenteditable approach. 
 
-I won't walk through it step by step. 
-
-Here is the full solution. 
+[Here is the full solution.](https://github.com/dwjohnston/easymde-test-examples/tree/main/src/examples/07_use_within_a_form_contenteditable) 
 
 Here are the key highlights. 
 
@@ -529,10 +589,80 @@ Here are the key highlights.
 3. We don't assert value with `have.value`. Instead we use `have.text`. 
 4. We now have a hidden input inside the markdown editor that contains the value for form submission. 
 
+```tsx
+export function MyMarkdownEditor(props: {
+    name?: string;
+    label?: string;
+    initialValue?: string;
+}) {
 
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const easyMdeRef = useRef<EasyMDE | null>(null);
 
+    useEffect(() => {
 
+        if (!textareaRef.current) {
+            throw new Error("Textarea ref not found.")
+        }
 
+        if (!easyMdeRef.current) {
+            easyMdeRef.current = new EasyMDE({
+                element: textareaRef.current,
+                initialValue: props.initialValue,
+                inputStyle: "contenteditable",  
+                
+            });
+
+            // Add the aria-label, testid to the contenteditable div
+            const codeMirrorCodeEl = easyMdeRef.current.codemirror.getInputField()
+            if (props.label) {
+                codeMirrorCodeEl.setAttribute("aria-label", props.label);
+            }
+            codeMirrorCodeEl.setAttribute("data-testid", "markdown-editor");
+           
+            const formElement = findNearestFormAncestor(textareaRef.current);
+
+            if (formElement) {
+
+                // Add a hidden input in, this is what will be submitted in forms
+                const hiddenInput = document.createElement("input");
+                if (props.name) {
+                    hiddenInput.setAttribute("name", props.name);
+                }
+                hiddenInput.setAttribute("type", "hidden");                
+                easyMdeRef.current.codemirror.getWrapperElement().appendChild(hiddenInput);
+
+                // Fix for: https://github.com/Ionaru/easy-markdown-editor/issues/559
+                formElement.addEventListener("reset", () => {
+                    // First set the textarea value to be the current value, so that the reset event fires with that
+                    hiddenInput.value= easyMdeRef.current?.value() ?? '';
+
+                    // And then reset it 
+                    setTimeout(() => {
+                        easyMdeRef.current?.value(props.initialValue ??'')
+                        
+                    }, 0)
+                })
+                
+                // When we submit a form set the value into the hidden input
+                formElement.addEventListener("submit", () => {
+                    hiddenInput.value= easyMdeRef.current?.value() ?? '';
+                })
+
+            }
+        }
+        return () => {
+
+        }
+    }, [])
+
+    return <textarea ref={textareaRef}></textarea>
+}
+```
+
+I think this solution is a lot cleaner. We're not hacking at EasyMDE's textarea values - we just let it do its thing. We just add an extra `<input type="hidden">` to contain the data. 
+
+We can't make assertions against an element's value (as there is none, it's a contenteditable div), but we make assertions against text content instead, which seems reasonable. 
 
 
 
