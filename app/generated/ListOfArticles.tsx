@@ -104,6 +104,13 @@
                 
                 <li>
                 <a
+                    href="/posts/testing_easy_mde"
+                >
+                    testing_easy_mde        </a>
+            </li>
+                
+                <li>
+                <a
                     href="/posts/testing_strategies"
                 >
                     testing_strategies        </a>
