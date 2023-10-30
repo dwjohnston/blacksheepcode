@@ -2,42 +2,36 @@ import parseFrontMatter from "front-matter";
 import { readFile, stat, readdir } from "./fs.server"
 import path from "path";
 import { bundleMDX } from "./mdx.server";
-export type Post = {
-  slug: string;
-  title: string;
-};
 
-export type PostMarkdownAttributes = {
-  title: string;
-};
-
-
+// The frontmatter can be any set of key values 
+// But that's not especially useful to use
+// So we'll declare our own set of properties that we are going to expect to exist 
 export type Frontmatter = {
   meta?: {
     title?: string;
     description?: string;
   }
-
-  _fileStats: {
-    dateCreated: string;
-    dateLastModified: string;
-  }
 }
 
+/**
+ * Get the React component, and frontmatter JSON for a given slug
+ * @param slug 
+ * @returns 
+ */
 export async function getPost(slug: string) {
 
   const filePath = path.join(`${__dirname}/../../app/blog-posts`, slug + ".mdx");
 
-  const [source, stats] = await Promise.all([
+  const [source] = await Promise.all([
     readFile(
       filePath,
       "utf-8"
-    ),
-    stat(filePath)
-
+    )
   ]);
 
-  const [rehypeHighlight, remarkGfm, rehypeAutolinkHeadings, remarkMdxImages, remarkToc, rehypeSlug] = await Promise.all([
+  // Dyamically import all the rehype/remark plugins we are using 
+  // (Netlify won't allow us to import them directly)
+  const [rehypeHighlight, remarkMdxImages, remarkToc, rehypeSlug] = await Promise.all([
     import("rehype-highlight").then((mod) => mod.default),
     import("remark-gfm").then((mod) => mod.default),
     import("rehype-autolink-headings").then((mod) => mod.default),
@@ -46,15 +40,14 @@ export async function getPost(slug: string) {
     import("rehype-slug").then((mod) => mod.default),
   ])
 
-  if(!process.env.NODE_ENV){
-    throw new Error("process.env.NODE_ENV did not exist")
-  }
-
   const post = await bundleMDX<Frontmatter>({
     source,
     cwd: process.cwd(),
 
     esbuildOptions: (options) => {
+
+      // Configuration to allow image loading 
+      // https://github.com/kentcdodds/mdx-bundler#image-bundling
       options.loader = {
         ...options.loader,
         '.png': 'dataurl',
@@ -62,35 +55,33 @@ export async function getPost(slug: string) {
 
       options.define = {
         ...options.define, 
-        "process.env.NODE_ENV": process.env.NODE_ENV
+        // Not sure what the purpose of this is, but it is neccessary
+        // Netlify production builds fail at runtime otherwise
+        // https://github.com/evanw/esbuild/issues/44
+        "process.env.NODE_ENV": "production"
       }
 
       return options;
     },
     mdxOptions: (options) => {
       options.remarkPlugins = [...(options.remarkPlugins ?? []), remarkToc, remarkMdxImages],
-      options.rehypePlugins = [...(options.rehypePlugins ?? []), rehypeHighlight,rehypeSlug, [rehypeAutolinkHeadings, {behavior: "wrap"}]]
-
+      options.rehypePlugins = [...(options.rehypePlugins ?? []), rehypeHighlight,rehypeSlug]
       return options
-
     }
-
   });
-
 
   return {
     ...post,
     frontmatter: {
       ...post.frontmatter,
-      _fileStats: {
-        dateLastModified: stats.mtime,
-        dateCreated: stats.ctime,
-
-      }
     }
   }
 }
 
+/**
+ * Get all frontmatter for all posts
+ * @returns 
+ */
 export async function getPosts() {
   const postsPath = await readdir(`${__dirname}/../../app/blog-posts/posts`, {
     withFileTypes: true,
@@ -100,11 +91,10 @@ export async function getPosts() {
     postsPath.map(async (dirent) => {
 
       const filePath = path.join(`${__dirname}/../../app/blog-posts/posts`, dirent.name)
-      const [file, stats] = await Promise.all([readFile(
+      const [file] = await Promise.all([readFile(
         filePath,
-      ), 
-      stat(filePath)
-    ])
+      )
+      ])
       const frontmatter = parseFrontMatter(file.toString());
       const attributes = frontmatter.attributes as Frontmatter;
 
@@ -112,11 +102,6 @@ export async function getPosts() {
         slug: dirent.name.replace(/\.mdx/, ""),
         frontmatter: {
           ...attributes, 
-          _fileStats: {
-            dateLastModified: stats.mtime,
-            dateCreated: stats.ctime,
-    
-          }
         }
       };
     })
