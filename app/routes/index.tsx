@@ -6,7 +6,7 @@ import { useLoaderData } from "@remix-run/react";
 
 export async function loader(data: DataFunctionArgs) {
   const posts = await getPosts();
-  return [...posts].sort((a, b) => a.frontmatter._fileStats.dateCreated < b.frontmatter._fileStats.dateCreated ? 1: -1); 
+  return posts;
 }
 
 
@@ -20,21 +20,24 @@ function BlogItem(props: {
   const {item} = props
   return <div className= "blog-item">
     <a href={`/posts/${item.slug}`}> <h3>{item.frontmatter.meta?.title ?? item.slug} </h3></a>
-
-    {item.frontmatter._fileStats.dateCreated}
     <p>{item.frontmatter.meta?.description}</p>
 
   </div>
 }
 
-export default function Index() {
-
+function ListOfBlogPosts() {
   const data = useLoaderData<Array<{
     slug: string; 
     frontmatter: Frontmatter;
   }>>(); 
+  return <>
+      {data.map((v) => {
+          return <BlogItem item={v} key={v.slug}/>
+        })}
+  </>
+}
 
-
+export default function Index() {
   return (
 
     <>
@@ -73,10 +76,8 @@ export default function Index() {
       <div className="main">
 
         <h2>Blog</h2>
-
-        {data.map((v) => {
-          return <BlogItem item={v} key={v.slug}/>
-        })}
+        <ListOfBlogPosts/>
+    
       </div>
 
       <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>
