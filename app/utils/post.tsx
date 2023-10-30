@@ -36,33 +36,21 @@ export async function getPost(slug: string) {
     stat(filePath)
 
   ]);
-  const rehypeHighlight = await import("rehype-highlight").then(
-    (mod) => mod.default
-  );
-  const { default: remarkGfm } = await import("remark-gfm");
-  const { default: rehypeAutolinkHeadings } = await import(
-    "rehype-autolink-headings"
-  );
 
-  const { default: remarkMdxImages } = await import("remark-mdx-images")
-
-  const { default: rehypeToc } = await import("rehype-toc");
-  const { default: rehypeSlug } = await import("rehype-slug");
-
-  const [remarkToc] = await Promise.all([
+  const [rehypeHighlight, remarkGfm, rehypeAutolinkHeadings, remarkMdxImages, remarkToc, rehypeSlug] = await Promise.all([
+    import("rehype-highlight").then((mod) => mod.default),
+    import("remark-gfm").then((mod) => mod.default),
+    import("rehype-autolink-headings").then((mod) => mod.default),
+    import("remark-mdx-images").then((mod) => mod.default),
     import("remark-toc").then((mod) => mod.default),
-  ]);
-
-
-  console.log(process.cwd())
+    import("rehype-slug").then((mod) => mod.default),
+  ])
 
   const post = await bundleMDX<Frontmatter>({
     source,
     cwd: process.cwd(),
 
     esbuildOptions: (options) => {
-
-      console.log(options)
       options.loader = {
         ...options.loader,
         '.png': 'dataurl',
@@ -71,10 +59,8 @@ export async function getPost(slug: string) {
       return options;
     },
     mdxOptions: (options) => {
-
-
       options.remarkPlugins = [...(options.remarkPlugins ?? []), remarkToc, remarkMdxImages],
-        options.rehypePlugins = [...(options.rehypePlugins ?? []), rehypeHighlight, rehypeAutolinkHeadings]
+      options.rehypePlugins = [...(options.rehypePlugins ?? []), rehypeHighlight,rehypeSlug, [rehypeAutolinkHeadings, {behavior: "wrap"}]]
 
       return options
 
