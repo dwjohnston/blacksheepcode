@@ -1,26 +1,30 @@
+body {
+    margin: 0;
+}
+
 .main {
     max-width: 600px;
     display: block;
     margin: 50px auto;
     border: solid 1px black;
-
     padding: 2em;
-
-
-
 }
 
+.blog-item {
+    border: solid 1px #aab;
+    background-color: #fcfcff; 
+    border-radius: 0.25em;
+    padding: 1em;
+    margin: 1em; 
+}
 
 .open-source {
     text-align: center;
 }
 
-
 body {
     background-color: #aab; 
-
-
-  font-family: 'Open Sans';
+    font-family: 'Open Sans';
 }
 
 header {
@@ -28,10 +32,10 @@ header {
     padding: 0.25em;
 
 }
+
 header>div {
     max-width: 800px;
     margin: 0 auto; 
-
 }
 
 header a {

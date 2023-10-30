@@ -1,6 +1,40 @@
 import { ListOfArticles } from "~/generated/ListOfArticles";
 import mainIcon from "../assets/blacksheep_100x100.webp";
+import { DataFunctionArgs } from "@remix-run/server-runtime";
+import { Frontmatter, getPosts } from "~/utils/post";
+import { useLoaderData } from "@remix-run/react";
+
+export async function loader(data: DataFunctionArgs) {
+  const posts = await getPosts();
+  return [...posts].sort((a, b) => a.frontmatter._fileStats.dateCreated < b.frontmatter._fileStats.dateCreated ? 1: -1); 
+}
+
+
+function BlogItem(props: {
+  item: {
+    slug: string; 
+    frontmatter: Frontmatter;
+  }
+}) {
+
+  const {item} = props
+  return <div className= "blog-item">
+    <a href={`/posts/${item.slug}`}> <h3>{item.frontmatter.meta?.title ?? item.slug} </h3></a>
+
+    {item.frontmatter._fileStats.dateCreated}
+    <p>{item.frontmatter.meta?.description}</p>
+
+  </div>
+}
+
 export default function Index() {
+
+  const data = useLoaderData<Array<{
+    slug: string; 
+    frontmatter: Frontmatter;
+  }>>(); 
+
+
   return (
 
     <>
@@ -39,7 +73,10 @@ export default function Index() {
       <div className="main">
 
         <h2>Blog</h2>
-        <ListOfArticles />
+
+        {data.map((v) => {
+          return <BlogItem item={v} key={v.slug}/>
+        })}
       </div>
 
       <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>
