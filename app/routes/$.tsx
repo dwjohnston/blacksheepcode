@@ -1,5 +1,4 @@
-import { Outlet, useLoaderData, useLocation } from "@remix-run/react"
-import { useEffect, useState } from "react";
+import {  useLoaderData, useLocation } from "@remix-run/react"
 import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
 import PostComments from "~/components/PostComments/PostComments";
 import { DataFunctionArgs, LoaderFunction, json } from "@remix-run/server-runtime";
@@ -33,7 +32,8 @@ function PostHeader(props: {
 }) {
 
     const { frontmatter } = props;
-
+    // My header is empty but this is potentially where we can add tags
+    // Make the h1 come from the post frontmatter, etc. 
     return <>
     </>
 }
