@@ -1,5 +1,5 @@
 import parseFrontMatter from "front-matter";
-import { readFile, stat, readdir } from "./fs.server"
+import { readFile, readdir } from "./fs.server"
 import path from "path";
 import { bundleMDX } from "./mdx.server";
 
@@ -31,9 +31,8 @@ export async function getPost(slug: string) {
 
   // Dyamically import all the rehype/remark plugins we are using 
   // (Netlify won't allow us to import them directly)
-  const [rehypeHighlight, remarkMdxImages, remarkToc, rehypeSlug] = await Promise.all([
+  const [rehypeHighlight,  rehypeAutoLink, remarkMdxImages, remarkToc, rehypeSlug] = await Promise.all([
     import("rehype-highlight").then((mod) => mod.default),
-    import("remark-gfm").then((mod) => mod.default),
     import("rehype-autolink-headings").then((mod) => mod.default),
     import("remark-mdx-images").then((mod) => mod.default),
     import("remark-toc").then((mod) => mod.default),
@@ -52,13 +51,13 @@ export async function getPost(slug: string) {
         ...options.loader,
         '.png': 'dataurl',
       };
-
+      options.platform="neutral",
       options.define = {
         ...options.define, 
         // Not sure what the purpose of this is, but it is neccessary
         // Netlify production builds fail at runtime otherwise
         // https://github.com/evanw/esbuild/issues/44
-        "process.env.NODE_ENV": "production"
+        // "process.env.NODE_ENV": "production"
       }
 
       return options;
