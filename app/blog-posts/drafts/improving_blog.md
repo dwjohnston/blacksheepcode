@@ -32,3 +32,7 @@ Additional items:
 - Add a 'date created' and 'last modfified' indicator to the posts. 
 
 
+## The Solution 
+
+I've essentially looked how [Kent C. Dodds' builds his blog](https://github.com/kentcdodds/kentcdodds.com), and copied that. 
+
