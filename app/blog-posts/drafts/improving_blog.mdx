@@ -6,6 +6,7 @@ meta:
 
 import {GithubPermalink} from "react-github-permalink";
 
+# How to configure Remix and mdx-bundler
 
 This post outlines a process I took to improve this blog. 
 
@@ -46,7 +47,7 @@ At first I looked at how [Kent C. Dodds' builds his blog](https://github.com/ken
 
 One of the top search results for 'remix mdx-bundler' gives us [this Oldweb2 blog post](https://blog.oldweb2.com/remix-mdx-blog), which is a lot simpler. However, this post is quite out of date. However, it was a useful starting point in understanding the general strategy of using mdx-bundler. 
 
-This solution is for Netlify. 
+This solution is for Netlify and Remix 1.x.x. 
 
 
 ### Move all of your MDX files out of the routes directory 
@@ -75,13 +76,15 @@ The [`.server.ts` file convention](https://remix.run/docs/en/main/file-conventio
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/842731a1f96f909fa914792e2dd4a3b135e82b5a/app/routes/$.tsx#L1-L58"/>
 
+### Update a pages metadata based on frontmatter
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/a600d7602d42733909890cc0bcd9cc2bd17a32cf/app/routes/$.tsx#L17-L28"/>
+
 ### Create home page list of blog posts
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/afbc9a277dff3518b96db345dee6ad9c0c2d4a0e/app/routes/index.tsx#L7-L38"/>
 
-### Problem with importing external dependencies 
-
-I've run into an issues where I can't just import 
+---
 
 And there you have it!
 
