@@ -1,16 +1,30 @@
-import {  useLoaderData, useLocation } from "@remix-run/react"
+import { useLoaderData, useLocation } from "@remix-run/react"
+import { MetaFunction } from "@remix-run/node";
 import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
 import PostComments from "~/components/PostComments/PostComments";
 import { DataFunctionArgs, LoaderFunction, json } from "@remix-run/server-runtime";
 import { getMDXComponent } from "mdx-bundler/client";
 import { useMemo } from "react";
-import { Frontmatter, getPost } from "~/utils/post";
+import { Frontmatter, getPost } from "~/utils/post.server";
 
 
 
 type LoaderData = {
     frontmatter: any;
     code: string;
+};
+
+export const meta: MetaFunction = (arg) => {
+    const frontmatter = arg.data.frontmatter as Frontmatter;
+    const title = frontmatter.meta?.title ?? "Black Sheep Code";
+    const description = frontmatter.meta?.description ?? undefined;
+
+    return {
+        title,
+        description,
+        "twitter:title": title,
+        "twitter:description": description,
+    };
 };
 
 export const loader: LoaderFunction = async ({ params, request }: DataFunctionArgs) => {
