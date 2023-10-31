@@ -38,6 +38,10 @@ export async function getPost(slug: string) {
     import("rehype-slug").then((mod) => mod.default),
   ])
 
+  if(!process.env.NODE_ENV){
+    throw new Error("process.env.NODE_ENV did not exist")
+  }
+
   const post = await bundleMDX<Frontmatter>({
     source,
     cwd: process.cwd(),
@@ -59,6 +63,11 @@ export async function getPost(slug: string) {
         // "process.env.NODE_ENV": "production"
 
         "process.env": JSON.stringify(process.env)
+      }
+
+      options.define = {
+        ...options.define, 
+        "process.env.NODE_ENV": process.env.NODE_ENV
       }
 
       return options;
