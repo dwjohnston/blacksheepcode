@@ -19,7 +19,7 @@ export type Frontmatter = {
  * @returns 
  */
 export async function getPost(slug: string) {
-  const filePath = path.join(`${process.cwd()}/app/blog-posts`, slug + ".mdx");
+  const filePath = path.join(`./app/blog-posts`, slug + ".mdx");
 
   const [source] = await Promise.all([
     readFile(
@@ -92,14 +92,14 @@ export async function getPost(slug: string) {
  * @returns 
  */
 export async function getPosts() {
-  const postsPath = await readdir(`${process.cwd()}/app/blog-posts/posts`, {
+  const postsPath = await readdir(`./app/blog-posts/posts`, {
     withFileTypes: true,
   });
 
   const posts = await Promise.all(
     postsPath.map(async (dirent) => {
 
-      const filePath = path.join(`${process.cwd()}/app/blog-posts/posts`, dirent.name)
+      const filePath = path.join(`./app/blog-posts/posts`, dirent.name)
       const [file] = await Promise.all([readFile(
         filePath,
       )
