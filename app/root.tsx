@@ -10,7 +10,8 @@ import {
 import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
-export const meta: MetaFunction = (...args) => {
+import githubPermalinkStyles from "react-github-permalink/dist/github-permalink.css";
+export const meta: MetaFunction = () => {
   return {
     charset: "utf-8",
     title: "Black Sheep Code - The Personal Blog of David Johnston",
@@ -35,6 +36,7 @@ export const links: LinksFunction = () => {
   {
     rel: "stylesheet", href: ourStyles,
   },
+  {rel: "stylesheet", href: githubPermalinkStyles},
   {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Open Sans"

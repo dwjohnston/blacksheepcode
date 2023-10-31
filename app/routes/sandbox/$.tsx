@@ -2,7 +2,7 @@ import { useLoaderData } from "@remix-run/react";
 import { DataFunctionArgs, LoaderFunction, json } from "@remix-run/server-runtime";
 import { getMDXComponent } from "mdx-bundler/client";
 import { useMemo } from "react";
-import { Frontmatter, getPost } from "~/utils/post";
+import { Frontmatter, getPost } from "~/utils/post.server";
 
 
 type LoaderData = {

@@ -1,7 +1,7 @@
 import { ListOfArticles } from "~/generated/ListOfArticles";
 import mainIcon from "../assets/blacksheep_100x100.webp";
 import { DataFunctionArgs } from "@remix-run/server-runtime";
-import { Frontmatter, getPosts } from "~/utils/post";
+import { Frontmatter, getPosts } from "~/utils/post.server";
 import { useLoaderData } from "@remix-run/react";
 
 export async function loader(data: DataFunctionArgs) {

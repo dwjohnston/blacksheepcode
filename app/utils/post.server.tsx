@@ -19,8 +19,7 @@ export type Frontmatter = {
  * @returns 
  */
 export async function getPost(slug: string) {
-
-  const filePath = path.join(`${__dirname}/../../app/blog-posts`, slug + ".mdx");
+  const filePath = path.join(`${process.cwd()}/app/blog-posts`, slug + ".mdx");
 
   const [source] = await Promise.all([
     readFile(
@@ -58,6 +57,8 @@ export async function getPost(slug: string) {
         // Netlify production builds fail at runtime otherwise
         // https://github.com/evanw/esbuild/issues/44
         // "process.env.NODE_ENV": "production"
+
+        "process.env": JSON.stringify(process.env)
       }
 
       return options;
@@ -82,14 +83,14 @@ export async function getPost(slug: string) {
  * @returns 
  */
 export async function getPosts() {
-  const postsPath = await readdir(`${__dirname}/../../app/blog-posts/posts`, {
+  const postsPath = await readdir(`${process.cwd()}/app/blog-posts/posts`, {
     withFileTypes: true,
   });
 
   const posts = await Promise.all(
     postsPath.map(async (dirent) => {
 
-      const filePath = path.join(`${__dirname}/../../app/blog-posts/posts`, dirent.name)
+      const filePath = path.join(`${process.cwd()}/app/blog-posts/posts`, dirent.name)
       const [file] = await Promise.all([readFile(
         filePath,
       )

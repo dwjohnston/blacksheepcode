@@ -1,4 +1,4 @@
-import { useLoaderData, useLocation } from "@remix-run/react"
+import {  useLoaderData, useLocation } from "@remix-run/react"
 import { MetaFunction } from "@remix-run/node";
 import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
 import PostComments from "~/components/PostComments/PostComments";
@@ -15,17 +15,17 @@ type LoaderData = {
 };
 
 export const meta: MetaFunction = (arg) => {
-    const frontmatter = arg.data.frontmatter as Frontmatter;
-    const title = frontmatter.meta?.title ?? "Black Sheep Code";
-    const description = frontmatter.meta?.description ?? undefined;
+    const frontmatter = arg.data.frontmatter as Frontmatter; 
+    const title = frontmatter.meta?.title ?? "Black Sheep Code"; 
+    const description = frontmatter.meta?.description ?? undefined
 
     return {
-        title,
-        description,
-        "twitter:title": title,
-        "twitter:description": description,
+      title,
+      description, 
+      "og:twitter:title": title, 
+      "og:twitter:description": description,
     };
-};
+  };
 
 export const loader: LoaderFunction = async ({ params, request }: DataFunctionArgs) => {
     const slug = params["*"];
