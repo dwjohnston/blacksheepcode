@@ -1,0 +1,78 @@
+# Using Postman as a contract/blackbox test - Part 1 - Setting up Postman 
+
+**nb.** This is post is purely exploratory. Going in, I'm not sure if Postman is the right tool for the job. The purpose of this exercise is to play with it, and assess its value. I may do a separate post for other tools.
+
+What I'm trying to achieve here is setting up Postman to use as blackbox tests for our application. See [this post here for an explainer of why I want blackbox tests](../the_case_for_blackbox_tests). 
+
+## Adding postman tests to our app
+
+We are using the Pet Store application we have created earlier this series. [See here for the github](https://github.com/dwjohnston/open-api-go-and-typescript/commit/ee42799e8241398df20004d478771f0a4329818d). 
+
+We're going to start testing our application with Postman. 
+
+### 0. Start the application and make sure it's working 
+
+We start our api running with `go run main.go` and use our browser to navigate to `localhost:8080/api/pets`, we see that an empty array is being returned. 
+
+### 1. Create a postman account, create a team, create a workspace
+
+In order to do Github syncing, we need a team. 
+
+The workspace is here: [https://blacksheepcode.postman.co/workspace/Team-Workspace~9f9eaa38-ce70-4c20-8dd7-5260c3052fec/overview](https://blacksheepcode.postman.co/workspace/Team-Workspace~9f9eaa38-ce70-4c20-8dd7-5260c3052fec/overview)
+
+### 2. Import the existing OpenAPI spec
+
+We're already using OpenAPI, so let's see how well Postman works with it!
+
+In the APIs section on the left, now click import, and we'll import it via file.
+
+### 3. Connect our Github Repo to our Postman managed API
+
+![Screenshot of the connect github dialog](../assets/screenshots/postman5.png)
+
+We'll allow postman to create its own folders. 
+
+### 4. Push changes to Github 
+
+In the right hand panel we can push the changes we've made (adding the API, the collection) to the repo. 
+
+![Screenshot of the commit panel](../assets/screenshots/postman8.png)
+
+We could test making updates in the repo and seeing how they are reflected in Postman. 
+
+But I think editing our spec here is actually a good idea, so keep up with that, we can just edit the spec here and push the changes to our repo like we did in the first step. 
+
+### 5. Send a sample query (fails 🙀)
+
+We update our collection `{{baseUrl}}` variable to `localhost:8080/api`. Press save. 
+
+We run the `findPets` query. 
+
+We get an error - it appears that Postman has incorrectly defaulted the query parameters. 
+
+![Screenshot of eroneous query parameters](../assets/screenshots/postman2.png)
+
+### 6. Fix the query, Send a sample query (passes ✅)
+
+
+I haven't been able to find a method for getting Postman to do this defaulting in another way, so lets just manually edit the query, we'll just delete the query params. We commit the changes. 
+
+
+## Summing up 
+
+I'll end this post here. We've got postman making requests, and the postman requests are synchronised with our repository. 
+
+In our next post, we'll look at running some tests. 
+
+
+
+
+
+
+
+
+
+
+
+
+
