@@ -16,6 +16,7 @@
     "mdx-bundler": "^9.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-github-permalink": "^1.0.0",
     "rehype-highlight": "^6.0.0",
     "usehooks-ts": "^2.9.1"
   },
@@ -23,8 +24,10 @@
     "@remix-run/dev": "^1.7.5",
     "@remix-run/eslint-config": "^1.7.5",
     "@remix-run/serve": "^1.7.5",
+    "@testing-library/cypress": "^10.0.1",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "cypress": "^13.4.0",
     "eslint": "^8.23.1",
     "remark-toc": "^8.0.1",
     "ts-node": "^10.9.1",
