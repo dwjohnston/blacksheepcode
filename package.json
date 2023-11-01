@@ -6,7 +6,8 @@
     "dev": "remix dev",
     "start": "cross-env NODE_ENV=production netlify dev", 
     "lint": "eslint .", 
-    "types": "tsc && tsc -p cypress/tsconfig.json"
+    "types": "tsc && tsc -p cypress/tsconfig.json",
+    "test:cypress:ci": "cypress run"
   },
   "dependencies": {
     "@netlify/functions": "^1.0.0",

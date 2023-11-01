@@ -1,0 +1,33 @@
+name: Cypress
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env: 
+  PR_NUMBER: ${{ github.event.number }}
+  NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+  NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+
+
+jobs:
+  cypress-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Run Cypress
+        run: .github/workflows/scripts/wait-for-netlify-deploy.sh

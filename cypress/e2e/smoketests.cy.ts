@@ -17,21 +17,21 @@ Cypress.on('uncaught:exception', (err) => {
 
 describe('template spec', () => {
   it('Basic MDX Rendering', () => {
-    cy.visit('localhost:3000/test/basic_mdx'); 
+    cy.visit('test/basic_mdx'); 
 
     cy.findByRole("heading", {name: "This is a basic MDX test."}).should("exist");
     cy.findByText("This is some text").should("exist");
   })
   
   it('Image rendering', () => {
-    cy.visit('localhost:3000/test/images'); 
+    cy.visit('/test/images'); 
 
     cy.findByRole("heading", {name: "images"}).should("exist");
     cy.findByRole("img", {name: "this is the image alt text"}).should("exist");
   })
 
   it('Frontmatter ', () => {
-    cy.visit('localhost:3000/test/frontmatter'); 
+    cy.visit('/test/frontmatter'); 
 
     cy.findByRole("heading", {name: "frontmatter"}).should("exist");
 
@@ -44,7 +44,7 @@ describe('template spec', () => {
     })
 
     it("external component", () => {
-      cy.visit('localhost:3000/test/external_component'); 
+      cy.visit('/test/external_component'); 
 
       // I'm not asserting on actual content it should encounter 
       // Because we quickly hit the rate limit
