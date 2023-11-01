@@ -13,7 +13,7 @@ env:
   NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
   NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
   UPDATED_AT: ${{ github.event.pull_request.updated_at }}
-  COMMIT_SHA: $ {{ github.event.pull_request.head.sha}}
+  COMMIT_SHA: $ {{ github.event.pull_request.head.sha }}
 
 
 jobs:
@@ -33,4 +33,6 @@ jobs:
         run: yarn
 
       - name: Run Cypress
-        run: node .github/workflows/scripts/wait-for-netlify-deploy.js
+        run: |
+          export CYPRESS_BASE_URL=$(node .github/workflows/scripts/wait-for-netlify-deploy.js | grep -o 'Deploy URL: https://[^ ]*' | awk '{print $3}')
+          yarn test:cypress:ci 

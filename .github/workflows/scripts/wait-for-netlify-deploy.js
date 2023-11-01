@@ -79,7 +79,7 @@ async function main() {
         console.info(`Result state is '${resultStatus}'`)
 
         if(resultStatus === "ready") {
-            console.info(singleResult.deploy_ssl_url)
+            console.info(`Deploy URL: ${singleResult.deploy_ssl_url}`)
             process.exit(0); 
         }
 
@@ -91,4 +91,4 @@ async function main() {
     throw new Error("Maximum retries exceeded.")
 }
 
-// main(); 
+main(); 
