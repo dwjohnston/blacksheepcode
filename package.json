@@ -4,7 +4,9 @@
   "scripts": {
     "build": "ts-node buildTimeUtils/generateListOfArticles.ts && remix build",
     "dev": "remix dev",
-    "start": "cross-env NODE_ENV=production netlify dev"
+    "start": "cross-env NODE_ENV=production netlify dev", 
+    "lint": "eslint .", 
+    "types": "tsc && tsc -p cypress/tsconfig.json"
   },
   "dependencies": {
     "@netlify/functions": "^1.0.0",
