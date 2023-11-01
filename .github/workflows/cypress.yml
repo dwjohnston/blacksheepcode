@@ -9,9 +9,10 @@ on:
       - master
 env: 
   PR_NUMBER: ${{ github.event.number }}
-  BRANCH_NAME: ${{ github.ref_name }}
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
   NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
   NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+  UPDATED_AT: ${{ github.event.pull_request.updated_at }}
 
 
 jobs:
@@ -31,4 +32,4 @@ jobs:
         run: yarn
 
       - name: Run Cypress
-        run: .github/workflows/scripts/wait-for-netlify-deploy.sh
+        run: node .github/workflows/scripts/wait-for-netlify-deploy.js
