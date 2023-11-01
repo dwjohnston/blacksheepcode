@@ -10,8 +10,6 @@ RETRIES=0
 # https://answers.netlify.com/t/can-netlify-deliver-deploy-event-to-github-api-after-successful-deployment/10905/11
 sleep 30 
 
-BRANCH_NAME=${GITHUB_REF##*/}
-
 # Poll Netlify API to check if the current deploy preview is complete
 while [ $RETRIES -lt $MAX_RETRIES ]; do
 
@@ -20,10 +18,11 @@ while [ $RETRIES -lt $MAX_RETRIES ]; do
   echo $GITHUB_REF_NAME
   echo $PR_NUMBER
   echo $BRANCH_NAME
+  echo $GITHUB_BASE_REF
 
   
-  CURL_RESULT=$(curl --location "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID/deploys?branch=$BRANCH_NAME" --header "Authorization: Bearer $NETLIFY_TOKEN")
-  DEPLOY_ITEM=$(echo $CURL_RESULT | jq -r "[.[] | select(.review_id == $PR_NUMBER)] | sort_by(.created_at) | last")
+  CURL_RESULT=$(curl --location "https://api.netlify.com/api/v1/sites/$NETLIFY_SITE_ID/deploys" --header "Authorization: Bearer $NETLIFY_TOKEN")
+  DEPLOY_ITEM=$(echo $CURL_RESULT | jq -r "[.[] | select(.review_id == $PR_NUMBER && .)] | sort_by(.created_at) | last")
   DEPLOY_STATE=$(echo $DEPLOY_ITEM | jq -r '.state')
 
   echo $DEPLOY_ITEM

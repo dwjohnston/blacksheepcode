@@ -9,6 +9,7 @@ on:
       - master
 env: 
   PR_NUMBER: ${{ github.event.number }}
+  BRANCH_NAME: ${{ github.ref_name }}
   NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
   NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
 
