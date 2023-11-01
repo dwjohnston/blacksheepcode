@@ -50,7 +50,6 @@ export default function App() {
         <Links />
       </head>
       <body>
-
         <header>
           <div>
             <a href="/">Black Sheep Code</a>
