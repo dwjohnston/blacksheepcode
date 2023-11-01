@@ -1,15 +1,6 @@
----
-meta:
-  twitter:title: The case for blackbox tests 
-  twitter:description: Blackbox tests do not require knowledge of the implementation details - they're a 'how the consumer sees it' style of test. 
-  title: The case for blackbox tests 
-  description: Blackbox tests do not require knowledge of the implementation details - they're a 'how the consumer sees it' style of test. 
-
----
-
 # The case for blackbox tests
 
-Unit tests are good, and that's a whole conversation. The primary value of unit tests as I see it is: 
+Unit tests are good, and that's a whole different conversation. The primary value of unit tests as I see it is: 
 
 1. They run fast, and in a single process, so they're easy for developers and build servers to run.
 2. Writing unit tests nudges you toward writing testable code, and testable code tends to be easier to consume, extend and maintain. 
