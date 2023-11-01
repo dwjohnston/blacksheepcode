@@ -13,7 +13,7 @@ env:
   NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
   NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
   UPDATED_AT: ${{ github.event.pull_request.updated_at }}
-  COMMIT_SHA: $ {{ github.event.pull_request.head.sha }}
+  COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
 
 
 jobs:
@@ -43,5 +43,7 @@ jobs:
                   exit $exit_code
               fi
 
-              CYPRESS_BASE_URL=$(echo "$output" | grep -o 'Deploy URL: http://[^ ]*' | awk '{print $3}') yarn test:cypress:ci
+              deploy_url=$(echo "$output" | grep -o 'Deploy URL: http://[^ ]*' | awk '{print $3}')
+              echo $deploy_url
+              CYPRESS_BASE_URL=$deploy_url yarn test:cypress:ci
 
