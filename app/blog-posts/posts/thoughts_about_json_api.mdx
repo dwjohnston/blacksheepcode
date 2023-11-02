@@ -1,0 +1,606 @@
+---
+meta:
+  twitter:title: Thoughts about JSON API
+  twitter:description: JSON API is an opinionated REST API structuring spec. Here's my thoughts.
+  title: Thoughts about JSON API
+  description: JSON API is an opinionated REST API structuring spec. Here's my thoughts.
+  
+---
+
+# Thoughts about JSON API
+
+I've recently been exposed to [JSON API](https://jsonapi.org/), an API design spec that intends to be structured way to define HTTP endpoints without having to continually relitigate the best way to do it. Instead, adopt a spec and do what it tells you. 
+
+Using JSON API has been helpful informing my thinking about structuring API requests and responses. 
+
+In this post, I'll start from a purely TypeScript perspective and then examine how that aligns with JSON API's approach. 
+
+## Requirements of an API 
+
+For a typical CRUD like application, we'll usually require our API to do the following: 
+
+- List all of a given resource (eg. Get all todos)
+- Retrieve a single instance of a resource (eg. Get the todo with id "1")
+- Create a resource
+- Update a resource
+- Delete a resource
+- Associate one resource with another (eg. Add assign user Bob to todo item "1")
+- Paginate lists of resources - for many APIs it's not practical to return every single user, that list might be millions long. Instead we paginate responses 
+- Filter lists of resources - again if it's not feasable to return every instance of a resource, we also need our API to allow us to filter resources for us. 
+- Proactively return related resources. 
+  - For example if a Todo has an assignee of type User, when we fetch the Todo, chances are we also want to fetch the User too. And if the user has an Organisation, then chances are we also want to fetch the Organisation, and so forth. 
+  - We could perform these operations in serial (ie. wait for the Todo to return, and then fetch the User), _or_ we optimistically load the data in the one call removing the need for multiple round trip calls. 
+
+## Proactive data fetch 
+
+There are three general approaches I know of to do this: 
+
+- GraphQL aims to solve this kind of problem returning all the data required in a single query. 
+- Stripe's API is a REST API that [has a 'expansion parameters' strategy](https://stripe.com/docs/expand) that allows you expand a given id into the full object in the single query. 
+- The JSON API spec has the concept of ['included' data](https://jsonapi.org/format/#fetching-includes) which returns related data. 
+
+Let me know if you know of other tooling that does this. 
+
+## The pain points I have as a TypeScript developer 
+
+Let's take your classic Todo app. We might have the definition like this: 
+
+```typescript
+type TodoItem = {
+    id: string; 
+    title: string; 
+    isComplete: boolean; 
+    assigneeId: string | null;  // null = not assigned 
+}
+
+```
+
+### Pain point #1  - ID doesn't always exist, patching optional values. 
+
+For the most part, we can pass these TodoItems around and everything is hunkydory. But where this commonly gets painful is in doing CRUD operations - where creating a Todo we don't currently have an ID, and for patching a Todo we don't need all of the fields. 
+
+We can kind of get around this by using TypeScript utility types, we could have some code like: 
+
+```typescript 
+
+function getTodo(id: string) : Promise<TodoItem> {
+
+}
+
+function createTodo(payload: Omit<TodoItem, "id">) : Promise<TodoItem>{
+
+} 
+
+function editTodo(payload: Partial<Omit<TodoItem, "id">>) : Promise<TodoItem>{
+
+}
+
+```
+
+
+### Pain point #2 - Additional metadata 
+
+Our Todos might also include data like createdBy, createdDate. Additionally, and CRUD application might have access based permissions where admins can edit and item, but regular users can not. A good user interface will disable the edit button if the user can not edit the thing. Also, note that the metadata fields are likely the same for all resource types, TodoItem, User, Widget, etc. 
+
+Bundling those values into the resource itself is pain, for two reasons: 
+
+1. It makes the object harder to read
+2. It makes it harder to do that `Omit` style logic above, as we not have more values we need to omit. 
+
+So I think it's reasonable to have standard wrapper object for resources, that contains the metadata as a seperate property. 
+
+ie. We might have a `TodoResource` object like: 
+
+```typescript 
+type TodoResource = {
+   data: TodoItem; 
+   metadata: {
+    canEdit: boolean; 
+    canDelete: boolean; 
+    createdDate: string; 
+    editedDate: string; 
+   }
+}
+```
+
+### Creating an abstraction for an individual item
+
+We can solve both of the above problems by creating a simple wrapper abstraction 
+
+
+```typescript
+
+type ApplicationResource<T> = {
+
+    id: string; 
+    data: T; 
+    metadata: {
+        canEdit: boolean; 
+        canDelete: boolean; 
+        createdDate: string; 
+        editedDate: string; 
+    }
+}
+
+```
+
+Now we can use this like: 
+
+```typescript
+
+type TodoItem = {
+    title: string; 
+    isComplete: boolean; 
+    assigneeId: string | null;  // null = assigned 
+}
+
+type User = {
+    name: string; 
+}
+
+function getUser(id: string): Promise<ApplicationResource<User>> {
+
+}
+
+function getTodo(id: string): Promise<ApplicationResource<TodoItem>> {
+    
+}
+```
+
+That is, all references individual resources have a consistent structure, up to the the `data` property. 
+
+Omitting the ID of the resource from the individual `TodoItem`, `User` types means that we don't need to worry about it omitting it later for patch or create requests. 
+
+### Create an abstraction for lists of items. 
+
+For a list of items we want to include an object wrapper that includes pagination info. 
+
+I would suggest that _all_ endpoints that return a list, return responses of this shape, even if there are only ever a handful of items. This makes for a consistent developer experience. (You can just ignore any pagination query paramaters, and return a pageSize of 'all'). 
+
+```typescript
+
+type PaginatedResponse<T> = {
+    paginationInfo: {
+        pageSize: number | "all", 
+        pageNum: number; 
+        totalNumItems: number; 
+    }, 
+    data: Array<OurApplicationResource<T>>; 
+}
+
+```
+
+### An abstraction for related resources
+
+Whether an individual response or an array response, we also may want to include proactively loaded that. 
+
+I would suggest that a payload for proactively loaded data looks like this: 
+
+```typescript 
+
+type ProactivePayload = {
+    users: Array<OurApplicationResponse<User>>; 
+    todos: Array<OurApplicationResponse<TodoItem>>; 
+    widgets: Array<OurApplicationResponse<Widget>>; 
+}
+
+```
+
+Crucially I suggest not doing an 'expansion' type stategy, where the for example TodoItem would look like: 
+
+```typescript 
+type TodoItem  = {
+    title: string; 
+    isComplete: boolean; 
+    assignee: string | null | User;  // string = userId, null = unassigned, User = full user object 
+}
+```
+
+or 
+
+```typescript 
+type TodoItem  = {
+    title: string; 
+    isComplete: boolean; 
+    assignee: string | null |   // string = userId, null = unassigned 
+}
+
+type TodoItemExpanded  = {
+    title: string; 
+    isComplete: boolean; 
+    assignee: User | null |   // User = User, null = unassigned 
+}
+```
+
+Because code like this will have you writing a bunch of conditional logic everywhere. 
+
+Instead my preference is to _always_ be dealing with ids, and then we can use hooks to fetch the corresponding data, and rely on our state management to either fetch it from its local cache, or do the API call for us. 
+
+## Summarising 
+
+We have API responses for either lists of data, or individual items. 
+
+Both of these responses may contain optimistic updating data. 
+
+A full typing for an application that has Users and TodoItems may look like this
+
+```typescript 
+
+// Business Objects 
+
+type TodoItem = {
+    title: string; 
+    isComplete: boolean; 
+    assigneeId: string | null;  // null = assigned 
+}
+
+type User = {
+    name: string; 
+}
+
+// Common wrapper info
+
+type Metadata = {
+        canEdit: boolean; 
+        canDelete: boolean; 
+        createdDate: string; 
+        editedDate: string; 
+}
+type ApplicationResource<T> = {
+
+    id: string; 
+    data: T; 
+    metadata: Metadata;
+}
+
+type ProactivePayload = {
+    users: Record<string, ApplicationResource<User>>; 
+    todoItems: Record<string, ApplicationResource<TodoItem>>; 
+}
+
+type PaginationInfo = {
+    pageSize: number | "all", 
+    pageNum: number; 
+    totalNumItems: number; 
+}
+
+
+
+
+// API responses 
+
+type ArrayResponse<T> = {
+    paginationInfo: PaginationInfo; 
+    data: Array<ApplicationResource<T>>; 
+    includedData: ProactivePayload; 
+}
+
+type IndividualResponse<T> = {
+    data: ApplicationResource<T>;
+    includedData: ProactivePayload;  
+}
+
+
+
+
+```
+
+typescriptlang.org/play?ts=4.9.5#code/C4TwDgpgBAKg9gEzgSWBAtlAvFA3gKCiKmAEtgAbCALigGdgAnUgOwHMBuKQ40ugYTjowVNLQBGcOFQCGLLjyIy6dUmxYQIyBLQbN2UAD5QWAVwoUuUAPTWT5itijLV6iAm4BffPlCQoAKp0EIxOBMQmMug09EysnF4+tlAAogAeTDJQrABmcD5+0ADyYGTofGQAxgAKMiAUcDIeOOHEpsGMdLQAShCVcIwIADx68QA0gR0AfAoRwIgoaOhdUL39gyNx7BPwSKgYM4m+4NC1bKwyZHAsyCx5YYpQYDJsEADKpABeMWbo4iFGKAAIhkFiBE0ez1eADlTOhaL9-oxZsR5sBQbD0Ptlgi4UiFN5jv4AIJgESkSqXUjXXp0OCmRiVCBDGBTB6PUg6WL6BKPBCXGS0GAoojRdH89G0VoRIiUlgpBDkCRSWTybgy4hygAiEFEMUk0ggchFMsqjCNaAQWsuMVG7BNEXc5Hc1rE3PiJu8hPwyWJ1WQUHNdDA12CdG4ROgxMYjDqtJDLGCLLZLUhLwuVxudzgtDOGepWbyJolgqg0djICGpPJlMztPpjOZrMOHJYlQopgQLoFtBKZQqFNq9UaCAJBROUFuioAbpzTKD46Gmym8Hye2WyRQKVSaRA6QymcmOK3253u5KoH3SOUGIO6g0mlZ8N6gA
+
+
+
+## Problem: JSON Schema (and thus OpenAPI) doesn't support generics. 
+
+It's all well and good for me to have defined these handy generics, they prevent a lot of copy paste boilerplate. Unfortunately generics are not supported by JSON Schema. 
+
+There is this interesting article: https://json-schema.org/blog/posts/dynamicref-and-generics but for the purpose of this post, lets assume that this isn't going to work. 
+
+It seems to me the only solution is that, if generating typings from an OpenAPI spec, we need to accept that we will have verbose typings; ie. 
+
+```typescript
+type SingleUserApiResponse = {
+    data: {
+        id: string; 
+        data: {
+            name: string; 
+        }
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }; 
+    includedData: {
+        users: Record<string, {
+        id: string; 
+        data: {
+            name: string; 
+
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+        todoItems: Record<string, {
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    }
+}
+
+type SingleTodoApiResponse = {
+    data: {
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }; 
+    includedData: {
+        users: Record<string, {
+        id: string; 
+        data: {
+            name: string; 
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+        todoItems: Record<string, {
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    }
+}
+
+type ArrayUserApiResponse = {
+    paginationInfo: {
+            pageSize: number | "all", 
+    pageNum: number; 
+    totalNumItems: number; 
+    }
+    data: Array<{
+        id: string; 
+        data: {
+            name: string; 
+        }
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    includedData: {
+        users: Record<string, {
+        id: string; 
+        data: {
+            name: string; 
+
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+        todoItems: Record<string, {
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    }
+}
+
+type ArrayTodoApiResponse = {
+    paginationInfo: {
+            pageSize: number | "all", 
+    pageNum: number; 
+    totalNumItems: number; 
+    }
+    data: Array<{
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    includedData: {
+        users: Record<string, {
+        id: string; 
+        data: {
+            name: string; 
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+        todoItems: Record<string, {
+        id: string; 
+        data: {
+            title: string; 
+            isComplete: boolean; 
+            assigneeId: string | null;  // null = assigned         
+       };
+        metdadata: {
+            canEdit: boolean; 
+            canDelete: boolean; 
+            createdDate: string; 
+            editedDate: string; 
+        }
+    }>; 
+    }
+}
+
+
+```
+
+https://www.typescriptlang.org/play?ts=4.9.5#code/C4TwDgpgBAyglgOwOYBsIFUDOEBOBBMOAJQkzAHsFsoBeKAbwCgooATAQ2HYC4HmWocVr0zAciJAG5+LDl15MBAhOwC2EEWInSlAXxlR1wDnJ58lLAMbsEAUVZxgvAEblyaGzovWEAEQhowBpQru4QngZWOOFBrL6cwaLiyF5KEA6x8UGayVIG+iy6XoiWKACurOlZZooCZdg4mLwkluQ4rAA8SRIANOYWQjnakWycNSMsKupDKYwjRSNGJmMKE1A+9o4ubh4Iqd42-oHBobv7SpbRCXEJM3kWAumOVbdQ3bMPBQK6AHz7wORWOQAJJBVRNKAtNqdd5IPq1JSDN5aD4WUyrB4sYCONB3c4COCYADC5FUYGO2zCEUxUHYmEwcCQCAgEGBwmRuSgAB8oAgyigUJIWAB6YW8-koWi0+mM5msGlQeb4pbsdH9B4bDKUs5rHxHCDZEI7cJ7XVXTKvWH4lhPC2Gq3zfJ-fj6fSMUCQWASNAAFUB5AIxFIFCo0DotTVCME7IdSkjI2xwFxHOGD0JJLJFKNVNNDzpDKZLLZd254oFQqgorLkro+dl6QV+X2KvjGpsmyc2Z1bb8AQNJ2N1O85pe9pR9wsttHiXH+y+CxYJXKlRu8nVUHquAhUPaXXH8JGSNjaJW66UUxnuXxC4sLdPUYu7a1XZN1vWhz7htOr7NMWneLWKdV0vVMLC+QpnSUAEgVBCBwWaCBWl3WEDzTGNZxGVtMUTZNjzTYlSXJfttR-Gk60LVl0M5Hk+XLEUxVomtpQLOVG0+ZUDWWNcHwETUthfIce31L9B1zTFLj-YCAJpICshA1E9CdLxXTmD1oDwHAcHYEAsFwQMSDIShqHDfgwHYJBEE4OBKGBBAADNyAxAQzKQCB4AAL2CPlVGcXBSwAInYAV-J6AwXIgAA5MpVF4bzfJwf5yC4FAotUWD4PFHzcGU-g1Q0rSQA6KMjwwuN7xGC9pO+Aw724kY+M7b9BN4j8syasSLhHKSUwUx4Mn-HqJ0KF1IMEBBSgqUdxiUTdGgQpCYX3M9oyqsq6ppSrBukJVFk41VyppBqSOax9eza0S3wk645NWyd+u6vDqr0UasX9dLt0Q6E91yVCBio0C1um7CcXkoaBgIzNiIEjqLHI5lKJLGiJQrKtGKlOGGxpHaHlqoGew7Y6YdO4SBxzS6upurbAPuynHuG56crdNSoHy7S-SBfTgyMsN+hcyzsRs+zHPXcKPK86L4oCoKUBCsLzMi6LYol7KDABZLUvepWsoSl1ctPVnCuK-7eqwqCQduxcIaIkSyZGDGEcG0tGJRhiJXRmVC3lLG9GbPbTZauxn3a-E9U-Unu2HSTadKu7ngemP6agX5inG5cpqclhZo+hbvt6ZaSqvTCDsxTa6aTjjjH29bxKffjg91Vqofrw6KctBPY7tUHryU1W3rBbOvpQ-PjbB2Ri4eHCu7WdNCPO22yI9+Hi0dpG6MrV2BXdljMcxbHbz98eDkDuuLobs6m9Pluo7bwuZJpm+Aae75RpUoA
+
+Phew! This kind of sucks. 
+
+
+Fortunately, two things: 
+
+1. We can extract the business object typings from these typings. 
+
+```typescript
+type User = SingleTodoApiResponse['data']['data'];
+type TodoItem = SingleTodoApiResponse['data']['data'];
+```
+
+2. We can still use generics in our own code: 
+
+```typescript
+function logmetadata<T>(item: ApplicationResource<T>) {
+  console.log(item.metadata); 
+}
+
+function getUsers(): ArrayUserApiResponse {
+
+}
+
+function getTodos() : ArrayTodoApiResponse {
+
+}
+
+function main() {
+  const usersResponse = getUsers(); 
+  const todosResponse = getTodos();
+
+  usersResponse.data.forEach((v) => {
+    logmetadata(v); 
+  })
+
+  todosResponse.data.forEach((v) => {
+    logmetadata(v); 
+  })
+}
+```
+
+TypeScript can still correctly deduce the overlap of the generic typings that we defined and the verbose typings that were generated for us. 
+
+
+## How does this approach compare to JSON API? 
+
+JSON API includes the following concepts that we have not included: 
+
+### Relationships 
+
+JSON API makes a distinction between ordinary data, and foreign-key-like attributes, in our example fields like `assigneeId`. 
+
+JSON API's opinion is to such attributes in seperate area of the response: 
+
+```json
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+
+{
+  "links": {
+    "self": "http://example.com/articles/1"
+  },
+  "data": {
+    "type": "articles",
+    "id": "1",
+    "attributes": {
+      "title": "JSON:API paints my bikeshed!"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "related": "http://example.com/articles/1/author"
+        }
+      }
+    }
+  }
+}
+```
+
+Although I can see the merit of this, especially in a distributed system where your application maybe interacting with data payloads from systems outside of your control, for just a simple REST API this seems like overkill and too cumbersome. 
+
+Additionally JSON API appears to support a concept of having multiple ways to access a resource: 
+
+1. Just accessing a resource directly eg: `GET http://example.com/people/1`
+2. Accessing a resource via a relationship to another object: `GET http://example.com/articles/1/author`
+
+This seems unnecessarily complex. Also, would seem to lend itself to more bike shedding, as people argue of the semantics of relationships from one resource to another. 
+
+The updates of attributes and updating of relationships neccessarily needs to occur on different endpoints according to [the spec](https://jsonapi.org/format/#crud-updating-to-one-relationships). This adds cognitive burden for the consumer of the API (eg. a frontend developer) having to using different URLs to update different aspects of a resource. 
+
+
+### Links
+
+Working hand in hand with the relationships concept is the [links](
+https://jsonapi.org/format/#document-links
+) concept, where response payloads also include links to any related resources. 
+
+Especially in a distributed system, I can see how this is useful, you don't need to keep up with any APIs you might need are located, the data that enters your system can tell you where they can be found. 
+
+This concept is also mentioned in the book _Release It!_ in Chapter 16, in what it calls 'URL Dualism'.    
+
+However, for a simple REST API again, not needed, we know that all of our resources are coming from the one API. 
+
+## Conclusions 
+
+JSON API does a good job of encompassing everything that you might want to include in an API response. Certainly I've found it valuable to have to get familiar with it, as it does start solving problems I wouldn't have otherwise thought about. 
+
+However it is at the cost of a extra cognitive and technical complexity in consuming and implementing the API. 
+
+
+
+
+

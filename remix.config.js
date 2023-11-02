@@ -1,28 +1,21 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-const {
-  remarkMdxFrontmatter,
-} = require("remark-mdx-frontmatter");
-
 module.exports = {
-  serverBuildTarget: "netlify",
+  ignoredRouteFiles: ["**/.*"],
   server:
     process.env.NETLIFY || process.env.NETLIFY_LOCAL
-      ? "./server.js"
+      ? "./server.ts"
       : undefined,
-  ignoredRouteFiles: ["**/.*", ...(process.env.NODE_ENV === 'development' ? [] : ["drafts/*"])],
-  mdx: async (filename, ...rest) => {
-    const [rehypeHighlight, remarkToc] = await Promise.all([
-      import("rehype-highlight").then((mod) => mod.default),
-      import("remark-toc").then((mod) => mod.default),
-    ]);
-  
-    return {
-      remarkPlugins: [remarkToc],
-      rehypePlugins: [rehypeHighlight],
-    };
-  },
+  serverBuildPath: ".netlify/functions-internal/server.js",
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
-  // serverBuildPath: ".netlify/functions-internal/server.js",
   // publicPath: "/build/",
+  serverModuleFormat: "cjs",
+  future: {
+    v2_dev: true,
+    v2_errorBoundary: true,
+    v2_headers: true,
+    v2_meta: true,
+    v2_normalizeFormMethod: true,
+    v2_routeConvention: true,
+  },
 };

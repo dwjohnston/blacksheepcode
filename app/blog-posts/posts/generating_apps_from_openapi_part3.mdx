@@ -1,0 +1,142 @@
+---
+meta:
+  twitter:title: Generating MSW mocks from an OpenAPI spec. 
+  twitter:description: We're using msw-auto-mock to generate MSW mocks to test our React application. 
+  title: Generating MSW mocks from an OpenAPI spec. 
+  description: We're using msw-auto-mock to generate MSW mocks to test our React application. 
+
+---
+
+
+# Generating apps from OpenAPI specs - Part 3 - Generating MSW API mocks using msw-auto-mock 
+
+A commonly suggested approach for testing frontend code is to use a tool like [Mock Service Worker](https://mswjs.io/) to mock your HTTP requests. 
+
+In this post, we'll demonstrate usage of the tool [msw-auto-mock](https://github.com/zoubingwu/msw-auto-mock) to achieve this, and save us writing screeds of mocking logic ourselves. 
+
+All code for this example can by found [here](https://github.com/dwjohnston/open-api-go-and-typescript/commit/40a8a5676abe1ca6040684dc1079da4a6c0c9f5d). 
+
+## Our component 
+
+```tsx 
+export const DisplayPetById = (props: DisplayPetByIdProps) => {
+  const {  } = props;
+
+
+  const petQuery = usePet(props.petId); 
+
+  return (
+    <div>
+      {petQuery.isLoading && "...loading"}
+      {petQuery.isError && "Error!"}
+      {petQuery.data && <>
+        Pet Name: {petQuery.data.name}
+      </>}
+    </div>
+  );
+};
+```
+
+We have a simple component here. That `usePet` looks like this: 
+
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { petsApi } from "../services/petsService";
+
+export function usePet(petId:number){
+
+    return useQuery({
+        queryFn: () => petsApi.findPetById({ id: petId}),
+        queryKey: ["pet", petId],
+    }); 
+}
+```
+
+We're using react-query to provide loading flags etc, and we're using that service function that created in our earlier post. 
+
+## The Test
+
+We make sure we have included an example in our OpenAPI definition: 
+
+```diff
+//Pet.json 
+{
+  "type": "object",
+  "required": [
+    "id",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "name": {
+      "type": "string", 
++     "example" : "Fido"
+      
+    },
+    "tag": {
+      "type": "string"
+    }
+  }
+}
+
+```
+
+We can now run: 
+
+```
+msw-auto-mock ../spec/petstore-separate/spec/swagger.json -o src/generated/msw.js --base-url '/api'
+```
+
+And hey presto, all of the MSW boiler plate is created in that `msw.js` output file we generated. 
+
+Our test: 
+
+```tsx
+import React from 'react';
+
+// We have our render method which includes the react-query provider
+import {render} from "../testUtils/testRender";
+import {screen} from "@testing-library/react";
+import {DisplayPetById} from './DisplayPetById';
+// Import handlers from the generated MSW boilerplate
+import {handlers} from "../generated/msw";
+import { setupServer } from 'msw/lib/node';
+
+const server = setupServer(...handlers);
+
+describe(DisplayPetById, () => {
+
+
+    beforeAll(() => {
+        // Establish requests interception layer before all tests.
+        server.listen()
+      })
+      afterAll(() => {
+        // Clean up after all tests are done, preventing this
+        // interception layer from affecting irrelevant tests.
+        server.close()
+      })
+
+  it("Renders without error", async () => {
+    render(<DisplayPetById  petId={1}/>)
+
+
+    expect(screen.getByText("...loading")).toBeInTheDocument(); 
+
+    // The petname is based on the example we set in the OpenAPI definition!
+    expect(await screen.findByText("Pet Name: Fido")).toBeInTheDocument(); 
+
+
+  }); 
+});
+
+```
+
+
+Brilliant!
+
+msw-auto-mock does not currently support multiple examples, which might make this limiting for more comprehensive testing. In that case you might need to get creative and/or extend the functionality of what msw-auto-mock is providing. 
+
