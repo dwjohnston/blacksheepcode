@@ -1,4 +1,3 @@
-import { ListOfArticles } from "~/generated/ListOfArticles";
 import mainIcon from "../assets/blacksheep_100x100.webp";
 
 
@@ -39,7 +38,6 @@ export default function Index() {
       <div className="main">
 
         <h2>Blog</h2>
-        <ListOfArticles />
       </div>
 
       <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>

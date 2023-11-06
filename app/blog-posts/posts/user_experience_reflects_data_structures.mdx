@@ -1,0 +1,77 @@
+---
+meta:
+  twitter:title: User Experience reflects data the underlying data structu
+  twitter:description: I propose a variation of Conway's Law.
+  title: User Experience reflects data the underlying data structu
+  description: I propose a variation of Conway's Law.
+  
+---
+
+# User Experience reflects data the underlying data structures
+
+If it doesn't exist already, I want to propose a variant of Conway's Law which states
+
+> Any organization that designs a system (defined broadly) will produce a design whose structure is a copy of the organization's communication structure
+
+The variant is
+
+> Any designed user experience will reflect the underlying data structures
+
+## An example - a video streaming sign up flow 
+
+Let's take a sign up flow, where the user is going to enter their details, as well as entering some of their TV watching genre preferences. 
+
+There are multiple ways we might design a data model for such a system: 
+
+### Approach 1 - Include the preferences as part of the user object 
+
+
+```typescript
+type Genre = "horror" | "romance" | "action" | "comedy"; 
+
+
+// GET, POST /user
+type User = {
+    username: string; 
+    emailAddress: string; 
+
+    favouriteGenres: Array<Genre>; 
+}
+```
+
+With a data model like this, a user could enter all their details on the one page, and then submit the form, we `POST /user`,  and we're done. 
+
+Or if we wanted, we could split the flow into two pages, having the user select their favourite genres after they've entered their details, but this just being a frontend facade, we don't actually submit the data until they've finished selecting the genres. 
+
+However, this approach does have a little more friction from a development perspective, there's that little bit of extra logic required to split the form across two pages and then join the data again for form submission. 
+
+
+### Approach 2 - Genres are a collection belonging to users 
+
+```typescript 
+type Genre = "horror" | "romance" | "action" | "comedy"; 
+
+
+// GET, POST /user
+type User = {
+    username: string; 
+    emailAddress: string; 
+}
+
+// GET, POST /user/{userId}/favouriteGenres
+type FavouriteGenres = Array<Genre>; 
+```
+
+If our data model was way, the single page flow is less natural - we need the id of the user before we can call the `POST /user/{userId/favouriteGenres` endpoint. 
+
+We could fudge it, making it a single page, but hiding two API calls in the one form submission. But then we have issues like, 'what if the first API call succeeds, but the second one fails'?
+
+We can see that a two page sign up has less friction, the user experience is going to be inclined this way, because of the data model. 
+
+
+## What of it? 
+
+I don't know really. It's an interesting observation to mull on. 
+
+I'm not really suggesting that we should change our data model to facilitate the best user experience; instinctively,  I would say that considerations around performance and the mental sensibility of data model are more important. 
+

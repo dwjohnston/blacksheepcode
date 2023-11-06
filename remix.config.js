@@ -1,41 +1,4 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-
-const fs = require('fs');
-const path = require('path');
-
-function generateRoutes(folderPath) {
-  const routes = [];
-
-  function traverseDir(currentPath, relativePath = '') {
-    const files = fs.readdirSync(currentPath);
-
-    files.forEach((file) => {
-      const filePath = path.join(currentPath, file);
-      const fileStats = fs.statSync(filePath);
-
-      if (fileStats.isDirectory()) {
-        // If it's a directory, recursively traverse it
-        traverseDir(filePath, path.join(relativePath, file));
-      } else {
-        // If it's a file, add a route definition
-
-        if(path.basename(file).startsWith("_index")){
-          return;
-        }
-        
-        const routePath = path.join(relativePath, path.basename(file).split('.')[0]);
-        const filePathRelativeToApp = path.relative('app', filePath);
-        routes.push([routePath, filePathRelativeToApp]); 
-      }
-    });
-  }
-
-  traverseDir(folderPath);
-  return routes;
-}
-const routeDefinitions = generateRoutes('./app/routes');
-
-
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
   server:
@@ -46,27 +9,6 @@ module.exports = {
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",
-  mdx: async (filename, ...rest) => {
-    const [rehypeHighlight, remarkToc] = await Promise.all([
-      import("rehype-highlight").then((mod) => mod.default),
-      import("remark-toc").then((mod) => mod.default),
-    ]);
-  
-    return {
-      remarkPlugins: [remarkToc],
-      rehypePlugins: [rehypeHighlight],
-    };
-  },
-
-  routes: (defineRoutes) => {
-    return defineRoutes((route) => {
-
-      routeDefinitions.forEach((v) => {
-        console.log(v);
-        route(...v)})
-    }); 
-  },
-
   serverModuleFormat: "cjs",
   future: {
     v2_dev: true,

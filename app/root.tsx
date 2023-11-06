@@ -1,5 +1,9 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
+<<<<<<< HEAD
 import type { LinksFunction,  MetaFunction } from "@remix-run/node";
+=======
+import type { LinksFunction } from "@remix-run/node";
+>>>>>>> c6c25c3 (Everything)
 import {
   Links,
   LiveReload,

@@ -1,0 +1,279 @@
+---
+meta:
+  twitter:title: Agnostic state and service management in React 
+  twitter:description: Avoid make state framework specific calls inside of your React components, and instead access them via hooks
+  title: Agnostic state and service management in React 
+  description: Avoid make state framework specific calls inside of your React components, and instead access them via hooks
+
+---
+
+# Agnostic state and service management in React 
+
+Here's how I like to do my state/service management in React. 
+
+Code for this example is viewable [here](../projects/agnostic-state-management/).
+
+## Part 1 - A simple application 
+
+```tsx
+
+type Todo = {
+    userId: string;
+    id: number;
+    title: string;
+    completed: boolean;
+}
+
+export const TodoList = () => {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [todos, setTodos] = useState([] as Todo[]);
+
+    useEffect(() => {
+
+        setIsLoading(true);
+        fetch('https://jsonplaceholder.typicode.com/todos')
+            .then(response => response.json())
+            .then(json => setTodos(json as Todo[]))
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }, [])
+
+    return (
+        <div><ul>
+
+            {isLoading && "Loading..."}
+            {todos.map((v) => {
+                return <li key={v.id}>
+                    {v.title} <strong>Completed:</strong> {`${v.completed}`}
+                </li>
+            })}
+        </ul>
+        </div>
+    );
+};
+
+```
+
+Here, we're fetching a list of todos and displaying them as a list. While the fetch is happening, we display some kind of loading indicator. 
+
+
+## Part 2 - Two kinds of components - stateless and stateful. 
+
+The first thing I like to do define components that have actual UX in them, as stateless components - that is - their parent is responsible for telling them what data they have available to them. (This isn't to say that they never have a `useState` hook inside of them, but that statefulness is always considered temporary). 
+
+The stateful aspect (in this case, fetching the data from the API and storing it in to memory, also, determining the loading state) is contained in a parent component. 
+
+
+
+**Stateless component**
+```jsx
+export const TodoListComponent = (props: TodoListProps) => {
+
+    const {isLoading, todos} = props; 
+
+    return (
+        <div><ul>
+
+            {isLoading && "Loading..."}
+            {todos.map((v) => {
+                return <li key={v.id}>
+                    {v.title} <strong>Completed:</strong> {`${v.completed}`}
+                </li>
+            })}
+        </ul>
+        </div>
+    );
+};
+
+```
+
+The advantage of this style is that it makes testing these components dead easy. You don't need to worry about context, service mocking, any of that.
+
+These are also dead easy to create storybook stories for. 
+
+
+**Stateful component**
+
+```tsx
+export const TodoListPage = (props: TodoListPageProps) => {
+    const { } = props;
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [todos, setTodos] = useState([] as Todo[]);
+
+    useEffect(() => {
+
+        setIsLoading(true);
+        fetch('https://jsonplaceholder.typicode.com/todos')
+            .then(response => response.json())
+            .then(json => setTodos(json as Todo[]))
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }, [])
+
+
+    return (
+        <div>
+            <TodoListComponent todos={todos} isLoading={isLoading} />
+        </div>
+    );
+};
+
+```
+
+## Part 3- Extracting the state management to a hook 
+
+All of the logic that determines the state (eg making the API call) should be pulled out to a hook. The way the parent component becomes aware of those values, is via the hook 
+
+
+
+**The state hook** 
+
+```jsx
+export function useTodos(): {
+    todos: Array<Todo>; 
+    isLoading: boolean; 
+} {
+    const [isLoading, setIsLoading] = useState(false);
+    const [todos, setTodos] = useState([] as Todo[]);
+
+    useEffect(() => {
+
+        setIsLoading(true);
+        fetch('https://jsonplaceholder.typicode.com/todos')
+            .then(response => response.json())
+            .then(json => setTodos(json as Todo[]))
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }, [])   
+
+
+    return {
+        isLoading, todos
+    }
+}
+```
+
+In the real world there's a good chance that you're using a tool like Redux, React-Query or Apollo to do your state management. 
+
+A big advantage of putting your state logic into hooks like this, is that you hide the details of your state management solution from your react components. Your react components don't need to know which state management solution you're using, and if you decide to change, you only need to make changes to the hook. 
+
+
+**Stateful parent component**
+
+```tsx
+export const TodoListPage = (props: TodoListPageProps) => {
+    const { } = props;
+
+    const {isLoading, todos} = useTodos();
+
+
+    return (
+        <div>
+            <TodoListComponent todos={todos} isLoading={isLoading} />
+        </div>
+    );
+};
+```
+
+
+## Part 4 - Pull API calls out to a Services folder 
+
+I like to pull any of my API interactions out to a services folder. 
+
+
+**API service** 
+```ts
+import { Todo } from "../TodoListComponent";
+
+export async function fetchAllTodos() : Promise<Array<Todo>> {
+    const res = await fetch('https://jsonplaceholder.typicode.com/todos'); 
+    const json = await res.json(); 
+
+    // Validate that the response is of the right shape here
+
+    return json as Array<Todo>; 
+
+}
+
+```
+
+The purpose of this is have a nice simple and clean interface for API interactions.
+
+The services level can also provide: 
+
+- Response validation (Check that the server response is the shape you expect it to be)
+- Authentication management (refreshing auth tokens)
+- Be returning or throwing useful errors 
+- Retry functionality 
+
+
+## Part 5 - Inject services via context provider 
+
+Finally, I like to inject the services via a context provider: 
+
+
+**Service Provider** 
+```tsx
+type Services = {
+
+    fetchTodos: () => Promise<Array<Todo>>;
+}
+const ServicesContext = React.createContext<Services>({
+
+    fetchTodos: async () => [] // This is the service that will be used if no services provider is used. 
+    // Perhaps instead of returning empty objects, you could throw errors instead. 
+})
+
+export const ServicesProvider = (props: React.PropsWithChildren<Services>) => {
+
+    const { children, ...rest } = props;
+    return <ServicesContext.Provider value={rest}>{children}</ServicesContext.Provider>
+}
+
+
+export const useServices = () => {
+    return React.useContext(ServicesContext); 
+}
+```
+
+**Declare The Service Provider in application root** 
+
+```tsx
+
+import { fetchAllTodos } from './services/TodosService';
+
+export const App = () => {
+
+
+    return (
+            <ServicesProvider fetchTodos={fetchAllTodos}>
+                <TodoListPage />
+            </ServicesProvider>
+
+    );
+};
+```
+
+
+**Using the injected service in the state management hook**
+
+```tsx
+//...
+    const {fetchTodos} = useServices(); 
+//...
+```
+
+
+The reason I like to do this is for testability. 
+
+It's now dead easy to change the behaviour of the fetchTodos service, just by changing what we pass into the ServicesProvider. 
+
+This is useful for testing, where we often want to pass in `jest.fn()`s. [I write more about this here](https://github.com/dwjohnston/technical-blog/blob/main/posts/javascript_testing_strategy_part2.md#dependency-injection-3---inject-via-context) . 
+
+Also, it could be used for deploying the application to different environments, or A/B testing services, we can change how the application behaves all at the top level of the application. 
+
