@@ -1,4 +1,5 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import { cssBundleHref } from "@remix-run/css-bundle";
+import type { LinksFunction,  MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,9 +8,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+
 import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
+
 export const meta: MetaFunction = (...args) => {
   return {
     charset: "utf-8",
@@ -29,9 +32,10 @@ export const meta: MetaFunction = (...args) => {
 
   }
 };
+export const links: LinksFunction = () => [
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: styles },
   {
     rel: "stylesheet", href: ourStyles,
   },
@@ -39,13 +43,14 @@ export const links: LinksFunction = () => {
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Open Sans"
   }
-  ];
-};
+];
 
 export default function App() {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
       </head>
@@ -57,10 +62,10 @@ export default function App() {
         </header>
         <div className="main-column">
           <Outlet />
-          <ScrollRestoration />
-          <Scripts />
-          <LiveReload />
         </div>
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
       </body>
     </html>
   );

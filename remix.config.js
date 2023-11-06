@@ -1,15 +1,51 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-const {
-  remarkMdxFrontmatter,
-} = require("remark-mdx-frontmatter");
+
+const fs = require('fs');
+const path = require('path');
+
+function generateRoutes(folderPath) {
+  const routes = [];
+
+  function traverseDir(currentPath, relativePath = '') {
+    const files = fs.readdirSync(currentPath);
+
+    files.forEach((file) => {
+      const filePath = path.join(currentPath, file);
+      const fileStats = fs.statSync(filePath);
+
+      if (fileStats.isDirectory()) {
+        // If it's a directory, recursively traverse it
+        traverseDir(filePath, path.join(relativePath, file));
+      } else {
+        // If it's a file, add a route definition
+
+        if(path.basename(file).startsWith("_index")){
+          return;
+        }
+        
+        const routePath = path.join(relativePath, path.basename(file).split('.')[0]);
+        const filePathRelativeToApp = path.relative('app', filePath);
+        routes.push([routePath, filePathRelativeToApp]); 
+      }
+    });
+  }
+
+  traverseDir(folderPath);
+  return routes;
+}
+const routeDefinitions = generateRoutes('./app/routes');
+
 
 module.exports = {
-  serverBuildTarget: "netlify",
+  ignoredRouteFiles: ["**/.*"],
   server:
     process.env.NETLIFY || process.env.NETLIFY_LOCAL
-      ? "./server.js"
+      ? "./server.ts"
       : undefined,
-  ignoredRouteFiles: ["**/.*", ...(process.env.NODE_ENV === 'development' ? [] : ["drafts/*"])],
+  serverBuildPath: ".netlify/functions-internal/server.js",
+  // appDirectory: "app",
+  // assetsBuildDirectory: "public/build",
+  // publicPath: "/build/",
   mdx: async (filename, ...rest) => {
     const [rehypeHighlight, remarkToc] = await Promise.all([
       import("rehype-highlight").then((mod) => mod.default),
@@ -21,8 +57,23 @@ module.exports = {
       rehypePlugins: [rehypeHighlight],
     };
   },
-  // appDirectory: "app",
-  // assetsBuildDirectory: "public/build",
-  // serverBuildPath: ".netlify/functions-internal/server.js",
-  // publicPath: "/build/",
+
+  routes: (defineRoutes) => {
+    return defineRoutes((route) => {
+
+      routeDefinitions.forEach((v) => {
+        console.log(v);
+        route(...v)})
+    }); 
+  },
+
+  serverModuleFormat: "cjs",
+  future: {
+    v2_dev: true,
+    v2_errorBoundary: true,
+    v2_headers: true,
+    v2_meta: false,
+    v2_normalizeFormMethod: true,
+    v2_routeConvention: true,
+  },
 };
