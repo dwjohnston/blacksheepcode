@@ -72,14 +72,14 @@ export async function getPost(slug: string) {
  * @returns 
  */
 export async function getPosts() {
-  const postsPath = await readdir(`${__dirname}/../../app/blog-posts/posts`, {
+  const postsPath = await readdir(`${process.cwd()}/app/blog-posts/posts`, {
     withFileTypes: true,
   });
 
   const posts = await Promise.all(
     postsPath.map(async (dirent) => {
 
-      const filePath = path.join(`${__dirname}/../../app/blog-posts/posts`, dirent.name)
+      const filePath = path.join(`${process.cwd()}/app/blog-posts/posts`, dirent.name)
       const [file] = await Promise.all([readFile(
         filePath,
       )
