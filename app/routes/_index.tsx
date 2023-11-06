@@ -1,5 +1,41 @@
+import { DataFunctionArgs } from "@remix-run/server-runtime";
 import mainIcon from "../assets/blacksheep_100x100.webp";
+import { Frontmatter, getPosts } from "~/utils/post.server";
+import { useLoaderData } from "@remix-run/react";
 
+
+export async function loader(data: DataFunctionArgs) {
+  const posts = await getPosts();
+  return posts;
+}
+
+
+function BlogItem(props: {
+  item: {
+    slug: string; 
+    frontmatter?: Frontmatter;
+  }
+}) {
+
+  const {item} = props
+  return <div className= "blog-item">
+    <a href={`/posts/${item.slug}`}> <h3>{item.frontmatter.meta?.title ?? item.slug} </h3></a>
+    <p>{item.frontmatter.meta?.description}</p>
+
+  </div>
+}
+
+function ListOfBlogPosts() {
+  const data = useLoaderData<Array<{
+    slug: string; 
+    frontmatter: Frontmatter;
+  }>>(); 
+  return <>
+      {data.map((v) => {
+          return <BlogItem item={v} key={v.slug}/>
+        })}
+  </>
+}
 
 export default function Index() {
   return (<>
@@ -38,6 +74,8 @@ export default function Index() {
       <div className="main">
 
         <h2>Blog</h2>
+
+        <ListOfBlogPosts/>
       </div>
 
       <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank">Open Collective</a>
