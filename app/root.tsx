@@ -1,9 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-<<<<<<< HEAD
 import type { LinksFunction,  MetaFunction } from "@remix-run/node";
-=======
-import type { LinksFunction } from "@remix-run/node";
->>>>>>> c6c25c3 (Everything)
 import {
   Links,
   LiveReload,
@@ -13,7 +9,8 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import styles from 'highlight.js/styles/vs2015.css';
+
+import highlightJsStyles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 
@@ -39,7 +36,7 @@ export const meta: MetaFunction = (...args) => {
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 
-  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: highlightJsStyles },
   {
     rel: "stylesheet", href: ourStyles,
   },
