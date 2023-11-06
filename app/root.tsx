@@ -1,9 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-<<<<<<< HEAD
-import type { LinksFunction,  MetaFunction } from "@remix-run/node";
-=======
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
->>>>>>> 5f89047 (Add list of blog posts in)
 import {
   Links,
   LiveReload,

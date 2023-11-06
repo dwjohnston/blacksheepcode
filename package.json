@@ -6,7 +6,6 @@
     "dev": "remix dev",
     "start": "netlify serve",
     "lint": "eslint .",
-
     "types": "tsc && tsc -p cypress/tsconfig.json",
     "test:cypress:ci": "cypress run"
   },

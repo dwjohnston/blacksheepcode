@@ -3,23 +3,6 @@ import { readFile, readdir } from "./fs.server"
 import path from "path";
 import { bundleMDX } from "./mdx.server";
 
-// if (process.platform === 'win32') {
-//   process.env.ESBUILD_BINARY_PATH = path.join(
-//     process.cwd(),
-//     'node_modules',
-//     'esbuild',
-//     'esbuild.exe',
-//   )
-// } else {
-//   process.env.ESBUILD_BINARY_PATH = path.join(
-//     process.cwd(),
-//     'node_modules',
-//     'esbuild',
-//     'bin',
-//     'esbuild',
-//   )
-// }
-
 // The frontmatter can be any set of key values 
 // But that's not especially useful to use
 // So we'll declare our own set of properties that we are going to expect to exist 
@@ -58,6 +41,7 @@ export async function getPost(slug: string) {
       options.loader = {
         ...options.loader,
         '.png': 'dataurl',
+        '.webp': "dataurl",
       };
       options.platform="neutral",
       options.define = {

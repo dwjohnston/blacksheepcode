@@ -19,8 +19,8 @@ function BlogItem(props: {
 
   const {item} = props
   return <div className= "blog-item">
-    <a href={`/posts/${item.slug}`}> <h3>{item.frontmatter.meta?.title ?? item.slug} </h3></a>
-    <p>{item.frontmatter.meta?.description}</p>
+    <a href={`/posts/${item.slug}`}> <h3>{item.frontmatter?.meta?.title ?? item.slug} </h3></a>
+    <p>{item.frontmatter?.meta?.description}</p>
 
   </div>
 }

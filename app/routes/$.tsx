@@ -1,13 +1,13 @@
-import React from "react";
-
+import React, {useMemo} from "react";
 import {  useLoaderData, useLocation } from "@remix-run/react"
-
-import { DataFunctionArgs, LoaderFunction, json } from "@remix-run/server-runtime";
+import type { DataFunctionArgs, LoaderFunction} from "@remix-run/server-runtime";
+import { json } from "@remix-run/server-runtime";
 import { getMDXComponent } from "mdx-bundler/client/index.js";
-import { useMemo } from "react";
-import { Frontmatter, getPost } from "../utils/post.server";
+import type { Frontmatter} from "../utils/post.server";
+import { getPost } from "../utils/post.server";
 
-import {Prism as SyntaxHighlighter} from "react-syntax-highlighter";
+import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub";
+import PostComments from "~/components/PostComments/PostComments";
 
 type LoaderData = {
     frontmatter: any;
@@ -33,8 +33,6 @@ export const loader: LoaderFunction = async ({ params, request }: DataFunctionAr
 function PostHeader(props: {
     frontmatter: Frontmatter;
 }) {
-
-    const { frontmatter } = props;
     // My header is empty but this is potentially where we can add tags
     // Make the h1 come from the post frontmatter, etc. 
     return <>
@@ -45,21 +43,12 @@ export default function Post() {
     const { code, frontmatter } = useLoaderData<LoaderData>();
     const Component = useMemo(() => getMDXComponent(code), [code]);
     const params = useLocation();
-    const codeString = '(num) => num + 1';
-
-    console.log(SyntaxHighlighter)
-
     return (
         <>
-
-        hello
-        <SyntaxHighlighter language="javascript">
-      {codeString}
-    </SyntaxHighlighter>
-            {/* <PostHeader frontmatter={frontmatter} /> */}
+            <PostHeader frontmatter={frontmatter} />
             <Component />
-
-   
+            <EditWithGithub postName={params.pathname} />
+            <PostComments />
         </>
     );
 }
