@@ -1,7 +1,6 @@
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
-import { EditWithGithub } from '~/components/EditWithGithub/EditWithGithub';
 import { RaiseAnIssue } from '~/components/RaiseAnIssue/RaiseAnIssue';
 export type GameOfLifeProps = {
 };
@@ -49,9 +48,6 @@ function getLivingNeighboursCount(map: Array<Array<boolean>>, y: number, x: numb
 
     const yIndexsToUse = [y];
     const xIndexesToUse = [x];
-
-    const neighbours = [] as Array<boolean>;
-
     if (y !== 0) {
         yIndexsToUse.push(y - 1);
     }
