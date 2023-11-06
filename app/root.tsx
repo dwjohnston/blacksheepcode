@@ -1,5 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction,  MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -32,7 +32,6 @@ export const meta: MetaFunction = (...args) => {
 
   }
 };
-
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 
@@ -56,13 +55,14 @@ export default function App() {
         <Links />
       </head>
       <body>
-
         <header>
           <div>
             <a href="/">Black Sheep Code</a>
           </div>
         </header>
-        <Outlet />
+        <div className="main-column">
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
