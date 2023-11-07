@@ -6,8 +6,6 @@ export default () => {
 
     const params = useLocation();
     return <>
-
-    POSTS.TSX
         <Outlet />
         <EditWithGithub postName={params.pathname} />
         <PostComments />
