@@ -10,6 +10,7 @@
     "jsx": "react-jsx",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "module": "ESNext",
     "target": "ES2019",
     "strict": true,
     "allowJs": true,

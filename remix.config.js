@@ -64,17 +64,7 @@ module.exports = {
 
   routes: (defineRoutes) => {
     return defineRoutes((route) => {
-
-
-      // route("posts", "routes/posts.tsx", () => {
-      //   route("testing_easy_mde", "routes/posts/testing_easy_mde.mdx")
-      // })
-
-      // console.log(routeDefinitions)
       routeDefinitions.forEach((v) => {
-
-
-
         console.log("Declaring route:", v.folder, `routes/posts.tsx`)
         route(v.folder, `routes/${v.folder}.tsx`, () => {
           v.routes.forEach((w) => {

@@ -1,0 +1,8 @@
+{
+  "meta": {
+    "twitter:title": "OpenAPI contract tests - Performance testing",
+    "twitter:description": "We can use a tool called jest-timing-reporter to provide a performance diff in our pull request",
+    "title": "OpenAPI contract tests - Performance testing",
+    "description": "We can use a tool called jest-timing-reporter to provide a performance diff in our pull request"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "meta": {
+    "title": "Why I don't like module mocks, kinda.",
+    "description": "I think requiring module mocks to test your code suggests a code smell. However, they can be a powerful tool for an existing codebase.",
+    "twitter:title": "Why I don't like module mocks, kinda.",
+    "twitter:description": "I think requiring module mocks to test your code suggests a code smell. However, they can be a powerful tool for an existing codebase."
+  }
+}
