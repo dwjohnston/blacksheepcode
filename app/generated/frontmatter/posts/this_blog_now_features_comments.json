@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "This blog now features comments",
-    "twitter:description": "I've add comment functionality via the Utterances plugin",
-    "title": "This blog now features comments",
-    "description": "I've add comment functionality via the Utterances plugin"
+  "slug": "posts/this_blog_now_features_comments",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "This blog now features comments",
+      "twitter:description": "I've add comment functionality via the Utterances plugin",
+      "title": "This blog now features comments",
+      "description": "I've add comment functionality via the Utterances plugin"
+    }
   }
 }

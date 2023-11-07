@@ -1,8 +1,15 @@
 {
-  "meta": {
-    "twitter:title": "OpenAPI and contract tests with Jest",
-    "twitter:description": "Using good ol' Jest to write some contract tests",
-    "title": "OpenAPI and contract tests with Jest",
-    "description": "Using good ol' Jest to write some contract tests"
+  "slug": "posts/generating_apps_from_openapi_part5a",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "OpenAPI and contract tests with Jest",
+      "twitter:description": "Using good ol' Jest to write some contract tests",
+      "title": "OpenAPI and contract tests with Jest",
+      "description": "Using good ol' Jest to write some contract tests"
+    },
+    "series": {
+      "name": "generating_apps_from_open_ai",
+      "part": 6
+    }
   }
 }

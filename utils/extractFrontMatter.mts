@@ -9,22 +9,20 @@ export const a = "a"
 const startToken = "/app/routes/";
 const endToken = ".mdx";
 function getParts(inputString: string) : [string, string] {
+  const startIndex = inputString.indexOf(startToken);
+  const endIndex = inputString.indexOf(endToken);
 
+  if (startIndex !== -1 && endIndex !== -1) {
+    const extractedPart = inputString.substring(startIndex + startToken.length, endIndex);
+    const segments = extractedPart.split('/'); // Split by '/'
+    if (segments.length !==2){
+      throw new Error("Expected an array of length 2")
+    }
 
-const startIndex = inputString.indexOf(startToken);
-const endIndex = inputString.indexOf(endToken);
-
-if (startIndex !== -1 && endIndex !== -1) {
-  const extractedPart = inputString.substring(startIndex + startToken.length, endIndex);
-  const segments = extractedPart.split('/'); // Split by '/'
-  if (segments.length !==2){
-    throw new Error("Expected an array of length 2")
+    return segments as [string, string]; 
+  } else {
+    throw new Error("String format is not as expected");
   }
-
-  return segments as [string, string]; 
-} else {
-  throw new Error("String format is not as expected");
-}
 }
 
 async function processFile(inputString: string) {
@@ -33,13 +31,17 @@ async function processFile(inputString: string) {
      const [subPath, fileName] = getParts(inputString); 
 
     const output = fm(fileText);
-
-    console.log(output);
-
   const basePath = path.join(process.cwd(), "app", "generated", "frontmatter", subPath); 
   await fsAsync.mkdir(basePath, {recursive: true})
+
+  
+
   //@ts-ignore
-  await fsAsync.writeFile(path.join(basePath, fileName + ".json"), JSON.stringify(output.attributes, null, 2)); 
+  await fsAsync.writeFile(path.join(basePath, fileName + ".json"), JSON.stringify({
+    slug: `${subPath}/${fileName}`,
+    frontmatter: output.attributes
+  }, null, 2)); 
+  await fsAsync.appendFile(path.join(basePath, 'index.js'), `export {default as ${fileName}} from './${fileName}.json';\n`); 
 }
 
 async function findMdxFiles(folderPath: string) {
@@ -53,15 +55,17 @@ async function findMdxFiles(folderPath: string) {
       const fileStats = fs.statSync(filePath);
 
       if (fileStats.isDirectory()) {
-        // If it's a directory, recursively traverse it
+        // fs.appendFileSync(path.join(process.cwd(), "app", "generated", "frontmatter", "index.js"), `export * from './${file}';\n`); 
+
         traverseDir(filePath);
       } else if (file.endsWith('.mdx')) {
         // If it's an .mdx file, log it
-        console.log(filePath);
         promises.push(processFile(filePath));
 
       }
     });
+
+
   }
 
   traverseDir(folderPath);

@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "I'm playing with Remix",
-    "twitter:description": "Using Remix to generate a static blog",
-    "title": "I'm playing with Remix",
-    "description": "Using Remix to generate a static blog"
+  "slug": "posts/i_am_playing_with_remix",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "I'm playing with Remix",
+      "twitter:description": "Using Remix to generate a static blog",
+      "title": "I'm playing with Remix",
+      "description": "Using Remix to generate a static blog"
+    }
   }
 }

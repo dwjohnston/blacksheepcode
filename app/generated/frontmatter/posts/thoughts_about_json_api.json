@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "Thoughts about JSON API",
-    "twitter:description": "JSON API is an opinionated REST API structuring spec. Here's my thoughts.",
-    "title": "Thoughts about JSON API",
-    "description": "JSON API is an opinionated REST API structuring spec. Here's my thoughts."
+  "slug": "posts/thoughts_about_json_api",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "Thoughts about JSON API",
+      "twitter:description": "JSON API is an opinionated REST API structuring spec. Here's my thoughts.",
+      "title": "Thoughts about JSON API",
+      "description": "JSON API is an opinionated REST API structuring spec. Here's my thoughts."
+    }
   }
 }

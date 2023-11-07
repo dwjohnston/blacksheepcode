@@ -21,7 +21,7 @@ function generateRoutes(folders) {
       } else {
         // If it's a file, add a route definition
 
-        if(path.basename(file).startsWith("_index")){
+        if(path.basename(file).startsWith("_index") || path.basename(file).startsWith("index") ){
           return;
         }
         
@@ -62,20 +62,22 @@ module.exports = {
     };
   },
 
-  routes: (defineRoutes) => {
-    return defineRoutes((route) => {
-      routeDefinitions.forEach((v) => {
-        console.log("Declaring route:", v.folder, `routes/posts.tsx`)
-        route(v.folder, `routes/${v.folder}.tsx`, () => {
-          v.routes.forEach((w) => {
-            console.log("Declaring route:", ...w)
-            route(...w);
-          })
-        })
-      });
+  // routes: (defineRoutes) => {
+  //   return defineRoutes((route) => {
+  //     console.log("Declaring route:", '/', '-->', `routes/_index.tsx`)
+  //     route('/', "routes/_index.tsx");
+  //     routeDefinitions.forEach((v) => {     
+  //       console.log("Declaring route:", v.folder, '-->', `routes/posts.tsx`)
+  //       route(v.folder, `routes/${v.folder}.tsx`, () => {
+  //         v.routes.forEach((w) => {
+  //           console.log("Declaring route:", '-->', ...w)
+  //           route(...w);
+  //         })
+  //       })
+  //     });
 
-    }); 
-  },
+  //   }); 
+  // },
 
   serverModuleFormat: "cjs",
   future: {
@@ -84,6 +86,6 @@ module.exports = {
     v2_headers: true,
     v2_meta: false,
     v2_normalizeFormMethod: true,
-    v2_routeConvention: true,
+    v2_routeConvention: false,
   },
 };

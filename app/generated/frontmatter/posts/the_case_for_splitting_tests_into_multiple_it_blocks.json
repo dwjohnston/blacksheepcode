@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "The case for splitting Cypress tests into multiple it blocks",
-    "twitter:description": "Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visiblity of the parts of the test.",
-    "title": "The case for splitting Cypress tests into multiple it blocks",
-    "description": "Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visiblity of the parts of the test."
+  "slug": "posts/the_case_for_splitting_tests_into_multiple_it_blocks",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "The case for splitting Cypress tests into multiple it blocks",
+      "twitter:description": "Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visiblity of the parts of the test.",
+      "title": "The case for splitting Cypress tests into multiple it blocks",
+      "description": "Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visiblity of the parts of the test."
+    }
   }
 }

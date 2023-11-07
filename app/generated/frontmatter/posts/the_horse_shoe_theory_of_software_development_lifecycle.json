@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "The horseshoe model for software development",
-    "twitter:description": "I propose that the designer and the QA should be one and the same",
-    "title": "The horseshoe model for software development",
-    "description": "I propose that the designer and the QA should be one and the same"
+  "slug": "posts/the_horse_shoe_theory_of_software_development_lifecycle",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "The horseshoe model for software development",
+      "twitter:description": "I propose that the designer and the QA should be one and the same",
+      "title": "The horseshoe model for software development",
+      "description": "I propose that the designer and the QA should be one and the same"
+    }
   }
 }

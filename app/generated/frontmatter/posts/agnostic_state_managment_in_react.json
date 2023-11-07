@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "Agnostic state and service management in React",
-    "twitter:description": "Avoid make state framework specific calls inside of your React components, and instead access them via hooks",
-    "title": "Agnostic state and service management in React",
-    "description": "Avoid make state framework specific calls inside of your React components, and instead access them via hooks"
+  "slug": "posts/agnostic_state_managment_in_react",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "Agnostic state and service management in React",
+      "twitter:description": "Avoid make state framework specific calls inside of your React components, and instead access them via hooks",
+      "title": "Agnostic state and service management in React",
+      "description": "Avoid make state framework specific calls inside of your React components, and instead access them via hooks"
+    }
   }
 }

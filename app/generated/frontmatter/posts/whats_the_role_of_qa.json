@@ -1,8 +1,11 @@
 {
-  "meta": {
-    "twitter:title": "What is the role of QA and how should their tests fit into the development process?",
-    "twitter:description": "If we're doing shift left testing, and developers are writing their own tests - then where does that leave QA?",
-    "title": "What is the role of QA and how should their tests fit into the development process?",
-    "description": "If we're doing shift left testing, and developers are writing their own tests - then where does that leave QA?"
+  "slug": "posts/whats_the_role_of_qa",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "What is the role of QA and how should their tests fit into the development process?",
+      "twitter:description": "If we're doing shift left testing, and developers are writing their own tests - then where does that leave QA?",
+      "title": "What is the role of QA and how should their tests fit into the development process?",
+      "description": "If we're doing shift left testing, and developers are writing their own tests - then where does that leave QA?"
+    }
   }
 }

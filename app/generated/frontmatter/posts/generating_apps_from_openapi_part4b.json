@@ -1,8 +1,15 @@
 {
-  "meta": {
-    "twitter:title": "Postman and OpenAPI - Automated Tests",
-    "twitter:description": "Postman has an automated testing feature, but how well does it work?",
-    "title": "Postman and OpenAPI - Automated Tests",
-    "description": "Postman has an automated testing feature, but how well does it work?"
+  "slug": "posts/generating_apps_from_openapi_part4b",
+  "frontmatter": {
+    "meta": {
+      "twitter:title": "Postman and OpenAPI - Automated Tests",
+      "twitter:description": "Postman has an automated testing feature, but how well does it work?",
+      "title": "Postman and OpenAPI - Automated Tests",
+      "description": "Postman has an automated testing feature, but how well does it work?"
+    },
+    "series": {
+      "name": "generating_apps_from_open_ai",
+      "part": 5
+    }
   }
 }
