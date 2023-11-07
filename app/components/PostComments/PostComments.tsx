@@ -22,16 +22,16 @@ const PostComments = () => {
         commentScript.setAttribute('theme', 'github-light')
         commentScript.setAttribute('crossorigin', 'anonymous')
         // we will append this script as a child to the ref element we have created above
-        if (containingEl) {
-            containingEl.appendChild(commentScript)
-        } else {
-            console.log(`Error adding utterances comments on: ${commentBox}`)
+        commentScript.onload = (e) => {
+            if (containingEl) {
+                containingEl.appendChild(commentScript)
+            } else {
+                console.log(`Error adding utterances comments on: ${commentBox}`)
+            }
         }
 
-
-
         return () => {
-            if (containingEl) {
+            if (containingEl && containingEl.contains(commentScript)) {
                 containingEl.removeChild(commentScript);
             }
         }
@@ -39,6 +39,8 @@ const PostComments = () => {
 
     return (
         <>
+
+        POST COMMENTS
             <Comment ref={commentBox} />
         </>
     )

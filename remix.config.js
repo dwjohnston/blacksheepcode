@@ -3,19 +3,21 @@
 const fs = require('fs');
 const path = require('path');
 
-function generateRoutes(folderPath) {
-  const routes = [];
+function generateRoutes(folders) {
+  return folders.map((folder) => {
 
-  function traverseDir(currentPath, relativePath = '') {
+    console.log(folder)
+
+    const currentPath = `./app/routes/${folder}`
+    const relativePath = ""
     const files = fs.readdirSync(currentPath);
-
-    files.forEach((file) => {
+    const routes = files.map((file) => {
       const filePath = path.join(currentPath, file);
       const fileStats = fs.statSync(filePath);
 
       if (fileStats.isDirectory()) {
         // If it's a directory, recursively traverse it
-        traverseDir(filePath, path.join(relativePath, file));
+        throw new Error("Did not expect to find a directory");
       } else {
         // If it's a file, add a route definition
 
@@ -23,17 +25,19 @@ function generateRoutes(folderPath) {
           return;
         }
         
-        const routePath = path.join(relativePath, path.basename(file).split('.')[0]);
+        const routePath = path.basename(file).split('.')[0];
         const filePathRelativeToApp = path.relative('app', filePath);
-        routes.push([routePath, filePathRelativeToApp]); 
+        return ([routePath, filePathRelativeToApp]); 
       }
     });
-  }
 
-  traverseDir(folderPath);
-  return routes;
+    return {
+      folder, 
+      routes
+    }
+  })
 }
-const routeDefinitions = generateRoutes('./app/routes');
+const routeDefinitions = generateRoutes(['posts', 'test', 'drafts']);
 
 
 module.exports = {
@@ -61,9 +65,25 @@ module.exports = {
   routes: (defineRoutes) => {
     return defineRoutes((route) => {
 
+
+      // route("posts", "routes/posts.tsx", () => {
+      //   route("testing_easy_mde", "routes/posts/testing_easy_mde.mdx")
+      // })
+
+      // console.log(routeDefinitions)
       routeDefinitions.forEach((v) => {
-        console.log(v);
-        route(...v)})
+
+
+
+        console.log("Declaring route:", v.folder, `routes/posts.tsx`)
+        route(v.folder, `routes/${v.folder}.tsx`, () => {
+          v.routes.forEach((w) => {
+            console.log("Declaring route:", ...w)
+            route(...w);
+          })
+        })
+      });
+
     }); 
   },
 
