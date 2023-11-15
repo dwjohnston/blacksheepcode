@@ -52,7 +52,7 @@ export function getFolderAndFilenameFromSlug(slug: string): {
 
 } {
 
-    const [, folder, fName] = slug.split("/");
+    const [, folder, fName] = slug.split(/[?/#]/);
 
     if (!folder) {
         throw new Error("Expected folder to exist");
