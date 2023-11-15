@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "npm run generate:mdxjson && remix build",
     "dev": "remix dev",
     "start": "netlify serve",
     "lint": "eslint .",
