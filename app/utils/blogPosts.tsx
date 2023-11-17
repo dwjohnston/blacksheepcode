@@ -74,12 +74,12 @@ export function getFolderAndFilenameFromSlug(slug: string): {
  * @param slug 
  * @returns 
  */
-export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFrontMatter> {
+export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFrontMatter | null> {
     const { folder, filename } = getFolderAndFilenameFromSlug(slug);
 
     const frontmatter = allMetadata[folder][filename] as BaseFrontmatter;
     if (!frontmatter) {
-        throw new Error(`Did not find frontmatter for folder: '${folder}' and filename: '${filename}'`)
+        return null;
     }
 
     let seriesFrontmatter : Array<BaseFrontmatterWithMandatorySeriesInfo> | undefined; 

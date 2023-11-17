@@ -151,3 +151,35 @@ table td {
 .series-box .current {
     font-weight: bold;
 }
+
+.infopanel {
+    border: solid 1px; 
+    border-radius: 1em; 
+    padding: 1em; 
+    margin: 0.5em 0;
+
+    font-size: 0.8em;
+}
+
+.infopanel-warning {
+    border-color: #ffc400;
+    background-color: #ffecb3;
+}
+
+.infopanel-info {
+    border-color: #40c4ff;
+    background-color: #b3e5fc;
+}
+
+.infopanel .icon {
+    float: left; 
+    margin: 0.5em;
+}
+
+.infopanel-warning .icon {
+    color:  #ffc400;
+}
+
+.infopanel-info .icon {
+    color:  #40c4ff;
+}

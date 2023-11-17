@@ -1,0 +1,99 @@
+---
+meta:
+  title:  How to configure Remix and mdx-bundler
+  description: I've switched this blog to using Remix and mdx-bundler to make better use of frontmatter headers
+
+series: 
+    name: remix_blog
+    part: 2
+---
+
+import {GithubPermalink} from "react-github-permalink";
+import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
+
+# How to configure Remix and mdx-bundler
+
+<InfoPanel level="warning">
+<p>The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.</p>
+</InfoPanel>
+
+This post outlines a process I took to improve this blog, although I ultimately abandoned this approach due to the requirement to have access to the file system.
+
+## Starting Point
+
+Initially I had followed [Remix's MDX guide](https://remix.run/docs/en/main/guides/mdx). 
+
+We declare `.mdx` files in our Remix routing structure. Remix's out-of-the-box tooling can handle the the MDX content and at build time converts it to JavaScript where it is treated just like any other ordinary React route component. 
+
+Conveniently, [YAML frontmatter](https://docs.github.com/en/contributing/writing-for-github-docs/using-yaml-frontmatter) headers are also supported. 
+
+Some configuration was required - to add codeblock syntax highlighting, for example. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/69005aa52d9b80ba81904fc6012d5afcc1889bc6/remix.config.js#L13-L23"/>
+
+
+## The Problem
+
+The problem I had is mostly around the usage of frontmatter - I had no control of how the frontmatter behaved with my application; I could only use the functionality as provided with the out-of-the-box tooling - adding titles, social meta tags etc. 
+
+One annoying issue I had was that twitter's social meta tags required their own `twitter` prefix (eg. `og:twitter:title`), even though this was going to be the exact same as the other socials, [I had to go through and specially add frontmatter items for twitter on every post](https://github.com/dwjohnston/blacksheepcode/pull/60/files).
+
+But mostly, I wanted to be able to group items in a series - and provide links to the next item in the series etc, all without having to maintain those links everywhere. 
+
+Note the nice series box at the top of this page. 
+
+Additional functionality might include including an author tag and creation dates. 
+
+## The Solution 
+
+A recommended solution [by Remix themselves](https://remix.run/docs/en/main/guides/mdx#mdx) is to use [mdx-bundler](https://github.com/kentcdodds/mdx-bundler). 
+
+At first I looked at how [Kent C. Dodds' builds his blog](https://github.com/kentcdodds/kentcdodds.com). But his configuration is _complex_ (eg. [see here](https://github.com/kentcdodds/kentcdodds.com/blob/e488c740c83da7979adb1fd2366a7933df4a213d/app/utils/mdx.tsx)). 
+
+One of the top search results for 'remix mdx-bundler' gives us [this Oldweb2 blog post](https://blog.oldweb2.com/remix-mdx-blog), which is a lot simpler. However, this post is quite out of date. However, it was a useful starting point in understanding the general strategy of using mdx-bundler. 
+
+This solution is for Netlify and Remix 1.x.x. 
+
+
+### Move all of your MDX files out of the routes directory 
+
+You are no longer going to use Remix's out-of-the-box file routing for the blog posts. I moved all my posts from `~/app/routes/posts/blog_post.mdx` to `~/app/blog-posts/posts/blog_post.mdx`. 
+
+### Update your TSConfig if you haven't already 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/020ff44a2b20db79aab9b47f04ccc91554a26056/tsconfig.json#L10-L11"/>
+
+The `module` property will allow us to do dynamic imports later. 
+
+### Declare .server.ts utility files 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/020ff44a2b20db79aab9b47f04ccc91554a26056/app/utils/fs.server.ts#L1-L3"/>
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/020ff44a2b20db79aab9b47f04ccc91554a26056/app/utils/mdx.server.ts#L1-L3"/>
+
+The [`.server.ts` file convention](https://remix.run/docs/en/main/file-conventions/-server) causes Remix to not include this code in client bundles - which is important as these use node packages. 
+
+### Create a post.tsx utility for parsing the MDX. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/c34a3a39992e38f50b8409d3dbcf549801556496/app/utils/post.tsx#L1-L110"/>
+
+### Create a slug handler
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/842731a1f96f909fa914792e2dd4a3b135e82b5a/app/routes/$.tsx#L1-L58"/>
+
+### Update a pages metadata based on frontmatter
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/a600d7602d42733909890cc0bcd9cc2bd17a32cf/app/routes/$.tsx#L17-L28"/>
+
+### Create home page list of blog posts
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/afbc9a277dff3518b96db345dee6ad9c0c2d4a0e/app/routes/index.tsx#L7-L38"/>
+
+---
+
+And there you have it!
+
+
+
+
+

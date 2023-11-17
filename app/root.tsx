@@ -9,9 +9,12 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
+
 import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
+import { GithubPermalinkProvider } from "react-github-permalink";
 
 export const meta: MetaFunction = (...args) => {
   return {
@@ -32,6 +35,7 @@ export const meta: MetaFunction = (...args) => {
 
   }
 };
+
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 
@@ -39,10 +43,13 @@ export const links: LinksFunction = () => [
   {
     rel: "stylesheet", href: ourStyles,
   },
+  {rel: "stylesheet", href: githubPermalinkStyle},
   {
     rel: "stylesheet",
     href: 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'
-  }
+  }, 
+  {rel: "stylesheet",
+  href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"}
 ];
 
 export default function App() {
@@ -75,7 +82,9 @@ export default function App() {
           </div>
         </header>
         <div className="main-column">
-          <Outlet />
+          <GithubPermalinkProvider githubToken={"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"}>
+            <Outlet />
+          </GithubPermalinkProvider>
         </div>
         <ScrollRestoration />
         <Scripts />
