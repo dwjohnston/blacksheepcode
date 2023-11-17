@@ -51,6 +51,20 @@ export default function App() {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NB66YHJYM"></script>
+        <script
+                      dangerouslySetInnerHTML={{
+                        __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                      
+                        gtag('config', 'G-0NB66YHJYM');
+                        `
+                      }}
+        >
+
+        </script>
         <Meta />
         <Links />
       </head>
