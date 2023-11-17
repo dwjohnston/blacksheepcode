@@ -30,7 +30,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn
+        run: npm i
 
       - name: Run Cypress
         run: .github/workflows/scripts/run-cypress.sh

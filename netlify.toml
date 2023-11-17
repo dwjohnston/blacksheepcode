@@ -1,5 +1,5 @@
 [build]
-  command = "remix build"
+  command = "ls node_modules/@esbuild && npm run build"
   publish = "public"
 
 [[redirects]]

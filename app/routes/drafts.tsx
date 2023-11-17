@@ -1,13 +1,12 @@
-import { Outlet,  useLocation } from "@remix-run/react"
+import { Outlet, useLocation } from "@remix-run/react"
 import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
+import { FrontmatterBox } from "~/components/FrontmatterBox/FrontmatterBox";
 import PostComments from "~/components/PostComments/PostComments";
 import { createLoaderFunction, createMetaFunction } from "~/utils/blogPosts";
-import { FrontmatterBox } from "~/components/FrontmatterBox/FrontmatterBox";
 
 
-
-export const loader = createLoaderFunction("posts");
-export const meta = createMetaFunction("posts");
+export const loader = createLoaderFunction("drafts");
+export const meta = createMetaFunction("drafts");
 
 export default () => {
     const params = useLocation();

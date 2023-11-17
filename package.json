@@ -2,12 +2,14 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "npm run generate:mdxjson && remix build",
     "dev": "remix dev",
     "start": "netlify serve",
     "lint": "eslint .",
     "types": "tsc && tsc -p cypress/tsconfig.json",
-    "test:cypress:ci": "cypress run"
+    "test:cypress": "cypress open",
+    "test:cypress:ci": "cypress run", 
+    "generate:mdxjson": "rm -rf app/generated/frontmatter && ts-node --esm utils/extractFrontMatter.mts"
   },
   "dependencies": {
     "@netlify/functions": "^1.4.0",
@@ -15,6 +17,7 @@
     "@remix-run/css-bundle": "^1.19.3",
     "@remix-run/node": "^1.19.3",
     "@remix-run/react": "^1.19.3",
+    "@stefanprobst/remark-extract-yaml-frontmatter": "^3.0.0",
     "cross-env": "^7.0.3",
     "isbot": "^3.6.8",
     "mdx-bundler": "^9.2.1",
@@ -35,6 +38,7 @@
     "@types/source-map-support": "^0.5.6",
     "cypress": "^13.4.0",
     "eslint": "^8.38.0",
+    "front-matter": "^4.0.2",
     "remark-toc": "^8.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"

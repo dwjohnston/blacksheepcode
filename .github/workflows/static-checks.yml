@@ -22,10 +22,13 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: yarn
+        run: npm i
+
+      - name: Build
+        run: npm run build
 
       - name: Run Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Run Types Check
-        run: yarn types
+        run: npm run types

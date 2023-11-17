@@ -52,4 +52,17 @@ describe('template spec', () => {
       // Because we quickly hit the rate limit
       cy.get(".react-github-permalink").should("exist");
     })
+
+    it("series - has the right content", () => {
+      cy.visit('/test/series1'); 
+
+      cy.findByText("I am series - post 1 content").should("exist"); 
+      cy.findByText('I am the series description').should("exist")
+
+
+      cy.findByRole("link", {name: "Series - Post 1"}).should("exist");
+      cy.findByRole("link", {name: "Series - Post 2"}).should("exist");
+
+
+    })
 })

@@ -127,3 +127,27 @@ table td {
     border: 1px solid black;
     padding: 0.5em;
 }
+
+.homepage-article-link {
+    border: solid 1px black; 
+    padding: 1em; 
+    margin: 1em;
+    display: block;
+    text-decoration: none;
+}
+
+.homepage-article-link-title {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+
+.series-box {
+    border: solid 1px black; 
+    padding: 1.5em; 
+    margin: 1em 4em;
+}
+
+.series-box .current {
+    font-weight: bold;
+}
