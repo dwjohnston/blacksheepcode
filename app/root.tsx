@@ -1,5 +1,5 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction,  MetaFunction } from "@remix-run/node";
+import { json, type LinksFunction,  type MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
@@ -15,6 +16,14 @@ import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 import { GithubPermalinkProvider } from "react-github-permalink";
+
+declare global {
+  interface Window { ENV: {
+    GITHUB_TOKEN?: string; 
+  }}
+}
+
+
 
 export const meta: MetaFunction = (...args) => {
   return {
@@ -52,7 +61,20 @@ export const links: LinksFunction = () => [
   href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"}
 ];
 
+export async function loader() {
+
+  console.log(process.env.NODE_ENV);
+  return json({
+    ENV: {
+      GITHUB_TOKEN: process.env.NODE_ENV === 'development' ? process.env.GITHUB_TOKEN : null
+    },
+  });
+}
+
+
 export default function App() {
+
+  const data = useLoaderData();
   return (
     <html lang="en">
       <head>
@@ -82,7 +104,7 @@ export default function App() {
           </div>
         </header>
         <div className="main-column">
-          <GithubPermalinkProvider githubToken={"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"}>
+          <GithubPermalinkProvider githubToken={data.ENV.GITHUB_TOKEN ?? undefined}>
             <Outlet />
           </GithubPermalinkProvider>
         </div>
