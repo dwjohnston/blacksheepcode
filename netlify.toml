@@ -1,5 +1,5 @@
 [build]
-  command = "ls node_modules/@esbuild && npm run build"
+  command = "npm run build"
   publish = "public"
 
 [[redirects]]
