@@ -89,7 +89,8 @@ We make sure we have included an example in our OpenAPI definition:
 We can now run: 
 
 ```
-msw-auto-mock ../spec/petstore-separate/spec/swagger.json -o src/generated/msw.js --base-url '/api'
+msw-auto-mock ../spec/petstore-separate/spec/swagger.json \
+ -o src/generated/msw.js --base-url '/api'
 ```
 
 And hey presto, all of the MSW boiler plate is created in that `msw.js` output file we generated. 

@@ -28,8 +28,8 @@ declare global {
 export const meta: MetaFunction = (...args) => {
   return {
     charset: "utf-8",
-    title: "Black Sheep Code - The Personal Blog of David Johnston",
-    description: "A nice blog",
+    title: "Black Sheep Code - Various tech writings from David Johnston",
+    description: "Modern web development - testability, extensibility, declarative APIs, declarative code from open specs and more.",
     viewport: "width=device-width,initial-scale=1",
     "og:type": "website",
     'og:image': `https://blacksheepcode.com${bscImage}`,
@@ -78,11 +78,16 @@ export default function App() {
   return (
     <html lang="en">
       <head>
+        {/* https://webmasters.stackexchange.com/questions/126661/pagespeed-insights-reports-that-google-analytics-is-blocking-main-thread-in-page */}
+        <link rel="preconnect" href="https://www.googletagmanager.com"/>
+        <link rel="preconnect" href="https://www.google-analytics.com"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NB66YHJYM"></script>
         <script
-                      dangerouslySetInnerHTML={{
+              dangerouslySetInnerHTML={{
                         __html: `
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}

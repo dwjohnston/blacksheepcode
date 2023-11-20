@@ -61,7 +61,9 @@ The `swagger.json` file in the entrypoint for the spec.
 The command to run is: 
 
 ```
-openapi-generator-cli generate -g go-server -o ./backend -i ./spec/petstore-separate/spec/swagger.json 
+openapi-generator-cli generate -g \
+ go-server -o ./backend \
+ -i ./spec/petstore-separate/spec/swagger.json 
 ```
 
 This creates the following folder structure: 
@@ -177,7 +179,10 @@ frontend
 We generate our boilerplate with: 
 
 ```
-openapi-generator-cli generate -g typescript-fetch -o ./frontend/src/generated -i ./spec/petstore-separate/spec/swagger.json 
+openapi-generator-cli generate  \
+-g typescript-fetch \
+-o ./frontend/src/generated \
+-i ./spec/petstore-separate/spec/swagger.json 
 ```
 
 That is, we'll put all our generated code into `src/generated`. 

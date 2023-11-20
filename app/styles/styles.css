@@ -3,12 +3,10 @@
     display: block;
     margin: 50px auto;
     border: solid 1px black;
-
     padding: 2em;
-
-
-
 }
+
+
 
 
 .open-source {
@@ -21,11 +19,14 @@ body {
 
 
   font-family: 'Open Sans';
+  margin:0;
 }
 
 header {
     background-color: #222; 
-    padding: 0.25em;
+    padding: 0.5em 0.5em;
+
+    font-size: 1.5em;
 
 }
 header>div {
@@ -145,7 +146,11 @@ table td {
 .series-box {
     border: solid 1px black; 
     padding: 1.5em; 
-    margin: 1em 4em;
+    
+}
+
+.series-box li {
+    margin: 0.5em 0;
 }
 
 .series-box .current {
@@ -182,4 +187,36 @@ table td {
 
 .infopanel-info .icon {
     color:  #40c4ff;
+}
+
+@media only screen and (max-width: 767px)  {
+    .main-column {
+        margin:0;
+        padding: 0.5em;
+    }
+
+    .main {
+        margin: 0;
+        margin-bottom: 0.25em;
+        border: 0px solid transparent;
+
+        padding: 0;
+    }
+
+    li:has(>a) {
+        margin: 0.5em 0;
+    }
+    .series-box {
+        padding: 0; 
+        border: border 1px solid grey; 
+        border-width: 0 0 1px;
+    }
+
+    .series-box >p {
+        margin-top: 0;
+    }
+
+    .homepage-article-link {
+        margin: 0.5em 0;
+    }
 }

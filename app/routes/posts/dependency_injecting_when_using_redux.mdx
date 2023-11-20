@@ -8,17 +8,11 @@ meta:
 ---
 
 
-In a previous post I outlined my strategy for [agnostic state management in React](./agnostic_state_managment_in_react.md). 
+In a previous post I outlined my strategy for [agnostic state management in React](./agnostic_state_managment_in_react). 
 
 In this post I'm discussing the use of this strategy with redux. 
 
 Our context is this - our application uses timestamps about the place, and it requires allowing the user to easily change the timezone that the timestamps display in. 
-
-## The Code
-
-The code for this example is [available here](../projects/redux-dependency-injection).
-
-
 
 ## Our App
 
@@ -165,7 +159,8 @@ export const IsoStringDate = () => {
 These will just error with the message 
 
 ```
-Error: could not find react-redux context value; please ensure the component is wrapped in a <Provider>
+Error: could not find react-redux context value;
+please ensure the component is wrapped in a <Provider>
 ```
 
 ### We add the Provider to our tests
@@ -326,56 +321,6 @@ The idea being, your redux store will essentially a determinstic reducer (determ
 We're arguably doing the same thing in the approach I've suggested, where we pass in our own `setPreferredTimezone` function. 
 
 I think what I don't like about the redux approach is the cerebral overhead of understanding what the redux store is doing. 
-
-Here's a picture: 
-
-```
-
-    ┌─────────────────────────────────────────────────────────────┐
-    │ OUR COMPONENT                                               │
-    │                                                             │
-    │ Uses functions/data from a hook                             │
-    │                                                             │
-    ├─────────────────────────────────────────────────────────────┤
-    ├─────────────────────────────────────────────────────────────┤
-    │ Redux store                                                 │
-    │                                                             │
-    │ ??? - As a developer we have to look in at how this behaves │
-    │                                                             │
-    ├─────────────────────────────────────────────────────────────┤
-    ├─────────────────────────────────────────────────────────────┤
-    │ Deterministic services                                      │
-    │                                                             │
-    │ Defined in test                                             │
-    │                                                             │
-    │                                                             │
-    └─────────────────────────────────────────────────────────────┘
-```
-
-```
-
-  ┌─────────────────────────────────────────────────────────────┐
-  │ OUR COMPONENT                                               │
-  │                                                             │
-  │ Uses functions/data from a hook                             │
-  │                                                             │
-  ├─────────────────────────────────────────────────────────────┤
-  ├─────────────────────────────────────────────────────────────┤
-  │ Generic Provider                                            │
-  │                                                             │
-  │ Services/data is passed straight through                    │
-  │                                                             │
-  ├─────────────────────────────────────────────────────────────┤
-  ├─────────────────────────────────────────────────────────────┤
-  │ Deterministic services                                      │
-  │                                                             │
-  │ Defined in test                                             │
-  │                                                             │
-  │                                                             │
-  └─────────────────────────────────────────────────────────────┘
-
-
-````
 
 - 'Maintaining two sets of state management' 
 

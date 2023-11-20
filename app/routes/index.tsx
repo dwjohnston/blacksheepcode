@@ -37,7 +37,7 @@ export default function Index() {
         </div>
         <div>
           <h1>Black Sheep Code</h1>
-          <p>Personal Website of David Johnston</p>
+          <p>Various tech writings from David Johnston.</p>
         </div>
       </div>
       <div>
@@ -53,7 +53,7 @@ export default function Index() {
         <ul>
           <li><a href="/game-of-life">Conway's Game of Life</a>
           </li>
-          <li><a href="http://new.geoplanets.io/" target="_blank" rel="noreferrer">GeoPlanets</a> - My first foray in to geometric art.
+          <li><a href="http://new.geoplanets.io/" target="_blank" rel="noreferrer">GeoPlanets</a> - A foray in to geometric art.
           </li>
         </ul>
       </div>
