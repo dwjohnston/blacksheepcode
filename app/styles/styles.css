@@ -145,7 +145,11 @@ table td {
 .series-box {
     border: solid 1px black; 
     padding: 1.5em; 
-    margin: 1em 4em;
+    
+}
+
+.series-box li {
+    margin: 0.5em 0;
 }
 
 .series-box .current {
