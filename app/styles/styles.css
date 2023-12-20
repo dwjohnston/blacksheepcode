@@ -140,6 +140,8 @@ table td {
 .homepage-article-link-title {
     text-decoration: underline;
     font-weight: bold;
+    margin-bottom: 0;
+
 }
 
 
@@ -219,4 +221,8 @@ table td {
     .homepage-article-link {
         margin: 0.5em 0;
     }
+}
+
+.date-published {
+    font-size: 0.75em;
 }

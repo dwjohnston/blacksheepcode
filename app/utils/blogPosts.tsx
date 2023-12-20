@@ -23,6 +23,7 @@ export type BaseFrontmatter = {
         meta?: {
             title?: string;
             description?: string;
+            dateCreated?: string;
         }
         series?: SeriesInfo;
     }
@@ -133,5 +134,7 @@ export function createMetaFunction(folder: BlogPostFolders): MetaFunction {
 
 
 export async function getAllPostFrontmatter() :  Promise<Array<BaseFrontmatter>> {
-    return Object.values(allPostMetaData);
+    return Object.values(allPostMetaData as Record<string, BaseFrontmatter>).sort((a,b) => {
+        return new Date(b.frontmatter.meta?.dateCreated ?? 0).valueOf() - new Date(a.frontmatter.meta?.dateCreated ?? 0).valueOf();
+    });
 }
