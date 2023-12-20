@@ -1,11 +1,18 @@
 ---
 meta:
-  twitter:title: Dependency injection when using redux
-  twitter:description: An unconventional strategy to inject the behaviour of your state management in testing contexts
-  title: Dependency injection when using redux
+  title: Dependency injection when using redux. 
   description: An unconventional strategy to inject the behaviour of your state management in testing contexts
+  dateCreated: 2022-08-01
 
 ---
+
+<InfoPanel level="warning">
+<p>I no longer recommend doing this. </p>
+<p>This entire post is an attempt at avoiding including your state management business logic in your component tests and/or avoiding module mocking.</p>
+<p>For updated guide to testing, see [this post](./testing_strategies)</p>
+<p>Where this approach might be valid, is if you were moving off a state management framework, to another, eg. you were moving away from a GraphQL based state management.</p>
+
+</InfoPanel>
 
 
 In a previous post I outlined my strategy for [agnostic state management in React](./agnostic_state_managment_in_react). 

@@ -1,4 +1,3 @@
-import { compile } from '@mdx-js/mdx'
 import fm from "front-matter";
 
 import fs from 'fs';

@@ -3,6 +3,11 @@ import type { BaseFrontmatter} from "~/utils/blogPosts";
 import { getAllPostFrontmatter } from "~/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
 
+function DatePublished(props: {date: string}) {
+  return <i className="date-published">Published: <time dateTime={props.date}>{new Date(props.date).toLocaleDateString(undefined, {day: 'numeric', month: 'long', year:'numeric'})}</time></i>
+
+}
+
 export function ListOfArticles(props: {
   allFrontmatter: Array<BaseFrontmatter>
 }) {
@@ -11,6 +16,7 @@ export function ListOfArticles(props: {
       return <Link to={v.slug} key={v.slug} className="homepage-article-link">
         <div>
           <p className="homepage-article-link-title">{v.frontmatter.meta?.title ?? v.slug}</p>
+          {v.frontmatter.meta?.dateCreated && <DatePublished date={v.frontmatter.meta.dateCreated}/>}
           <p className="homepage-article-link-description">{v.frontmatter.meta?.description ?? ''}</p>
         </div>
       </Link>
