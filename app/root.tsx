@@ -110,7 +110,6 @@ export default function App() {
         </header>
         <div className="main-column">
           <GithubPermalinkProvider githubToken={data.ENV.GITHUB_TOKEN ?? undefined}>
-
             <Outlet />
           </GithubPermalinkProvider>
         </div>
