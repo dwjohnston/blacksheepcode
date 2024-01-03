@@ -9,7 +9,7 @@ series:
     part: 2
 ---
 
-import {GithubPermalink} from "react-github-permalink";
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
 import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
 
 # How to configure Remix and mdx-bundler
@@ -48,7 +48,8 @@ Additional functionality might include including an author tag and creation date
 ## The Solution 
 
 <InfoPanel level="warning">
-<p>This solution is works for mdx-bundler@9.2.1. See [this issue re: 10.0.0.](https://github.com/kentcdodds/mdx-bundler/issues/217)</p>
+<p>This solution is works for mdx-bundler@9.2.1. See the following issue:</p>
+<GithubIssueLink issueLink="https://github.com/kentcdodds/mdx-bundler/issues/217"/>
 </InfoPanel>
 
 <InfoPanel level='info'>
