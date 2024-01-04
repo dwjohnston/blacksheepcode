@@ -2,11 +2,10 @@ import mainIcon from "../assets/blacksheep_100x100.webp";
 import { getAllPostFrontmatter } from "~/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
+import { useEffect } from "react";
+import { DatePublished } from "~/components/DatePublished/DatePublished";
 
-function DatePublished(props: {date: string | Date}) {
-  return <i className="date-published">Published: <time dateTime={new Date(props.date).toISOString()}>{new Date(props.date).toLocaleDateString(undefined, {day: 'numeric', month: 'long', year:'numeric'})}</time></i>
 
-}
 
 export function ListOfArticles(props: {
   allFrontmatter: Array<FrontMatterPlusSlug>

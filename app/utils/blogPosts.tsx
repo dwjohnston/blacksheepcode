@@ -61,7 +61,6 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
         });
     }
 
-    console.log(data)
     return { ...data, seriesFrontmatter } as EnrichedFrontMatterPlusSlug;
 }
 

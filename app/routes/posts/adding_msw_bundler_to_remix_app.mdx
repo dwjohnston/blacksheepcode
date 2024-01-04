@@ -15,7 +15,7 @@ import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
 # How to configure Remix and mdx-bundler
 
 <InfoPanel level="warning">
-<p>The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.</p>
+  The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.
 </InfoPanel>
 
 This post outlines a process I took to improve this blog, although I ultimately abandoned this approach due to the requirement to have access to the file system.
@@ -48,14 +48,12 @@ Additional functionality might include including an author tag and creation date
 ## The Solution 
 
 <InfoPanel level="warning">
-<p>This solution is works for mdx-bundler@9.2.1. See the following issue:</p>
+This solution is works for mdx-bundler@9.2.1. See the following issue:
 <GithubIssueLink issueLink="https://github.com/kentcdodds/mdx-bundler/issues/217"/>
 </InfoPanel>
 
 <InfoPanel level='info'>
-<p>
-The code blocks in this post come from this very simple Remix application [repository here](https://github.com/dwjohnston/example-remix-app). 
-</p>
+  The code blocks in this post come from this very simple Remix application [repository here](https://github.com/dwjohnston/example-remix-app). 
 </InfoPanel>
 
 A recommended solution [by Remix themselves](https://remix.run/docs/en/main/guides/mdx#mdx) is to use [mdx-bundler](https://github.com/kentcdodds/mdx-bundler). 

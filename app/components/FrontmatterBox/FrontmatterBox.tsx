@@ -1,7 +1,8 @@
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import type { PropsWithChildren} from "react";
+import React, { useEffect, useState } from "react";
 import {  Link,useLocation } from "@remix-run/react";
 import { getFrontmatterFromSlug } from "~/utils/blogPosts";
-import { EnrichedFrontMatterPlusSlug } from "utils/frontmatterTypings";
+import type { EnrichedFrontMatterPlusSlug } from "utils/frontmatterTypings";
 
 type FrontmatterBoxProps = {
     frontmatter: EnrichedFrontMatterPlusSlug| null; 
@@ -19,7 +20,6 @@ function SeriesBox(props: FrontmatterBoxProps) {
     }
 
     const firstSeriesItem = props.frontmatter?.seriesFrontmatter[0]; 
-
     
     return <div className="series-box">
         <p>
@@ -54,7 +54,6 @@ function NextBox(props: FrontmatterBoxProps) {
     if (props.frontmatter?.seriesFrontmatter && props.frontmatter.seriesFrontmatter[nextInSeries]) {
 
         const nextPost = props.frontmatter.seriesFrontmatter[nextInSeries]; 
-        console.log(nextPost)
 
         return <div className ="next-post">
             <Link to = {nextPost.slug}><strong>Next:</strong> {nextPost.frontmatter.meta.title}</Link>
@@ -73,7 +72,6 @@ export function FrontmatterBox(props: PropsWithChildren<{}>) {
         if(pathName !== location.pathname){
             setPathname(location.pathname);
             getFrontmatterFromSlug(location.pathname).then((v) => {
-                console.log(v)
                 setValue(v);
             }); 
         }
