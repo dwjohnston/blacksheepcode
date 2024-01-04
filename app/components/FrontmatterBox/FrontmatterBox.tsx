@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import {  Link,useLocation } from "@remix-run/react";
 
 import type { EnrichedFrontMatter} from "~/utils/blogPosts";
@@ -35,7 +35,35 @@ function SeriesBox(props: FrontmatterBoxProps) {
 
 }
 
-export function FrontmatterBox() {
+
+function partIsNumber(part: number | undefined) : part is number {
+    return typeof part === 'number'; 
+}
+
+function NextBox(props: FrontmatterBoxProps) {
+
+    console.log(props)
+    const part = props.frontmatter?.frontmatter.series?.part;
+    console.log(part)
+    if( !partIsNumber(part)){
+        return null; 
+    }
+
+    const nextInSeries = part; // nb. the series are 1 indexed, but the array here is 0 indexed.
+
+    if (props.frontmatter?.seriesFrontmatter && props.frontmatter.seriesFrontmatter[nextInSeries]) {
+
+        const nextPost = props.frontmatter.seriesFrontmatter[nextInSeries]; 
+        console.log(nextPost)
+
+        return <div className ="next-post">
+            <Link to = {nextPost.slug}><strong>Next:</strong> {nextPost.frontmatter.meta?.title ?? nextPost.slug}</Link>
+        </div>
+    }
+    return null; 
+}
+
+export function FrontmatterBox(props: PropsWithChildren<{}>) {
    
     const location = useLocation();
     const [pathName, setPathname] = useState(null as null | string); 
@@ -51,9 +79,13 @@ export function FrontmatterBox() {
     }, [pathName, location.pathname]); 
 
     if(!value){
-        return null; 
+        return props.children; 
     }
-    return <div>
+    return <><div>
         {value.seriesFrontmatter && <SeriesBox frontmatter={value}/>}
     </div>
+        {props.children}
+
+        <NextBox frontmatter={value}/>
+    </>
 }
