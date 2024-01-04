@@ -1,5 +1,5 @@
 import path from 'path';
-import { extractFrontMatter } from './extractFrontMatter.js';
+import { extractFrontMatter } from './extractFrontMatter';
 
 
 const folderPath = path.join(process.cwd(), 'app', 'routes'); // Update the path accordingly
