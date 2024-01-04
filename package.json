@@ -48,7 +48,6 @@
     "front-matter": "^4.0.2",
     "jest": "^29.7.0",
     "remark-toc": "^8.0.1",
-    "ts-node": "^10.9.1",
     "tsx": "^4.7.0",
     "typescript": "^5.0.4",
     "zod": "^3.22.4"
