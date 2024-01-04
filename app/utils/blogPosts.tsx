@@ -2,46 +2,15 @@ import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
+import { FrontmatterPayload } from "utils/frontmatterTypings";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
-export type SeriesInfo = {
-    name: string;
-    part: number;
-} | {
-    name: string;
-    part: 1;
-    description: string;
-};
-
-/**
- * This typing reflects what is generated into JSON
- */
-export type BaseFrontmatter = {
-    slug: string,
-    frontmatter: {
-        meta?: {
-            title?: string;
-            description?: string;
-            dateCreated?: string;
-        }
-        series?: SeriesInfo;
-    }
-}
-
-type BaseFrontmatterWithMandatorySeriesInfo = BaseFrontmatter & {frontmatter: {series: SeriesInfo}}
-
-/**
- * This typing reflects any additional enrichment we may provide
- */
-export type EnrichedFrontMatter = BaseFrontmatter & {
-    seriesFrontmatter?: Array<BaseFrontmatterWithMandatorySeriesInfo>;
-}
 
 export const allMetadata = {
-    "drafts": allDraftMetaData as Record<string, BaseFrontmatter>,
-    "posts": allPostMetaData as Record<string, BaseFrontmatter>,
-    "test": allTestMetaData as Record<string, BaseFrontmatter>
+    "drafts": allDraftMetaData as Record<string, FrontmatterPayload>,
+    "posts": allPostMetaData as Record<string, FrontmatterPayload>,
+    "test": allTestMetaData as Record<string, FrontmatterPayload>,
 }
 
 
