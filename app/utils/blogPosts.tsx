@@ -85,9 +85,11 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
 
     let seriesFrontmatter : Array<BaseFrontmatterWithMandatorySeriesInfo> | undefined; 
     if (frontmatter.frontmatter.series) {
-        seriesFrontmatter = Object.values(allMetadata[folder]).filter((v) => {
+        seriesFrontmatter = (Object.values(allMetadata[folder]).filter((v) => {
             return v.frontmatter.series?.name === frontmatter.frontmatter.series?.name
-        }) as Array<BaseFrontmatterWithMandatorySeriesInfo>;
+        }) as Array<BaseFrontmatterWithMandatorySeriesInfo>).sort((a, b) => {
+            return a.frontmatter.series.part - b.frontmatter.series.part
+        });
 
 
     }
