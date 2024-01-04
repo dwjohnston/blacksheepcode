@@ -28,7 +28,7 @@ declare global {
 export const meta: MetaFunction = (...args) => {
   return {
     charset: "utf-8",
-    title: "Black Sheep Code - Various tech writings from David Johnston",
+    title: "Black Sheep Code - Tech writings from David Johnston",
     description: "Modern web development - testability, extensibility, declarative APIs, declarative code from open specs and more.",
     viewport: "width=device-width,initial-scale=1",
     "og:type": "website",

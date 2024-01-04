@@ -43,7 +43,7 @@ export default function Index() {
         </div>
         <div>
           <h1>Black Sheep Code</h1>
-          <p>Various tech writings from David Johnston.</p>
+          <p>Tech writings from David Johnston.</p>
         </div>
       </div>
       <div>
