@@ -89,7 +89,7 @@ function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | n
         title: frontmatter.frontmatter.meta?.title,
         description: frontmatter.frontmatter?.meta?.description,
         "twitter:title": frontmatter.frontmatter.meta?.title,
-        "twitter:description": frontmatter.frontmatter?.meta?.title,
+        "twitter:description": frontmatter.frontmatter?.meta?.description,
     }
 }
 
