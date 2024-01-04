@@ -2,46 +2,15 @@ import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
+import type { EnrichedFrontMatterPlusSlug, FrontMatter, FrontMatterPlusSlug } from "utils/frontmatterTypings";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
-export type SeriesInfo = {
-    name: string;
-    part: number;
-} | {
-    name: string;
-    part: 1;
-    description: string;
-};
-
-/**
- * This typing reflects what is generated into JSON
- */
-export type BaseFrontmatter = {
-    slug: string,
-    frontmatter: {
-        meta?: {
-            title?: string;
-            description?: string;
-            dateCreated?: string;
-        }
-        series?: SeriesInfo;
-    }
-}
-
-type BaseFrontmatterWithMandatorySeriesInfo = BaseFrontmatter & {frontmatter: {series: SeriesInfo}}
-
-/**
- * This typing reflects any additional enrichment we may provide
- */
-export type EnrichedFrontMatter = BaseFrontmatter & {
-    seriesFrontmatter?: Array<BaseFrontmatterWithMandatorySeriesInfo>;
-}
 
 export const allMetadata = {
-    "drafts": allDraftMetaData as Record<string, BaseFrontmatter>,
-    "posts": allPostMetaData as Record<string, BaseFrontmatter>,
-    "test": allTestMetaData as Record<string, BaseFrontmatter>
+    "drafts": allDraftMetaData as Record<string, FrontMatterPlusSlug>,
+    "posts": allPostMetaData as Record<string, FrontMatterPlusSlug>,
+    "test": allTestMetaData as Record<string, FrontMatterPlusSlug>,
 }
 
 
@@ -75,24 +44,24 @@ export function getFolderAndFilenameFromSlug(slug: string): {
  * @param slug 
  * @returns 
  */
-export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFrontMatter | null> {
+export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFrontMatterPlusSlug> {
     const { folder, filename } = getFolderAndFilenameFromSlug(slug);
 
-    const frontmatter = allMetadata[folder][filename] as BaseFrontmatter;
-    if (!frontmatter) {
-        return null;
+    const data = allMetadata[folder][filename];
+    if (!data) {
+        throw new Error(`Frontmatter did not exist for slug: '${slug}`)
     }
 
-    let seriesFrontmatter : Array<BaseFrontmatterWithMandatorySeriesInfo> | undefined; 
-    if (frontmatter.frontmatter.series) {
-        seriesFrontmatter = Object.values(allMetadata[folder]).filter((v) => {
-            return v.frontmatter.series?.name === frontmatter.frontmatter.series?.name
-        }) as Array<BaseFrontmatterWithMandatorySeriesInfo>;
-
-
+    let seriesFrontmatter   : Array<FrontMatterPlusSlug> | null = null; 
+    if ('series' in data.frontmatter) {
+        seriesFrontmatter = (Object.values(allMetadata[folder]).filter((v) => {
+            return v.frontmatter.series?.name === data.frontmatter.series?.name
+        }) ).sort((a, b) => {
+            return (a.frontmatter.series?.part ?? 0)  - (b.frontmatter.series?.part ?? 0)
+        });
     }
 
-    return { ...frontmatter, url: slug, seriesFrontmatter } as EnrichedFrontMatter;
+    return { ...data, seriesFrontmatter } as EnrichedFrontMatterPlusSlug;
 }
 
 
@@ -109,7 +78,7 @@ export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
 }
 
 
-function mergeFrontmatterAndDefaultMetadata(frontmatter: BaseFrontmatter | null) {
+function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | null) {
 
     if (!frontmatter) {
         return DEFAULT_METADATA;
@@ -120,21 +89,21 @@ function mergeFrontmatterAndDefaultMetadata(frontmatter: BaseFrontmatter | null)
         title: frontmatter.frontmatter.meta?.title,
         description: frontmatter.frontmatter?.meta?.description,
         "twitter:title": frontmatter.frontmatter.meta?.title,
-        "twitter:description": frontmatter.frontmatter?.meta?.title,
+        "twitter:description": frontmatter.frontmatter?.meta?.description,
     }
 }
 
 export function createMetaFunction(folder: BlogPostFolders): MetaFunction {
     return (metaInput) => {
-        const loaderResult = metaInput.data as BaseFrontmatter | null;
+        const loaderResult = metaInput.data as FrontMatterPlusSlug | null;
         return mergeFrontmatterAndDefaultMetadata(loaderResult ?? null);
     }
 
 }
 
 
-export async function getAllPostFrontmatter() :  Promise<Array<BaseFrontmatter>> {
-    return Object.values(allPostMetaData as Record<string, BaseFrontmatter>).sort((a,b) => {
+export async function getAllPostFrontmatter() :  Promise<Array<FrontMatterPlusSlug>> {
+    return Object.values(allPostMetaData as Record<string, FrontMatterPlusSlug>).sort((a,b) => {
         return new Date(b.frontmatter.meta?.dateCreated ?? 0).valueOf() - new Date(a.frontmatter.meta?.dateCreated ?? 0).valueOf();
     });
 }

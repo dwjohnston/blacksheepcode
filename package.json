@@ -8,8 +8,9 @@
     "lint": "eslint .",
     "types": "tsc && tsc -p cypress/tsconfig.json",
     "test:cypress": "cypress open",
-    "test:cypress:ci": "cypress run", 
-    "generate:mdxjson": "rm -rf app/generated/frontmatter && ts-node --esm utils/extractFrontMatter.mts"
+    "test:cypress:ci": "cypress run",
+    "generate:mdxjson": "rm -rf app/generated/frontmatter && tsx utils/extractFrontMatter.bin.ts",
+    "test": "jest --watchAll"
   },
   "dependencies": {
     "@netlify/functions": "^1.4.0",
@@ -25,10 +26,15 @@
     "react-dom": "^18.2.0",
     "react-github-permalink": "^1.2.0",
     "rehype-highlight": "^6.0.0",
+    "remix-utils": "^6.6.0",
     "source-map-support": "^0.5.21",
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.7",
+    "@babel/preset-typescript": "^7.23.3",
+    "@jest/globals": "^29.7.0",
     "@remix-run/dev": "^1.19.3",
     "@remix-run/eslint-config": "^1.19.3",
     "@remix-run/serve": "^1.19.3",
@@ -36,12 +42,15 @@
     "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
     "@types/source-map-support": "^0.5.6",
+    "babel-jest": "^29.7.0",
     "cypress": "^13.4.0",
     "eslint": "^8.38.0",
     "front-matter": "^4.0.2",
+    "jest": "^29.7.0",
     "remark-toc": "^8.0.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.4",
+    "zod": "^3.22.4"
   },
   "engines": {
     "node": ">=14.0.0"

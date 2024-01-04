@@ -25,7 +25,8 @@ console.log({PR_NUMBER, BRANCH_NAME, NETLIFY_SITE_ID, UPDATED_AT, COMMIT_SHA})
 
 
 
-const MAX_NUM_TRIES = 10; 
+// 30 * 3000ms = 1.5 minutes
+const MAX_NUM_TRIES = 30; 
 const DELAY_TIME_MS = 3000; 
 
 async function main() {

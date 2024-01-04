@@ -1,15 +1,14 @@
 import mainIcon from "../assets/blacksheep_100x100.webp";
-import type { BaseFrontmatter} from "~/utils/blogPosts";
 import { getAllPostFrontmatter } from "~/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
+import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
+import { useEffect } from "react";
+import { DatePublished } from "~/components/DatePublished/DatePublished";
 
-function DatePublished(props: {date: string}) {
-  return <i className="date-published">Published: <time dateTime={props.date}>{new Date(props.date).toLocaleDateString(undefined, {day: 'numeric', month: 'long', year:'numeric'})}</time></i>
 
-}
 
 export function ListOfArticles(props: {
-  allFrontmatter: Array<BaseFrontmatter>
+  allFrontmatter: Array<FrontMatterPlusSlug>
 }) {
   return <div>
     {props.allFrontmatter.map((v) => {
@@ -32,7 +31,7 @@ export async function loader() {
 
 export default function Index() {
 
-  const allArticles = useLoaderData<Array<BaseFrontmatter>>();
+  const allArticles = useLoaderData<Array<FrontMatterPlusSlug>>();
 
   return (<>
     <div className="main">
@@ -43,7 +42,7 @@ export default function Index() {
         </div>
         <div>
           <h1>Black Sheep Code</h1>
-          <p>Various tech writings from David Johnston.</p>
+          <p>Tech writings from David Johnston.</p>
         </div>
       </div>
       <div>

@@ -15,62 +15,62 @@
 
 
 body {
-    background-color: #aab; 
-
-
-  font-family: 'Open Sans';
-  margin:0;
+    background-color: #aab;
+    font-family: 'Open Sans';
+    margin: 0;
 }
 
 header {
-    background-color: #222; 
+    background-color: #222;
     padding: 0.5em 0.5em;
 
     font-size: 1.5em;
 
 }
+
 header>div {
     max-width: 800px;
-    margin: 0 auto; 
+    margin: 0 auto;
 
 }
 
 header a {
-    color: white; 
+    color: white;
     text-decoration: none;
 }
+
 header a:hover {
     text-decoration: underline;
 }
 
 header a:visited {
-    color: white; 
+    color: white;
 }
 
 
 
 .main-column {
-    background-color: white; 
+    background-color: white;
     max-width: 800px;
-    margin:0.5em auto; 
-    padding: 2em; 
+    margin: 0.5em auto;
+    padding: 2em;
 
     box-shadow: 2px 2px 2px #555;
 }
 
 .logo-container {
-    width: 100px; 
-    height: 100px; 
+    width: 100px;
+    height: 100px;
 }
 
 .logo-container>img {
     object-fit: contain;
-    height: 100%; 
-    width: 100%; 
+    height: 100%;
+    width: 100%;
 }
 
 .headline {
-    display: flex; 
+    display: flex;
     align-items: center;
     gap: 2em;
 }
@@ -79,24 +79,25 @@ header a:visited {
     text-align: right;
 }
 
-a, a:hover {
-    color: black; 
+a,
+a:hover {
+    color: black;
 }
 
 
 
 .game-of-life-cell {
-    width: 20px; 
-    height: 20px; 
+    width: 20px;
+    height: 20px;
     border: solid 1px black;
 }
 
 .game-of-life-cell:hover {
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .game-of-life-row {
-    display: flex; 
+    display: flex;
     flex-flow: row nowrap;
 
 }
@@ -110,18 +111,18 @@ a, a:hover {
 }
 
 .blog-image {
-    max-width: 100%; 
+    max-width: 100%;
 }
 
 
 table {
     border-spacing: 0px;
-  border-collapse: separate;
-  border: 1px solid black;
+    border-collapse: separate;
+    border: 1px solid black;
 }
 
 table thead td {
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 table td {
@@ -130,8 +131,8 @@ table td {
 }
 
 .homepage-article-link {
-    border: solid 1px black; 
-    padding: 1em; 
+    border: solid 1px black;
+    padding: 1em;
     margin: 1em;
     display: block;
     text-decoration: none;
@@ -146,9 +147,9 @@ table td {
 
 
 .series-box {
-    border: solid 1px black; 
-    padding: 1.5em; 
-    
+    border: solid 1px black;
+    padding: 1.5em;
+
 }
 
 .series-box li {
@@ -160,9 +161,9 @@ table td {
 }
 
 .infopanel {
-    border: solid 1px; 
-    border-radius: 1em; 
-    padding: 1em; 
+    border: solid 1px;
+    border-radius: 1em;
+    padding: 1em;
     margin: 0.5em 0;
 
     font-size: 0.8em;
@@ -179,21 +180,21 @@ table td {
 }
 
 .infopanel .icon {
-    float: left; 
+    float: left;
     margin: 0.5em;
 }
 
 .infopanel-warning .icon {
-    color:  #ffc400;
+    color: #ffc400;
 }
 
 .infopanel-info .icon {
-    color:  #40c4ff;
+    color: #40c4ff;
 }
 
-@media only screen and (max-width: 767px)  {
+@media only screen and (max-width: 767px) {
     .main-column {
-        margin:0;
+        margin: 0;
         padding: 0.5em;
     }
 
@@ -208,13 +209,14 @@ table td {
     li:has(>a) {
         margin: 0.5em 0;
     }
+
     .series-box {
-        padding: 0; 
-        border: border 1px solid grey; 
+        padding: 0;
+        border: border 1px solid grey;
         border-width: 0 0 1px;
     }
 
-    .series-box >p {
+    .series-box>p {
         margin-top: 0;
     }
 
@@ -225,4 +227,12 @@ table td {
 
 .date-published {
     font-size: 0.75em;
+}
+
+.next-post {
+    border: solid 2px black;
+    padding: 2em 2em;
+    border-radius: 1em;
+    font-size: 1.2em;
+    margin: 2em 0 2em;
 }
