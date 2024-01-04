@@ -1,7 +1,6 @@
 {
   "private": true,
   "sideEffects": false,
-  "type": "module",
   "scripts": {
     "build": "npm run generate:mdxjson && remix build",
     "dev": "remix dev",

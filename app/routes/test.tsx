@@ -11,8 +11,9 @@ export const meta = createMetaFunction("test");
 export default () => {
     const params = useLocation();
     return <>
-        <FrontmatterBox/>
-        <Outlet />
+        <FrontmatterBox>
+            <Outlet />
+        </FrontmatterBox>
         <EditWithGithub postName={params.pathname} />
         <PostComments />
     </>

@@ -1,26 +1,29 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import {  Link,useLocation } from "@remix-run/react";
-
-import type { EnrichedFrontMatter} from "~/utils/blogPosts";
 import { getFrontmatterFromSlug } from "~/utils/blogPosts";
+import { EnrichedFrontMatterPlusSlug } from "utils/frontmatterTypings";
 
 type FrontmatterBoxProps = {
-    frontmatter: EnrichedFrontMatter | null; 
+    frontmatter: EnrichedFrontMatterPlusSlug| null; 
 }
 
 
 function SeriesBox(props: FrontmatterBoxProps) {
 
     if(!props.frontmatter?.seriesFrontmatter){
-        throw new Error("Expected seriesFrontmatter to exist");
+        return null;
+    }
+
+    if(!props.frontmatter.frontmatter.series){
+        return null;
     }
 
     const firstSeriesItem = props.frontmatter?.seriesFrontmatter[0]; 
+
     
     return <div className="series-box">
         <p>
-            {/* @ts-expect-error */}
-            This article is a part of the series "<i className="series-description-text">{firstSeriesItem.frontmatter.series.description ?? firstSeriesItem.frontmatter.series.name}</i>"
+            This article is a part of the series "<i className="series-description-text">{firstSeriesItem.frontmatter.series?.description ?? firstSeriesItem.frontmatter.series?.name}</i>"
         </p>
         <ul>
             {props.frontmatter?.seriesFrontmatter?.map((v) => {
@@ -41,10 +44,7 @@ function partIsNumber(part: number | undefined) : part is number {
 }
 
 function NextBox(props: FrontmatterBoxProps) {
-
-    console.log(props)
     const part = props.frontmatter?.frontmatter.series?.part;
-    console.log(part)
     if( !partIsNumber(part)){
         return null; 
     }
@@ -57,7 +57,7 @@ function NextBox(props: FrontmatterBoxProps) {
         console.log(nextPost)
 
         return <div className ="next-post">
-            <Link to = {nextPost.slug}><strong>Next:</strong> {nextPost.frontmatter.meta?.title ?? nextPost.slug}</Link>
+            <Link to = {nextPost.slug}><strong>Next:</strong> {nextPost.frontmatter.meta.title}</Link>
         </div>
     }
     return null; 
@@ -67,12 +67,13 @@ export function FrontmatterBox(props: PropsWithChildren<{}>) {
    
     const location = useLocation();
     const [pathName, setPathname] = useState(null as null | string); 
-    const [value, setValue] = useState<null | EnrichedFrontMatter>(null);
+    const [value, setValue] = useState<null | EnrichedFrontMatterPlusSlug>(null);
 
     useEffect(() => {
         if(pathName !== location.pathname){
             setPathname(location.pathname);
             getFrontmatterFromSlug(location.pathname).then((v) => {
+                console.log(v)
                 setValue(v);
             }); 
         }
@@ -82,7 +83,7 @@ export function FrontmatterBox(props: PropsWithChildren<{}>) {
         return props.children; 
     }
     return <><div>
-        {value.seriesFrontmatter && <SeriesBox frontmatter={value}/>}
+        <SeriesBox frontmatter={value}/>
     </div>
         {props.children}
 

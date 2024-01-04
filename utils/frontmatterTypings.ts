@@ -3,12 +3,13 @@ import {z} from "zod";
 const metaSchema = z.object({
     title: z.string(),
     description: z.string(), 
-    dateCreated: z.date(),
+    dateCreated: z.date().or(z.string()),
   }); 
 
   const seriesSchema = z.object({
     name: z.string(),
     part: z.number(),
+    description: z.string().optional()
   }); 
 
 export const frontMatterSchema = z.object({
@@ -18,9 +19,14 @@ export const frontMatterSchema = z.object({
 
 export type FrontMatter = z.infer<typeof frontMatterSchema>;
 
-export type FrontmatterPayload = {
+export type FrontMatterPlusSlug = {
     slug: string; 
     frontmatter: FrontMatter; 
+}
+
+
+export type EnrichedFrontMatterPlusSlug = FrontMatterPlusSlug & {
+  seriesFrontmatter: Array<FrontMatterPlusSlug> | null;
 }
 
 
