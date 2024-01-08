@@ -1,3 +1,4 @@
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import { json, type LinksFunction,  type MetaFunction } from "@remix-run/node";
 import {
@@ -8,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from "@remix-run/react";
 
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
@@ -70,6 +72,13 @@ export async function loader() {
     },
   });
 }
+
+
+export const ErrorBoundary = () => {
+  const error = useRouteError();
+  captureRemixErrorBoundaryError(error);
+  return <div>Something went wrong</div>;
+};
 
 
 export default function App() {
