@@ -1,6 +1,8 @@
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import { json, type LinksFunction,  type MetaFunction } from "@remix-run/node";
 import {
+  isRouteErrorResponse,
   Links,
   LiveReload,
   Meta,
@@ -8,6 +10,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useRouteError,
 } from "@remix-run/react";
 
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
@@ -16,6 +19,9 @@ import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 import { GithubPermalinkProvider } from "react-github-permalink";
+import { isErrorResponse } from "@remix-run/react/dist/data";
+import { Page404 } from "./error_pages/Page404";
+import { Page500 } from "./error_pages/Page500";
 
 declare global {
   interface Window { ENV: {
@@ -62,14 +68,53 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader() {
-
-  console.log(process.env.NODE_ENV);
   return json({
     ENV: {
       GITHUB_TOKEN: process.env.NODE_ENV === 'development' ? process.env.GITHUB_TOKEN : null
     },
   });
 }
+
+
+export const ErrorBoundary = () => {
+  const error = useRouteError();
+  captureRemixErrorBoundaryError(error);
+
+
+  return <>
+  
+  <html>
+
+    <head>
+        <title>Error!</title>
+        <Links />
+    </head>
+    <body>
+      {(() => {
+          try {
+            if (isRouteErrorResponse(error)) {
+              if(error.status === 404){
+                  return <Page404/>
+              }
+            }
+          
+          
+            return <Page500/>
+          }catch(err){
+            return <div>Something went wrong</div>
+          }
+      })()}
+    </body>
+  </html>
+  </>
+
+
+
+
+
+  
+};
+
 
 
 export default function App() {

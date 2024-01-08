@@ -7,7 +7,29 @@
 }
 
 
+.error-page  h1 {
+    text-align: center;
+}
 
+.error-page {
+    background-color: white; 
+    margin: 4em 2em 4em;
+    padding: 2em;
+}
+
+.error-page img {
+    width: 400px; 
+    height: 400px;
+    display: block; 
+    margin: 3em auto; 
+}
+
+.error-page a {
+    display: block; 
+    margin: 0 auto;
+    text-align: center; 
+    font-size: 1.5em;
+}
 
 .open-source {
     text-align: center;
