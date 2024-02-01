@@ -17,10 +17,14 @@ export function handleError(error : unknown, { request } : DataFunctionArgs) {
   Sentry.captureRemixServerException(error, 'remix.server', request);
 }
 
-Sentry.init({
+if(process.env.NODE_ENV === "production") {
+  Sentry.init({
     dsn: "https://1cad6b69367913399c1afbfc1c2ce4f4@o4506532749901824.ingest.sentry.io/4506532751081472",
     tracesSampleRate: 1
 })
+}
+
+
 
 const ABORT_DELAY = 5_000;
 
