@@ -2,7 +2,6 @@ import mainIcon from "../assets/blacksheep_100x100.webp";
 import { getAllPostFrontmatter } from "~/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
-import { useEffect } from "react";
 import { DatePublished } from "~/components/DatePublished/DatePublished";
 
 
@@ -10,9 +9,9 @@ import { DatePublished } from "~/components/DatePublished/DatePublished";
 export function ListOfArticles(props: {
   allFrontmatter: Array<FrontMatterPlusSlug>
 }) {
-  return <div>
+  return <div data-testid="bsc-homepage-all-article-previews">
     {props.allFrontmatter.map((v) => {
-      return <Link to={v.slug} key={v.slug} className="homepage-article-link">
+      return <Link to={v.slug} key={v.slug} className="homepage-article-link" data-testid="bsc-homepage-article-preview-box">
         <div>
           <p className="homepage-article-link-title">{v.frontmatter.meta?.title ?? v.slug}</p>
           {v.frontmatter.meta?.dateCreated && <DatePublished date={v.frontmatter.meta.dateCreated}/>}

@@ -56,7 +56,7 @@ function NextBox(props: FrontmatterBoxProps) {
         const nextPost = props.frontmatter.seriesFrontmatter[nextInSeries]; 
 
         return <div className ="next-post">
-            <Link to = {nextPost.slug}><strong>Next:</strong> {nextPost.frontmatter.meta.title}</Link>
+            <Link to = {`/${nextPost.slug}`}><strong>Next:</strong> {nextPost.frontmatter.meta.title}</Link>
         </div>
     }
     return null; 
