@@ -15,9 +15,7 @@ Cypress.on('uncaught:exception', (err) => {
   // Enable uncaught exception failures for other errors
 });
 
-
-
-describe('template spec', () => {
+describe('Test pages', () => {
   it('Basic MDX Rendering', () => {
     cy.visit('test/basic_mdx'); 
 
@@ -63,6 +61,10 @@ describe('template spec', () => {
       cy.findByRole("link", {name: "Series - Post 1"}).should("exist");
       cy.findByRole("link", {name: "Series - Post 2"}).should("exist");
 
+      cy.findByRole("link", {name: "Next: Series - Post 2"}).should("exist").click(); 
+      cy.findByText("I am series - post 2 content").should("exist");
+      cy.findByRole("link", {name: "Next: Series - Post 2"}).should("not.exist");
 
-    })
+    }
+    )
 })
