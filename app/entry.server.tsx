@@ -9,12 +9,21 @@ import { PassThrough } from "node:stream";
 
 import type { AppLoadContext, DataFunctionArgs, EntryContext } from "@remix-run/node";
 import { Response } from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
+import { RemixServer, isRouteErrorResponse } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
+
+
 export function handleError(error : unknown, { request } : DataFunctionArgs) {
-  Sentry.captureRemixServerException(error, 'remix.server', request);
+  if(isRouteErrorResponse(error)){
+    if(error.status >=500){
+      Sentry.captureRemixServerException(error, 'remix.server', request);
+    }
+  }
+  else {
+    Sentry.captureRemixServerException(error, 'remix.server', request);
+  }
 }
 
 if(process.env.NODE_ENV === "production") {
