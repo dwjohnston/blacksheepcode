@@ -18,7 +18,7 @@ The requirements are the same as I've outlined in [this post](./generating_apps_
 
 - Basic contract tests
 - Ideally I can do performance test too
-- Potentially I want to be able to executive imperitive logic between tests runs, eg. to clear down a server. 
+- Potentially I want to be able to executive imperative logic between tests runs, eg. to clear down a server. 
 
 ## Some tooling I'm considering 
 
@@ -45,7 +45,7 @@ This [commit here](https://github.com/dwjohnston/open-api-go-and-typescript/pull
 What we've done: 
 
 1. We set up basic jest boilerplate
-2. We used the openapi-generator to generate client code. This might be uneccesary, but hey, if it's helping us. 
+2. We used the openapi-generator to generate client code. This might be unnecessary, but hey, if it's helping us. 
 3. We write our tests. 
 
 Here's an example test: 
@@ -78,7 +78,7 @@ Here's an example test:
 To run: 
 
 1. Start the local server running with `go run main.go`
-2. In a seperate process run the tests with `yarn test`. 
+2. In a separate process run the tests with `yarn test`. 
 
 The tests pass! Great!
 
@@ -88,7 +88,7 @@ The problem is that the application still retains the state from the previous te
 
 ## Second pass - let's control the server from our test runner. 
 
-For this, instead of starting our server manually in a seperate terminal window, we'll start the server before each test case, and kill at the end of each test case. 
+For this, instead of starting our server manually in a separate terminal window, we'll start the server before each test case, and kill at the end of each test case. 
 
 The boilerplate for this is as follows, the comments explain what is happening: 
 
@@ -136,7 +136,7 @@ afterEach(() => {
 
 Now, run the tests twice, they pass! Hooray!
 
-## Somethings I don't like 
+## Some things I don't like 
 
 I'm happy with how the 'reset the server between test cases' functionality is working. 
 
@@ -151,7 +151,7 @@ A couple of examples:
         expect(apiResult1Body.id).toBe(321);
 ```
 
-I don't like to retrieve the body as a seperate await call - although that does line up with how HTTP requests work, so I guess I shouldn't complain. 
+I don't like to retrieve the body as a separate await call - although that does line up with how HTTP requests work, so I guess I shouldn't complain. 
 
 ```typescript
         try {

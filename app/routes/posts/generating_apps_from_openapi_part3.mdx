@@ -129,7 +129,7 @@ describe(DisplayPetById, () => {
 
     expect(screen.getByText("...loading")).toBeInTheDocument(); 
 
-    // The petname is based on the example we set in the OpenAPI definition!
+    // The pet name is based on the example we set in the OpenAPI definition!
     expect(await screen.findByText("Pet Name: Fido")).toBeInTheDocument(); 
 
 

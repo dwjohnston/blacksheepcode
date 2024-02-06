@@ -17,8 +17,6 @@ Code for these examples can be found [here](https://github.com/dwjohnston/query-
 
 I'm using react-query for these examples, but I believe that these patterns apply to all state management tools (arguably, with the exception of GraphQL). 
 
-
-
 ## API mocking - the trivial case 
 
 To start, let's demonstrate how we would write tests in the recommend manner - by mocking API calls. 
@@ -90,7 +88,6 @@ describe(TodoList, () => {
 ```
 
 Ok, pretty straightforward, nothing really bothers me here. 
-
 
 ## What about a more complex case?
 
@@ -176,7 +173,7 @@ describe(TodoList, () => {
         
         //Exists after some time      
         expect(await screen.findByText("aaaa")).toBeInTheDocument();
-        // bbbb never appears as it does not satisfied the 'preferred' critera
+        // bbbb never appears as it does not satisfied the 'preferred' criteria
         expect(screen.queryByText("bbbb")).not.toBeInTheDocument();
     });
 });
@@ -370,7 +367,7 @@ This may well be the case, but it's not particularly helpful.
 
 It's the norm to be working in imperfect codebases, the solution to any engineering challenge can't be 'only work in pristine codebases'. 
 
-It's possible that this 'user preferred todos' feature is an experiemental feature we're building a proof of concept for, and we're building a quick non-optimal to prove the concept, before building a first class backend solution.
+It's possible that this 'user preferred todos' feature is an experimental feature we're building a proof of concept for, and we're building a quick non-optimal to prove the concept, before building a first class backend solution.
 
  This actually brings up a second point - it should easy for us to switch out our data retrieval logic, potentially, even allow for A/B testing it or feature flagging it. 
 

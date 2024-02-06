@@ -1,7 +1,7 @@
 ---
 meta:
   title: A model of extensible changes.
-  description: Making changes in an extensible manner avoids having to do signficant code rewrites or being disruptive to downstream consumers of your API.
+  description: Making changes in an extensible manner avoids having to do significant code rewrites or being disruptive to downstream consumers of your API.
   dateCreated: 2022-08-10
 
 
@@ -125,7 +125,7 @@ doSomethingWithFoo({name: "foo", value: 1}); // Code passed a now disallowed num
 ```
 
 
-## When _returning_ data (eg. reponse bodies, function return values) 
+## When _returning_ data (eg. response bodies, function return values) 
 
 ### 🟢 You can always: 
 
@@ -273,7 +273,7 @@ assert(enrichedUser.name === "foo");
 
 ```
 
-The potential problem here is what if we change UserEnrichementData like: 
+The potential problem here is what if we change UserEnrichmentData like: 
 
 ```diff 
 type UserEnrichmentData  = {

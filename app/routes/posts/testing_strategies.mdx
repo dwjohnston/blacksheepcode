@@ -1,7 +1,7 @@
 ---
 meta:
   title: Various approaches for testing an Single Page Application as it relates to state management
-  description: The presence of state management is often what makes testing an Single Page Application difficult. Various approachs such as API mocking, dependency injection, component composition and error boundaries can help.
+  description: The presence of state management is often what makes testing an Single Page Application difficult. Various approaches such as API mocking, dependency injection, component composition and error boundaries can help.
   dateCreated: 2023-10-10
 ---
 
@@ -287,7 +287,7 @@ function useUsers() {
 +            const displayNameFormat = await getDisplayNameFormat();
 
             return users.map((v) => {
-+                // somekind of transformation logic based on the displayname format here
++                // some kind of transformation logic based on the displayname format here
             })
         }
     })
@@ -642,7 +642,7 @@ Take our markdown editor for example, probably we want to use it in a form. It m
 
 For example using Tanstack Query. 
 
-In this scenario we have a list of resturants and we want to have a button on each item to favourite the resturant. 
+In this scenario we have a list of restaurants and we want to have a button on each item to favourite the restaurant. 
 
 https://codesandbox.io/p/sandbox/tanstack-query-demo-forked-n83w43?file=%2Fsrc%2FRestaurantList.tsx%3A13%2C23
 

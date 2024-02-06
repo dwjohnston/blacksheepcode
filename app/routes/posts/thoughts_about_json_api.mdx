@@ -25,7 +25,7 @@ For a typical CRUD like application, we'll usually require our API to do the fol
 - Delete a resource
 - Associate one resource with another (eg. Add assign user Bob to todo item "1")
 - Paginate lists of resources - for many APIs it's not practical to return every single user, that list might be millions long. Instead we paginate responses 
-- Filter lists of resources - again if it's not feasable to return every instance of a resource, we also need our API to allow us to filter resources for us. 
+- Filter lists of resources - again if it's not feasible to return every instance of a resource, we also need our API to allow us to filter resources for us. 
 - Proactively return related resources. 
   - For example if a Todo has an assignee of type User, when we fetch the Todo, chances are we also want to fetch the User too. And if the user has an Organisation, then chances are we also want to fetch the Organisation, and so forth. 
   - We could perform these operations in serial (ie. wait for the Todo to return, and then fetch the User), _or_ we optimistically load the data in the one call removing the need for multiple round trip calls. 
@@ -56,7 +56,7 @@ type TodoItem = {
 
 ### Pain point #1  - ID doesn't always exist, patching optional values. 
 
-For the most part, we can pass these TodoItems around and everything is hunkydory. But where this commonly gets painful is in doing CRUD operations - where creating a Todo we don't currently have an ID, and for patching a Todo we don't need all of the fields. 
+For the most part, we can pass these TodoItems around and everything is hunky-dory. But where this commonly gets painful is in doing CRUD operations - where creating a Todo we don't currently have an ID, and for patching a Todo we don't need all of the fields. 
 
 We can kind of get around this by using TypeScript utility types, we could have some code like: 
 
@@ -86,7 +86,7 @@ Bundling those values into the resource itself is pain, for two reasons:
 1. It makes the object harder to read
 2. It makes it harder to do that `Omit` style logic above, as we not have more values we need to omit. 
 
-So I think it's reasonable to have standard wrapper object for resources, that contains the metadata as a seperate property. 
+So I think it's reasonable to have standard wrapper object for resources, that contains the metadata as a separate property. 
 
 ie. We might have a `TodoResource` object like: 
 
@@ -154,7 +154,7 @@ Omitting the ID of the resource from the individual `TodoItem`, `User` types mea
 
 For a list of items we want to include an object wrapper that includes pagination info. 
 
-I would suggest that _all_ endpoints that return a list, return responses of this shape, even if there are only ever a handful of items. This makes for a consistent developer experience. (You can just ignore any pagination query paramaters, and return a pageSize of 'all'). 
+I would suggest that _all_ endpoints that return a list, return responses of this shape, even if there are only ever a handful of items. This makes for a consistent developer experience. (You can just ignore any pagination query parameters, and return a pageSize of 'all'). 
 
 ```typescript
 
@@ -185,7 +185,7 @@ type ProactivePayload = {
 
 ```
 
-Crucially I suggest not doing an 'expansion' type stategy, where the for example TodoItem would look like: 
+Crucially I suggest not doing an 'expansion' type strategy, where the for example TodoItem would look like: 
 
 ```typescript 
 type TodoItem  = {
@@ -303,7 +303,7 @@ type SingleUserApiResponse = {
         data: {
             name: string; 
         }
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -317,7 +317,7 @@ type SingleUserApiResponse = {
             name: string; 
 
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -331,7 +331,7 @@ type SingleUserApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -349,7 +349,7 @@ type SingleTodoApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -362,7 +362,7 @@ type SingleTodoApiResponse = {
         data: {
             name: string; 
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -376,7 +376,7 @@ type SingleTodoApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -397,7 +397,7 @@ type ArrayUserApiResponse = {
         data: {
             name: string; 
         }
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -411,7 +411,7 @@ type ArrayUserApiResponse = {
             name: string; 
 
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -425,7 +425,7 @@ type ArrayUserApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -448,7 +448,7 @@ type ArrayTodoApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -461,7 +461,7 @@ type ArrayTodoApiResponse = {
         data: {
             name: string; 
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -475,7 +475,7 @@ type ArrayTodoApiResponse = {
             isComplete: boolean; 
             assigneeId: string | null;  // null = assigned         
        };
-        metdadata: {
+        metadata: {
             canEdit: boolean; 
             canDelete: boolean; 
             createdDate: string; 
@@ -542,7 +542,7 @@ JSON API includes the following concepts that we have not included:
 
 JSON API makes a distinction between ordinary data, and foreign-key-like attributes, in our example fields like `assigneeId`. 
 
-JSON API's opinion is to such attributes in seperate area of the response: 
+JSON API's opinion is to such attributes in separate area of the response: 
 
 ```json
 HTTP/1.1 200 OK
@@ -578,7 +578,7 @@ Additionally JSON API appears to support a concept of having multiple ways to ac
 
 This seems unnecessarily complex. Also, would seem to lend itself to more bike shedding, as people argue of the semantics of relationships from one resource to another. 
 
-The updates of attributes and updating of relationships neccessarily needs to occur on different endpoints according to [the spec](https://jsonapi.org/format/#crud-updating-to-one-relationships). This adds cognitive burden for the consumer of the API (eg. a frontend developer) having to using different URLs to update different aspects of a resource. 
+The updates of attributes and updating of relationships necessarily needs to occur on different endpoints according to [the spec](https://jsonapi.org/format/#crud-updating-to-one-relationships). This adds cognitive burden for the consumer of the API (eg. a frontend developer) having to using different URLs to update different aspects of a resource. 
 
 
 ### Links

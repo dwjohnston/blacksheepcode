@@ -78,7 +78,7 @@ This component _is_ state hooked - the reason being, we're going to be using tim
 
 Note that we allow the preferred timezone to be `null` and in this case the display reverts to using the browser's locale for the timezone. 
 
-Now note also that in accordance to advice I give about making your components be agnostic to your state management solution, we've abstracted the implementation of our setting and retreiving our preferred timezone to a `useTimezone` hook. 
+Now note also that in accordance to advice I give about making your components be agnostic to your state management solution, we've abstracted the implementation of our setting and retrieving our preferred timezone to a `useTimezone` hook. 
 
 
 ## Our useTimezone implementation
@@ -157,7 +157,7 @@ For example say we try write our stories like this:
 
 ```tsx
 export const InvalidDate = () => {
-  return <TimeDisplay time="invaliddate" />;
+  return <TimeDisplay time="invalid_date" />;
 };
 
 
@@ -179,7 +179,7 @@ please ensure the component is wrapped in a <Provider>
 export const InvalidDateWithProvider = () => {
 
   return <Provider store={store}>
-    <TimeDisplay time="invaliddate" />
+    <TimeDisplay time="invalid_date" />
    </Provider>;
 };
 ```
@@ -194,12 +194,12 @@ In the simple redux store we're using here, there's not much to go wrong.
 
 However, in the real world: 
 
-- The store may instantiate itself non-determinsitically (eg. if there was a Date.now() in any of the initial data values)
+- The store may instantiate itself non-deterministically (eg. if there was a Date.now() in any of the initial data values)
 - The action handlers (sagas, thunks) are making API calls.
 - We're bringing our entire data model in, just to test this one component.
 - Often the state won't be correctly instantiated until some kind of authentication flow has completed.  
 
-#### 2. If we're not using our production store, then we need to maintain a seperate 'test' store. 
+#### 2. If we're not using our production store, then we need to maintain a separate 'test' store. 
 
 Ok, so maybe instead of using the production store, we instantiate that provider like: 
 
@@ -207,7 +207,7 @@ Ok, so maybe instead of using the production store, we instantiate that provider
 export const InvalidDateWithProvider = () => {
 
   return <Provider store={testStore}>
-    <TimeDisplay time="invaliddate" />
+    <TimeDisplay time="invalid_date" />
    </Provider>;
 };
 ```
@@ -312,9 +312,9 @@ This approach gives ultimate flexibility.
 
 ## Is a sensible approach? Or are we over engineering things? 
 
-I want to take a step back here and consider whether this is genuinely a good approach, or if it's unnecessery complexity. 
+I want to take a step back here and consider whether this is genuinely a good approach, or if it's unnecessary complexity. 
 
-I think that it's true that this approach provides ultimate flexiblity, in choosing the behaviour of these injected dependencies. 
+I think that it's true that this approach provides ultimate flexibility, in choosing the behaviour of these injected dependencies. 
 
 However, is that really useful? 
 
@@ -326,7 +326,7 @@ Arguably there other ways you could inject your non-deterministic functions into
 
 For example, see this [Stack Overflow answer.](https://stackoverflow.com/questions/36375208/dependency-injection-in-a-redux-ac) 
 
-The idea being, your redux store will essentially a determinstic reducer (deterministic because in test, you'll be passing in deterministic services). 
+The idea being, your redux store will essentially a deterministic reducer (deterministic because in test, you'll be passing in deterministic services). 
 
 We're arguably doing the same thing in the approach I've suggested, where we pass in our own `setPreferredTimezone` function. 
 
@@ -338,7 +338,7 @@ You could make the argument that we're doing the same thing here. For each test 
 
 But this doesn't really bother me, at least in the example we've got. If anything, I'd consider it a _feature_, that when writing tests you need to consider how the component interacts with injected dependencies. 
 
-However, I could see a scenario where say you are testing quite a large/higher level component, you don't want to reproduce your state managment logic in the test. However, in this scenario, there would be nothing preventing you from using a your redux store. 
+However, I could see a scenario where say you are testing quite a large/higher level component, you don't want to reproduce your state management logic in the test. However, in this scenario, there would be nothing preventing you from using a your redux store. 
 
 
 
