@@ -46,7 +46,7 @@ These are the kind of interactions we might want to have with a markdown editor 
     </tr>
     <tr>
         <td>Assert that some text exists</td>
-        <td>Viewing an existing item, and then clicking 'edit' and expecting to see the markdown editor prepopulated.</td>
+        <td>Viewing an existing item, and then clicking 'edit' and expecting to see the markdown editor pre-populated.</td>
     </tr>
     <tr>
         <td>Clear the text</td>
@@ -242,7 +242,7 @@ This will make the textarea visible.
 
 Importantly note that it this textarea _doesn't always contain the complete value of the markdown editor_. 
 
-As an example, add an initialValue and then click the textarea - note that it doesn't contain the intialValue. Now press cmd/ctrl + a - note that it does! 
+As an example, add an initialValue and then click the textarea - note that it doesn't contain the initialValue. Now press cmd/ctrl + a - note that it does! 
 
 This is important because it means in our tests when we go to submit a form, or assert on the value of an element it won't necessarily contain the value of what is visible in the editor.
 
@@ -554,7 +554,7 @@ function findNearestFormAncestor(element: HTMLElement) {
 const formElement = findNearestFormAncestor(textareaRef.current);
 
 if (formElement) {
-    // As promised - the fix for intial value + new data on form submission. 
+    // As promised - the fix for initial value + new data on form submission. 
     // Note that this means that the textarea won't have it's updated value until form submission
     // So you can't make assertions until then.
     formElement.addEventListener("submit", () => {

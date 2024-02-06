@@ -73,7 +73,7 @@ eg. We select a a user from the list of users, and now we display the user's fir
 
 ### Scenario 2 - Populating the select from existing data, where we've referenced the item via an id: 
 
-eg. We this is likely an 'edit' form, and we have some intitial data that might look like this: 
+eg. We this is likely an 'edit' form, and we have some initial data that might look like this: 
 
 ```
 {
@@ -87,11 +87,11 @@ And when we finish editing the data, we're saving a similar object.
 
 ### Scenario 3 - Browser native form submission 
 
-We have a `<form>` and we are catching the form's submission event, and retreiving the values that way. 
+We have a `<form>` and we are catching the form's submission event, and retrieving the values that way. 
 
 ## Approach A - Provide a list of items, determine which one is selected by some kind of 'value' key. 
 
-In this example and all following examples, we are going to implment a simple 'select' component. 
+In this example and all following examples, we are going to implement a simple 'select' component. 
 
 Approach A has the following props: 
 
@@ -194,7 +194,7 @@ export const SelectApproachA = <T,>(props: SelectApproachAProps<T>) => {
 
 ```
 
-Pretty straight forward, we're making use of standard browser native features to attach `value` to the `<option>` element, and have that retreived in the `<select>` change handler. 
+Pretty straight forward, we're making use of standard browser native features to attach `value` to the `<option>` element, and have that retrieved in the `<select>` change handler. 
 
 One thing to note is that we treat the `null` selection as value `""` and we've put in an option for that. 
 
@@ -266,7 +266,7 @@ export const ApproachAScenario2Demo = (props: {
 };
 ```
 
-### Approach A - Scneario 3
+### Approach A - Scenario 3
 
 Capturing a form submission works, but we need to redundantly managed the selection state in the parent. ie. We're not doing anything with it in the parent, but need to include it, so that the component will respond to selection changes. This is the problem of using controlled components. 
 
@@ -288,7 +288,7 @@ export const ApproachAScenario3Demo = (props: {
                 <form onSubmit={(e) => {
                     e.preventDefault();
 
-                    // I have to google this everytime I try to do this
+                    // I have to google this every time I try to do this
                     // https://stackoverflow.com/questions/23427384/get-form-data-in-reactjs
                      
                     //@ts-ignore
@@ -307,7 +307,7 @@ export const ApproachAScenario3Demo = (props: {
 };
 ```
 
-As a side note here - note my `@ts-ignore` here. I would criticise React here - React seems to treat brower native form submission as a second class citizen, which is a shame because I think they're super helpful. 
+As a side note here - note my `@ts-ignore` here. I would criticise React here - React seems to treat browser native form submission as a second class citizen, which is a shame because I think they're super helpful. 
 
 
 ## Approach B - Provide a list of items, provide the selected item
@@ -455,7 +455,7 @@ So we can see that Approach A and B both have the same essential problem, depend
 
 ### Approach B - Scenario 3 
 
-Scneario 3 doesn't actually work for approach B, kind of. We can still capture the form submission. However, the value is always going to be a string. We can pass up full objects via a submission event. 
+Scenario 3 doesn't actually work for approach B, kind of. We can still capture the form submission. However, the value is always going to be a string. We can pass up full objects via a submission event. 
 
 
 ## Approach C - Uncontrolled component 
@@ -478,7 +478,7 @@ export type SelectApproachBProps<T> = {
 };
 ```
 
-Our implmentation does not change much: 
+Our implementation does not change much: 
 
 the only difference is on this line: 
 
@@ -506,7 +506,7 @@ export const ApproachCScenario3Demo = (props: {
                 <form onSubmit={(e) => {
                     e.preventDefault();
 
-                    // I have to google this everytime I try to do this
+                    // I have to google this every time I try to do this
                     // https://stackoverflow.com/questions/23427384/get-form-data-in-reactjs
 
                     //@ts-ignore
@@ -546,7 +546,7 @@ export const ApproachCScenario4aDemo = (props: {
                 <form onSubmit={(e) => {
                     e.preventDefault();
 
-                    // I have to google this everytime I try to do this
+                    // I have to google this every time I try to do this
                     // https://stackoverflow.com/questions/23427384/get-form-data-in-reactjs
 
                     //@ts-ignore

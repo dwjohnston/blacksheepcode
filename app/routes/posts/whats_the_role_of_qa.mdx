@@ -30,7 +30,7 @@ With all that said - I like the safety net that the QAs provide. Let's talk abou
 - Automated tests won't catch styling issues. There are tools that can test for styling - but I think that these tools will have too much overhead for a smaller or less mature team.
 - Manually testing all paths of a possible regression is time consuming, and impractical. 
   - Lets's say you've got component A and it's being used on Page A, B, C, D, E. The developers task is to add an optional piece of functionality to it, which is to be used on Page A. The dev writes unit tests for this, and also manually checks that it works on Page A (the functionality appears), and Page B (the functionality does not appear). However unbeknownst to the dev, Page E does something is doing something super hacky, perhaps with a direct DOM manipulation and breaks the thing. I would argue that it's quite reasonable for the dev to have missed this, and it's more in the responsibilities of the QA to be monitoring and then triaging and escalating for these kinds of breaking changes.
-  - On larger refactors, it might well be the responsiblity of the dev to test their code, but in the interests of time, pull in a QA to assist with it. 
+  - On larger refactors, it might well be the responsibility of the dev to test their code, but in the interests of time, pull in a QA to assist with it. 
 - As a sanity test - the dev might have already tested their code, but want a second opinion. 
 
 Additionally, I have found that often it is the QA who knows the product the best. There may be a section of the application that as a newer developer on the team, I'm not actually sure how it works/what it is meant to do. The QA is often the person who knows best. 
@@ -45,9 +45,9 @@ A fairly standard process is that:
 
 In its most basic form, this regression suite consists of the QAs manually clicking through to explore every aspect of the application. They may be following a check list of steps to follow written in a word document. 
 
-This is repetative, boring work, and prone to error. 
+This is repetitive, boring work, and prone to error. 
 
-So this is where QA might propose - 'Hey we can automate this process using tools like Cypress or Selium'. 
+So this is where QA might propose - 'Hey we can automate this process using tools like Cypress or Selenium'. 
 
 So far, no problems, the automated suites are just an extension of the manual process that the QAs are otherwise running. 
 
@@ -142,14 +142,14 @@ export const Widget = () => {
 
 Here there are a lot of class names, and it's unclear which of these class names are safe to remove, and which are not. 
 
-There's a few rules you could go for, and none of them are particularly satisyfing: 
+There's a few rules you could go for, and none of them are particularly satisfying: 
 
 - Never remove a className/element 
   - The problem with this, is that you hobble your developer's ability to change anything
 - If you do remove a className/element, and the tests fail, you have to put that className back 
-  - Excruitiatingly slow and painful process. This kind of thing is what would make an otherwise 1hour task, take a day or longer. 
+  - Excruciatingly slow and painful process. This kind of thing is what would make an otherwise 1hour task, take a day or longer. 
 - Have it specced out somewhere what classNames/elements a component should provide. Both the QA and the developer to this when developing the component/writing tests that involve it. 
-  - This adds a lot of bureaucratic overhead, and again makes developing components unncesseriliy painful. 
+  - This adds a lot of bureaucratic overhead, and again makes developing components unnecessarily painful. 
 
 
 ## What I recommend - use testing library style accessible selectors. 
@@ -192,7 +192,7 @@ export const Widget = () => {
 ```
 
 ```js
-cy.findByRole('button', {name: TEXT_CONTANTS.CLICK_ME}); 
+cy.findByRole('button', {name: TEXT_CONSTANTS.CLICK_ME}); 
 ```
 
 ## Devs should write examples of the accessible selectors. 
@@ -257,7 +257,7 @@ I think where organisations can start struggling here is:
 
 ## A counterpoint
 
-After writing this post, I come across this video which makes a good point. It makes the argument thata QAs role isn't _test execution_ it should be telling people what tests need to be covered. 
+After writing this post, I come across this video which makes a good point. It makes the argument that a QAs role isn't _test execution_ it should be telling people what tests need to be covered. 
 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/hIMwTzAAQ-w?start=2208" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>

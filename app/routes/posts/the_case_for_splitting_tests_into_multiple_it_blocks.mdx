@@ -1,7 +1,7 @@
 ---
 meta:
   title: The case for splitting Cypress tests into multiple it blocks
-  description: Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visiblity of the parts of the test.
+  description: Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visibility of the parts of the test.
   dateCreated: 2022-11-11
 
 ---
@@ -80,7 +80,7 @@ Then it narrows the code surface that we need to investigate. Granted we still n
 
 The multiple independent tests scenario would like three tests that could be run at the same time: 
 
-- "Given that I am on the widget page, I click the 'add wiget' button, fill the form, hit submit, and see the new widget"
+- "Given that I am on the widget page, I click the 'add widget' button, fill the form, hit submit, and see the new widget"
 - "Given that I am on the widget page, and there is a widget there, I hit the edit button, update the form, hit save, and see the edited widget"
 - "Given that I am on the widget page, and there is a widget there, I hit the delete button, hit confirm, and see that the widget no longer exists"
 
@@ -88,7 +88,7 @@ Yes - this sounds good - but how do we get the application into the state of tha
 
 We could do API mocking - but I don't like this approach: 
 
-1. It's more work. Now, in order to write some tests, we need to understand what API calls are made, provide mock data, and also possibly be defining some implementation behaviour (for example, "when I call DELETE /widgets/123, the widget with id 123 will no longer be returned in the GET /widgets" call). We're essentially reimplmenting our API in order to test. 
+1. It's more work. Now, in order to write some tests, we need to understand what API calls are made, provide mock data, and also possibly be defining some implementation behaviour (for example, "when I call DELETE /widgets/123, the widget with id 123 will no longer be returned in the GET /widgets" call). We're essentially reimplementing our API in order to test. 
 2. We're not actually testing the API. 
    - One of the big values of using Cypress IMO is that you are implicitly testing your API. The problem with API mocking is how your API actually behaves may differ from what what your define your mock as doing. In that scenario you tests may be passing and you wouldn't know about the error. 
 
@@ -122,7 +122,7 @@ describe ("Widgets page", () => {
 
 ```
 
-And we `itSerial.only` that delete widget test, then all preceeding itSerials in the describe will also run. Performance-wise this is no different to the 'one big test' approach. 
+And we `itSerial.only` that delete widget test, then all preceding itSerials in the describe will also run. Performance-wise this is no different to the 'one big test' approach. 
 
 ### Have `itSerial` blocks use page URLs to retain state. 
 
