@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e 
 output=$(node .github/workflows/scripts/wait-for-netlify-deploy.js 2>&1)
 echo $output
 exit_code=$?
