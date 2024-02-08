@@ -1,0 +1,90 @@
+---
+meta:
+  title: Why I've gone off React Testing Library
+  description: React Testing Library is perhaps the most popular tool for testing React applications. However its use of JSDOM under-the-hood means we often spend time dealing with browser APIs that JSDOM has not implemented.
+  dateCreated: 2024-02-08
+  
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+
+# Why I've gone off React Testing Library
+
+React Testing Library is a very popular testing library for React, one that I've known and loved. 
+
+React Testing Library's core revolutionary idea, that had it displace Enzyme has the de facto testing tool, boils down to two things: 
+
+- Don't test implementation details
+- Write interactions the way the a real user would
+
+To be clear - both of these philosophies I agree with.
+
+## The problem with React Testing Library is JSDom
+
+JSDOM is a JavaScript implementation of the DOM, in their words: 
+
+>In general, the goal of the project is to emulate enough of a subset of a web browser to be useful for testing and scraping real-world web applications.
+
+The key issue lies in that word _subset_. 
+
+In my experience there have numerous examples of a piece of code I'm trying to test relying on some browser API that JSDOM has not implemented.
+
+This has us scrambling to write mock implementations like the one suggested in [this Stack Overflow answer](https://stackoverflow.com/a/70704588/1068446). 
+
+### Examples of unsupported browser APIs
+
+**HTML5 Form Validation**
+
+<GithubIssueLink issueLink="https://github.com/jsdom/jsdom/issues/544"/>
+
+For example if we have a component that returns: 
+
+```html
+<form>
+    <input type="text" required"/>
+</form>
+```
+
+When we submit this form, in a real browser you will see a [browser native validation](https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation#using_built-in_form_validation) error and no form submission event will be fired. 
+
+JSDOM does not implement this API, and the form submission event will be fired. We won't be able to this 'the form doesn't submit' path. 
+
+**Resize Observer**
+
+<GithubIssueLink issueLink="https://github.com/jsdom/jsdom/issues/3368"/>
+
+For example I was using the [React Flow](https://reactflow.dev/) library, which happens to use ResizeObserver. Any component rendered using RTL simply errors. 
+
+**`contenteditable`** 
+
+<GithubIssueLink issueLink="https://github.com/jsdom/jsdom/issues/1670"/>
+
+[`contenteditable`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contenteditable) is an API that allows an arbitrary element, like a div, to behave as a textarea. This is useful for creating rich text editors. 
+
+JSDOM does not support the `contenteditable` API.
+
+The rich text editor library [Easy Markdown Editor](https://github.com/Ionaru/easy-markdown-editor) has on option to use `contenteditable`, but if we do we won't be able to use RTL to test it. 
+
+I write more about testing EasyMDE [here](./testing_easy_mde). 
+
+
+## What I suggest using instead - Cypress (or Playwright) component tests 
+
+Cypress now supports [component tests](https://docs.cypress.io/guides/component-testing/overview). Paired with [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/) this gives us the original philosophy of RTL: Don't test implementation details and write test interactions as the user would. 
+
+Playwright also supports [component tests](https://playwright.dev/docs/test-components). 
+
+Assertions on functions being called, à la `jest.fn()` can be achieve with Cypress's [`spy`](https://docs.cypress.io/api/commands/spy). 
+
+Cypress also has the benefit of having a visual display of the test running - something that can be very handy debugging your tests. 
+
+## An alternative solution - React Testing Library + Karma? 
+
+I'm been made aware of a tool called [Karma](https://karma-runner.github.io/6.4/intro/how-it-works.html) which appears to be a general purpose test runner that runs in the browser. 
+
+There is discussion of using this with React Testing Library here: 
+
+<GithubIssueLink issueLink="https://github.com/testing-library/dom-testing-library/issues/161"/>
+
+However, it doesn't otherwise seem particularly well documented. 
+
