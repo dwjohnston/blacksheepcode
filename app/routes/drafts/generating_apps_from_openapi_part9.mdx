@@ -1,0 +1,34 @@
+---
+meta:
+  title: Running our application on AWS using Terraform CDK. 
+  description: 
+  dateCreated: 2024-02-13
+
+series: 
+  name: generating_apps_from_open_ai
+  part: 9
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+
+In the [previous post](./generating_apps_from_openapi_part8) we dockerised our application. 
+
+In this post we'll get the Docker image running on AWS ECS using CDKTF. 
+
+Later, we'll performance test the application, and then start looking at how we can make improvements. 
+
+## The AWS infrastructure 
+
+We'll run a fairly standard AWS infrastructure for a web application. 
+
+The components are: 
+
+- AWS Virtual Private Cloud (VPC)
+- AWS Elastic Container Service (ECS)
+- AWS Application Load Balancer (ABS) 
+- AWS Cloudfront
+
+We're not using an S3 bucket for our frontend assets right now. We're going to create the application like this, do load testing with [k6](https://k6.io/) and later we'll add an S3 bucket and show how it improves performance. 
+
+
+
