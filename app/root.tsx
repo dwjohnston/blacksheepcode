@@ -19,7 +19,6 @@ import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 import { GithubPermalinkProvider } from "react-github-permalink";
-import { isErrorResponse } from "@remix-run/react/dist/data";
 import { Page404 } from "./error_pages/Page404";
 import { Page500 } from "./error_pages/Page500";
 
