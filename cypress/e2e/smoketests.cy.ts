@@ -67,4 +67,18 @@ describe('Test pages', () => {
 
     }
     )
+
+    it("trailing slash doesn't matter", () => {
+      cy.visit('test/basic_mdx/'); 
+
+      cy.findByRole("heading", {name: "This is a basic MDX test."}).should("exist");
+      cy.findByText("This is some text").should("exist");
+    })
+
+    it("query params - won't break things", () => {
+      cy.visit('test/basic_mdx?q=foo'); 
+
+      cy.findByRole("heading", {name: "This is a basic MDX test."}).should("exist");
+      cy.findByText("This is some text").should("exist");
+    })
 })

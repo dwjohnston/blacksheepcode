@@ -71,9 +71,9 @@ export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
         // Unfortunately we don't have access to the path via loader args, so we have to manually extract
         // it from the request. 
         const url = loaderArgs.request.url;
-        const parts = url.split('/');
-        const desiredPart = ["", parts[parts.length - 2], parts[parts.length - 1]].join("/"); 
-        return getFrontmatterFromSlug(desiredPart)
+
+        const path = new URL(url).pathname; 
+        return getFrontmatterFromSlug(path)
     }
 }
 
