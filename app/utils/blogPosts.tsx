@@ -73,6 +73,12 @@ export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
         const url = loaderArgs.request.url;
 
         const path = new URL(url).pathname; 
+
+        if(path.slice(1) === folder) {
+            return null; 
+        }
+        
+        
         return getFrontmatterFromSlug(path)
     }
 }
