@@ -81,4 +81,12 @@ describe('Test pages', () => {
       cy.findByRole("heading", {name: "This is a basic MDX test."}).should("exist");
       cy.findByText("This is some text").should("exist");
     })
+
+    it("/test will redirect home", () => {
+      cy.visit('test').its("status"); 
+      cy.findByText("Tech writings from David Johnston.").should("exist");
+
+      cy.request({url: '/test', failOnStatusCode: false}).its('status').should('be.ok')
+
+    })
 })
