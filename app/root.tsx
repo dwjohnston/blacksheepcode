@@ -1,6 +1,6 @@
 import { captureRemixErrorBoundaryError } from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
-import { json, type LinksFunction,  type MetaFunction } from "@remix-run/node";
+import { json, type LinksFunction, type MetaFunction } from "@remix-run/node";
 import {
   isRouteErrorResponse,
   Links,
@@ -13,6 +13,7 @@ import {
   useRouteError,
 } from "@remix-run/react";
 
+import {captureException} from "@sentry/remix";
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
 
 import styles from 'highlight.js/styles/vs2015.css';
@@ -23,9 +24,11 @@ import { Page404 } from "./error_pages/Page404";
 import { Page500 } from "./error_pages/Page500";
 
 declare global {
-  interface Window { ENV: {
-    GITHUB_TOKEN?: string; 
-  }}
+  interface Window {
+    ENV: {
+      GITHUB_TOKEN?: string;
+    }
+  }
 }
 
 
@@ -57,13 +60,15 @@ export const links: LinksFunction = () => [
   {
     rel: "stylesheet", href: ourStyles,
   },
-  {rel: "stylesheet", href: githubPermalinkStyle},
+  { rel: "stylesheet", href: githubPermalinkStyle },
   {
     rel: "stylesheet",
     href: 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap'
-  }, 
-  {rel: "stylesheet",
-  href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"}
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+  }
 ];
 
 export async function loader() {
@@ -81,37 +86,37 @@ export const ErrorBoundary = () => {
 
 
   return <>
-  
-  <html>
 
-    <head>
+    <html>
+
+      <head>
         <title>Error!</title>
         <Links />
-    </head>
-    <body>
-      {(() => {
+      </head>
+      <body>
+        {(() => {
           try {
             if (isRouteErrorResponse(error)) {
-              if(error.status === 404){
-                  return <Page404/>
+              if (error.status === 404) {
+                return <Page404 />
               }
             }
-          
-          
-            return <Page500/>
-          }catch(err){
+
+
+            return <Page500 />
+          } catch (err) {
             return <div>Something went wrong</div>
           }
-      })()}
-    </body>
-  </html>
+        })()}
+      </body>
+    </html>
   </>
 
 
 
 
 
-  
+
 };
 
 
@@ -123,23 +128,23 @@ export default function App() {
     <html lang="en">
       <head>
         {/* https://webmasters.stackexchange.com/questions/126661/pagespeed-insights-reports-that-google-analytics-is-blocking-main-thread-in-page */}
-        <link rel="preconnect" href="https://www.googletagmanager.com"/>
-        <link rel="preconnect" href="https://www.google-analytics.com"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
 
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NB66YHJYM"></script>
         <script
-              dangerouslySetInnerHTML={{
-                        __html: `
+          dangerouslySetInnerHTML={{
+            __html: `
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
                       
                         gtag('config', 'G-0NB66YHJYM');
                         `
-                      }}
+          }}
         >
 
         </script>
@@ -153,7 +158,17 @@ export default function App() {
           </div>
         </header>
         <div className="main-column">
-          <GithubPermalinkProvider githubToken={data.ENV.GITHUB_TOKEN ?? undefined}>
+          <GithubPermalinkProvider githubToken={data.ENV.GITHUB_TOKEN ?? undefined} onError={(err) => {
+            if (err instanceof Response) {
+              captureException(new Error(`Github API error`));
+            } else {
+              captureException({
+                message: "unknown exception",
+                err: err
+              });
+            }
+
+          }}>
             <Outlet />
           </GithubPermalinkProvider>
         </div>
