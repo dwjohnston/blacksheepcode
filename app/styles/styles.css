@@ -258,3 +258,9 @@ table td {
     font-size: 1.2em;
     margin: 2em 0 2em;
 }
+
+#comments:focus {
+    border: solid 2px #aaf;
+    border-radius: 0.2em;
+    
+}

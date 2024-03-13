@@ -86,5 +86,11 @@ export function FrontmatterBox(props: PropsWithChildren<{}>) {
         {props.children}
 
         <NextBox frontmatter={value}/>
+
+        <>
+        <br/>
+        <br/>
+            Questions? Comments? Criticisms? <a href="#comments">Get in the comments! 👇</a>
+        </>
     </>
 }
