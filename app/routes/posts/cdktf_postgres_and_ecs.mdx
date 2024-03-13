@@ -50,6 +50,8 @@ Populate your main.ts
 
 <GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L1-L622"/>
 
+If all you wanted was the raw boilerplate, then you can stop reading here - the rest of the post is explaining the main.ts.
+
 ## Explaining all the bits
 
 ### Instantiate providers
@@ -65,7 +67,7 @@ Any of the terraform providers need to instantiated.
 
 A VPC serves as a 'grouping' for our application, where we can logically separate various components and only allow the components that need to talk to each other, to do so. 
 
-Importantly this will isolate our application from the internet at large, we rely on AWS's infrastructure to prevent the items in our VPC being probed by the wider internet. 
+Importantly this will isolate our application from the internet at large, we rely on AWS's infrastructure to prevent the items in our VPC being probed by the wider internet, meaning our internals won't be subject to brute force or DDOS attacks.
 
 
 ### Create an ECS Cluster 
@@ -92,7 +94,7 @@ Here we create an AWS Application Load Balancer - for our purposes this services
 
 Some notes here: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L360-L365"/>
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L360-L365"/>
 
 By default AWS will want your Postgres to only allow have a SSL connection, and causes this common error: [`connect to PostgreSQL server: FATAL: no pg_hba.conf entry for host`](https://dba.stackexchange.com/questions/83984/connect-to-postgresql-server-fatal-no-pg-hba-conf-entry-for-host). 
 
