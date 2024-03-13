@@ -1,4 +1,4 @@
-import { captureRemixErrorBoundaryError } from "@sentry/remix";
+import { captureRemixErrorBoundaryError, captureException} from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import { json, type LinksFunction, type MetaFunction } from "@remix-run/node";
 import {
@@ -13,7 +13,6 @@ import {
   useRouteError,
 } from "@remix-run/react";
 
-import {captureException} from "@sentry/remix";
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
 
 import styles from 'highlight.js/styles/vs2015.css';

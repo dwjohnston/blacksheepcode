@@ -36,5 +36,16 @@
         "timezones",
         "Todos",
         "webp"
-    ]
+    ], 
+
+    "[mdx]": {
+        "editor.defaultFormatter": "unifiedjs.vscode-mdx",
+        "editor.inlineSuggest.enabled": false, 
+        "editor.quickSuggestions": {
+            "other": "off",
+            "comments": "off",
+            "strings": "off"
+        }
+    }
+
 }
