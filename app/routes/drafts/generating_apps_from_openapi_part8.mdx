@@ -1,0 +1,130 @@
+---
+meta:
+  title: Dockerising our application
+  description: We're going to run our application on AWS ECS, so first we need to dockerise it. 
+  dateCreated: 2024-02-13
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+
+# Dockerising our application
+
+We're need to dockerise our application to run it on AWS ECS. 
+
+Let's look at how we do that: 
+
+### 1. Create a Dockerfile
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L28"/>
+
+Let's walk through some individual parts of this: 
+
+#### Build frontend 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L7"/>
+
+Here, we use a use a docker container to build our frontend resources.
+
+The reason we do this is so that the artifact builds consistently across machines - we don't want a situation where an image build on my machine is different to an image built on someone else's machine. 
+
+Note also the: `FROM --platform=linux/amd64` clause - this avoids an issue where if you build the image on Apple Silicon, it's unable to run on regular amd64 architecture. See this [Stack Overflow answer](https://stackoverflow.com/a/74731135/1068446).
+
+Note also that we first copy the package.json and package-lock.json and do the install and _then_ we copy the rest of the application code and build the frontend. 
+
+The reason for this is [Docker layer caching](https://docs.docker.com/build/cache/) chances are, the dependencies (package.json and package-lock.json) aren't going to change, and so docker doesn't need to re-download the dependencies - it just uses the existing cached layer. 
+
+#### Build backend 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L9-L15"/>
+
+The backend build is much the same. We use the same technique of allowing docker the cache the dependencies layer before copying and compiling from the source files. 
+
+#### Build the Docker image 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L20-L28"/>
+
+Here we: 
+
+1. Install the requisite dependencies the docker image needs
+2. Copy our built artifacts across
+3. Copy our nginx and supervisord configs across
+4. Expose port 80
+5. Start supervisord running 
+
+##### supervisord
+
+We're using supervisord because our docker application needs to two processes: 
+
+1. The go application
+2. nginx for routing backend traffic to the go application, and all other traffic to our static resources. 
+
+We use supervisord as [suggested in Docker's documentation](https://docs.docker.com/config/containers/multi-service_container/#use-a-process-manager).
+
+Our supervisord.conf looks like this: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/supervisord.conf#L1-L18"/>
+
+There's not much to it. We do need to add those lines `stdout_logfile` lines to tell supervisord to redirect the process logs to the containers std out. 
+
+##### nginx 
+
+Our nginx config is a pretty standard one 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L1-L48"/>
+
+The important part is here: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L33-L41"/>
+
+ where we redirect anything starting with `/api` to the go application, and everything else to the static resources directory. 
+
+### Isn't a bad idea to serve your frontend from a Docker container? 
+
+Yes. 
+
+Putting our static assets in S3 bucket, and then serving them via a CDN is likely to a bit a lot faster, and cheaper. 
+
+However, there's two reasons we're doing this, for now: 
+
+1. Having a single image to run anywhere, can be convenient. Imagine this was some kind of internal tool, where performance isn't likely to be a problem, and we were sending this to a client. It's a lot easier to send them a single Docker image and tell them to run it however they want, rather than sending them a Docker image + a archive of static assets and tell them to glue it together themselves. 
+
+2. We're later going to start performance testing our application using [k6](https://k6.io/). I want to demonstrate the performance gains to be had by putting the static assets in an S3 bucket. 
+
+### Building the image
+
+We build the image with: 
+
+
+```
+	docker build -t openapi-go-and-typescript .
+```
+
+### Running the image 
+
+We run the image with: 
+
+```
+	docker run -p 80:80 openapi-go-and-typescript
+```
+
+Now we can access our application on `localhost:80` and voila! A running application!
+
+Comments? Questions? Criticisms? Suggestions? Get in the comments!
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

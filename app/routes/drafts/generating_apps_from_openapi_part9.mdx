@@ -1,0 +1,93 @@
+---
+meta:
+  title: Running our application on AWS using Terraform CDK. 
+  description: aa
+  dateCreated: 2024-02-13
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+
+In the [previous post](./generating_apps_from_openapi_part8) we dockerised our application. 
+
+In this post we'll get the Docker image running on AWS ECS using CDKTF. 
+
+Later, we'll performance test the application, and then start looking at how we can make improvements. 
+
+## The AWS infrastructure 
+
+We'll run a fairly standard AWS infrastructure for a web application. 
+
+The components are: 
+
+- AWS Virtual Private Cloud (VPC)
+  - A logically isolated network. Essentially see it as a 'grouping' where we can configure how things in the group can talk to each other, and we can otherwise control traffic in or out of the group. 
+- AWS Elastic Container Service (ECS)
+  - Allows running containers on AWS Fargate. 
+- AWS Application Load Balancer (ABS) 
+  - Essentially acts as nginx - routes traffic to right places, in this case our ECS service. 
+- AWS Cloudfront
+  - A Content Delivery Network (CDN). Provides edge caching for your resources, as well as provides us a handy HTTPS URL to see our application on. 
+
+We're not using an S3 bucket for our frontend assets right now. We're going to create the application like this, do load testing with [k6](https://k6.io/) and later we'll add an S3 bucket and show how it improves performance. 
+
+
+## CDKTF
+
+We're using [CDKTF](https://developer.hashicorp.com/terraform/cdktf) as our infrastructure-as-code solution.  
+
+Install CDKTF via the [instructions here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). 
+
+## The source material 
+
+I've used this repository as a guide for getting started: 
+
+https://github.com/cdktf/docker-on-aws-ecs-with-terraform-cdk-using-typescript
+
+This example appears to be a little out of date, and so I've massaged it and come up with this. 
+
+Note also, I've removed the S3 bucket, and Postgres database. 
+
+The final product looks like this: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L1-L574"/>
+
+I'm not going to go through each part, this'll perhaps be a post for another time, but I'll point out some things. 
+
+## Building the Docker image
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L107-L138"/>
+
+This is the logic that determines a unique tag for our docker image, based on the contents of what is going into the Docker image. 
+
+The idea here is that if the contents of the application haven't changed, then we don't need to go through with building and pushing the Docker image. 
+
+So we create content hashes of all of the requisite pieces, and then because a string concatenation of those will be too long, we then create a hash from that long string. 
+
+This solution is a little ugly, it would be nice to just declare the entire directory. Problem is, that leads to an recursive loop when it encounters to the cdktf.out directory - see my [Stack Overflow question addressing this](https://stackoverflow.com/questions/77965204/is-there-a-way-to-exclude-a-folder-from-a-terraformasset).
+
+
+## Running 
+
+We make sure we've got `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_DEFAULT_REGION` environment variables set. 
+
+We run 
+
+```
+cdtkf deploy infra
+```
+
+first run this may take several minutes, but eventually we should see: 
+
+```
+
+```
+
+Now we can access our application on that URL and see our deployed application!
+
+
+
+
+
+
+
+

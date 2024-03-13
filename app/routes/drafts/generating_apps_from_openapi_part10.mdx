@@ -1,0 +1,84 @@
+---
+meta:
+  title: Load testing our application with k6
+  description: aaa
+  dateCreated: 2024-02-13
+
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+
+
+In the [previous post](./generating_apps_from_openapi_part9) we got our application deployed to AWS using CDKTF. 
+
+In this post we'll start with some performance testing using Grafana's [k6 load testing tool](https://k6.io/).
+
+## Installation 
+
+First, make sure you have a k6 account, and the k6 CLI installed via the [instructions here](https://k6.io/docs/get-started/installation/).
+
+## Our first test 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_100.js#L1-L25"/>
+
+We run our test with 
+
+```
+k6 run load-tests/k6-20sec_at_100.js
+```
+
+Output: 
+
+```
+     data_received..................: 17 MB  836 kB/s
+     data_sent......................: 1.0 MB 50 kB/s
+     http_req_blocked...............: avg=446.18µs min=0s      med=0s       max=155.3ms  p(90)=1µs      p(95)=1µs     
+     http_req_connecting............: avg=94.47µs  min=0s      med=0s       max=25.31ms  p(90)=0s       p(95)=0s      
+     http_req_duration..............: avg=79.99ms  min=14.34ms med=91.32ms  max=314.5ms  p(90)=107.48ms p(95)=112.63ms
+       { expected_response:true }...: avg=79.99ms  min=14.34ms med=91.32ms  max=314.5ms  p(90)=107.48ms p(95)=112.63ms
+     http_req_failed................: 0.00%  ✓ 0           ✗ 24946
+     http_req_receiving.............: avg=107.28µs min=5µs     med=18µs     max=16.38ms  p(90)=227.5µs  p(95)=414.74µs
+     http_req_sending...............: avg=33.72µs  min=6µs     med=19µs     max=11.93ms  p(90)=35µs     p(95)=43µs    
+     http_req_tls_handshaking.......: avg=274.1µs  min=0s      med=0s       max=111.85ms p(90)=0s       p(95)=0s      
+     http_req_waiting...............: avg=79.85ms  min=5.07ms  med=91.18ms  max=314.48ms p(90)=107.36ms p(95)=112.43ms
+     http_reqs......................: 24946  1240.117303/s
+     iteration_duration.............: avg=161.02ms min=31.28ms med=179.89ms max=406.56ms p(90)=201.8ms  p(95)=204.51ms
+     iterations.....................: 12473  620.058651/s
+     vus............................: 100    min=100       max=100
+     vus_max........................: 100    min=100       max=100
+
+```
+
+The important part is this: 
+
+```
+     http_req_duration..............: avg=79.99ms  min=14.34ms med=91.32ms  max=314.5ms  p(90)=107.48ms p(95)=112.63ms
+```
+
+So 95% of of requests take 112.63ms or less. That seems reasonable. 
+
+
+Let's ramp up the number of simultaneous requests, this time we'll try 1000vus
+
+
+<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_1000.js#L1-L29"/>
+
+
+Output: 
+
+```
+
+```
+
+Ok, so we can demonstrate somewhere between 100 and 1000 simultaneous requests performance drops off dramatically and we start seeing 5xx errors. 
+
+## A breakpoint test
+
+Grafana helpful provides [guidance for various test types](https://grafana.com/docs/k6/latest/testing-guides/test-types/).
+
+We want to do a [breakpoint test](https://grafana.com/docs/k6/latest/testing-guides/test-types/breakpoint-testing/), we'll increase load until we start getting slow response times. 
+
+
+
+
+

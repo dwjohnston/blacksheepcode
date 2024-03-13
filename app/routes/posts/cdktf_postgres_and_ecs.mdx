@@ -1,0 +1,140 @@
+---
+meta:
+  title: Run a Docker image on AWS ECS + Postgres using Terraform CDK 
+  description: CDKTF is a tool that allows us to use fully fledged programming languages to do Terraform deployments, having the advantage of being type safe for one. 
+  dateCreated: 2024-02-21
+
+---
+
+import { GithubPermalink } from "react-github-permalink"
+import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
+
+
+# Create an AWS ECS + Postgres application using Terraform CDK 
+
+The following is quick guide for running a simple Todo Docker container running on AWS Elastic Container Service (ECS), and talking to a AWS RDS Postgres instance, using Terraform CDK.
+
+First make sure you have [CDKTF installed via the instructions here](https://developer.hashicorp.com/terraform/tutorials/cdktf/cdktf-install).
+
+Also make sure you have `AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` and `AWS_REGION` environment variables set in your local visitLexicalEnvironment. 
+
+This example is largely adapted from [this official example here](https://github.com/cdktf/docker-on-aws-ecs-with-terraform-cdk-using-typescript), though a decent amount of finagling was required. 
+
+I've found it's actually quite difficult to google for these guides, so hopefully this is helpful for someone.
+
+
+## Our application
+
+Our application is a simple todo app running on ExpressJS. 
+
+We can see the core logic here: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/backend/src/app.ts#L5-L45"/>
+
+## The CDKTF configuration 
+
+Create the CDKTF boilerplate
+
+```
+mkdir infra 
+cdktf init 
+```
+
+(Follow prompts, use TypeScript as your language, install the aws, docker, null and random providers). 
+
+Add the AWS VPC and RDS modules to your ctktf.json 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/cdktf.json#L7-L10"/>
+
+Populate your main.ts
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L1-L622"/>
+
+If all you wanted was the raw boilerplate, then you can stop reading here - the rest of the post is explaining the main.ts.
+
+## Explaining all the bits
+
+### Instantiate providers
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L472-L481"/>
+
+Any of the terraform providers need to instantiated. 
+
+
+### Create a VPC 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L482-L497"/>
+
+A VPC serves as a 'grouping' for our application, where we can logically separate various components and only allow the components that need to talk to each other, to do so. 
+
+Importantly this will isolate our application from the internet at large, we rely on AWS's infrastructure to prevent the items in our VPC being probed by the wider internet, meaning our internals won't be subject to brute force or DDOS attacks.
+
+
+### Create an ECS Cluster 
+
+<GithubPermalink permalink="hhttps://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L499-L500"/>
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L34-L186"/>
+
+Here we declare a an ECS instance, and we declare its task - to run a docker image. We add roles and configuration to allow this application to write logs. 
+
+### Create and expose load balancer 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L501-L535"/>
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L188-L323"/>
+
+Here we create an AWS Application Load Balancer - for our purposes this services as a mechanism for selectively exposing components in our VPC - in this case - our running Docker container. 
+
+### Create a Postgres Database 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L517-L522"/>
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/7faa1c20ac54a8780d62deeab6a9738a5c2618c1/infra/main.ts#L326-L402"/>
+
+Some notes here: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L360-L365"/>
+
+By default AWS will want your Postgres to only allow have a SSL connection, and causes this common error: [`connect to PostgreSQL server: FATAL: no pg_hba.conf entry for host`](https://dba.stackexchange.com/questions/83984/connect-to-postgresql-server-fatal-no-pg-hba-conf-entry-for-host). 
+
+So we turn it off. Alternatively we would need to make our application have the SSL PEM file for AWS's default SSL certificate, but for simplicity's sake we'll turn it off.
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L382-L383"/>
+
+If `manageMasterUserPassword` is on then the configuration will completely ignore the password we provided it, and create a secret using Secrets Manager. 
+
+For our purposes we want to provide the password via an environment variable, and I can't see a way to otherwise retrieve the secret at deploy time. 
+
+We could provide the secret arn, which is accessible as `db.dbInstanceMasterUserSecretArnOutput` and then at runtime retrieve the secret via AWS's SDK. 
+
+However we still shouldn't provide the database root password to our application. What we really should do at this point is be creating some specific passwords for our application(s) to use. 
+
+## Create Docker Image
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L521-L525"/>
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L404-L445"/>
+
+Here we run the command to create the docker image locally and push it up to AWS ECR. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L409-L414"/>
+
+Note the use of the asset hash here. We'll only rebuild the image if any of the composing artifacts (ie the source code) have changed. 
+
+## Run Docker Image 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L526-L534"/>
+
+We run our docker image, passing in the requisite environment variables. 
+
+
+## Add Cloudfront 
+
+
+<GithubPermalink permalink="https://github.com/dwjohnston/load-testing-with-k6/blob/931a8053a470a0ce8b35bbe42e8c0233a7bb93df/infra/main.ts#L543-L582"/>
+
+We add the Cloudfront CDN - conveniently giving us an SSL certificate. 
+
+
+
