@@ -1,0 +1,190 @@
+---
+meta:
+  title: How to get started testing a React codebase that has no tests.
+  description: You've inherited a React codebase that has no tests. You're having trouble with regressions and think that tests might help, but how do you get started?
+  dateCreated: 2024-03-12
+---
+
+# How to get started testing a codebase that has no tests.
+
+I was asked recently what advice I would give someone/a team working on a codebase that has no tests. 
+
+## The solution is an organisational/cultural/procedural one 
+
+Testing your codebase isn't just a matter of adding some tooling and some test code to your codebase. That's a part of it, yes, but acknowledge that this change involves changing how people in the organisation think and act about the product. 
+
+As such, tests aren't something that we can just put into the codebase, and -boom- problem solved. There's going to be an amount of learning to be diffused to the rest of the team; also, the solution isn't going to be immediately apparent, it may take multiple iterations to to discover what works for your code base. 
+
+## Take a low hanging fruit approach
+
+Start with writing the tests that are the easiest to test, and are also providing some value (see 'Test the spots that are giving you problems').  
+
+### Low hanging fruit #1 - Browser based end-to-end tests 
+
+Depending on what you already have set up, there maybe a bit of work getting this setup. 
+
+Essentially what you need is: 
+
+1. The ability to deploy a full application to some kind of test environment. 
+2. The ability to run browser based e2e tests (eg. Cypress or Playwright) against this test stack at either regular intervals (eg. overnight) or as part of your build checks for your pull requests. 
+3. You also need to be able to be run the application locally (or just the frontend locally, and pointed at your test backend) and run the tests locally. 
+
+In this style of test we aren't going to do any API mocking, real API calls will be made to your test environment. 
+
+The reasoning here is:
+1. Setting up mocks is time consuming
+2. Mocks can lie - you might believe that the API will return a response of a certain shape, and mock it as such, and your tests pass. But in reality the shape is something else the test should be failing. 
+
+Using a real API does mean that you may get occasional test failures due to a network issue as the test runs, but these shouldn't be frequent enough to be a problem. If they are frequent enough to be a problem, then that's probably a problem worth solving.
+
+### The problem of data in e2e tests
+
+A key problem you will need to address in your e2e tests is your philosophy about  how to create the data the this test requires to run, and how data from previous test runs affects the current test run.
+
+For this exercise, assume our application is a todo list.
+
+Essentially there are two approachs: 
+
+- Create the data 'on the fly' as part of running the test 
+- Seed the database with the test data needed before running the test suite.
+
+#### Data that this test needs to exist
+
+Your test expects some data to already exist. For example let's say our todo app has the ability to add priority flags to existing todos, and high priority todos will show in a separate panel. We are trying to write a test that demonstrates that the high priority todos are in the high priority panel. How do we get that todo to exist in the first place? 
+
+##### Create the data as part of the test
+
+We could do the flow of 'create todo' as part of this test, and then add the high priority flag, and then check that the todo exists in the high priority panel. 
+
+We will likely have to have multiple tests that require a todo to exist, and these will all redundantly do that same 'create todo' user flow, and this can mean our test suite will take longer than necessary.
+
+##### Seed the database with test data
+
+With this strategy as part of our application instantiation we add test data to the database. Our example test can then immediately expect the todo to exist. 
+
+#### Data from previous test runs
+
+Say we write a test that does something like "Click create todo. Write 'hello world' in the description box'. Click 'submit'. Expect to see a todo with the name 'hello world'". 
+
+The problem is, if there is a todo named 'hello world' that exists from a previous test run, then your test could actually be failing, but erroneously pass due to the data from the previous test run, or data from a different test within the same test run.
+
+Another issue you can have is that on paginated lists, your target data may exist on page 2 or page 10, so the test would either fails, or needs to some page traversal logic, which will be time consuming and possibly brittle. 
+
+##### Create data with unique identifiers for the given test run
+
+You can use a library like [human-readable-ids](https://www.npmjs.com/package/human-readable-ids) which generates unique, random, human readable IDs like 'silly-goose-37'. We create our test data and the test run expects this specific data to exist. Because the ids are unique, there's virtually no chance for a false positive to occur.
+
+##### Clear down the test data between each run / deploy a new application stack for each test run 
+
+Before the tests start running the application is reset to a clean slate. The tests then run against this nice pristine state. 
+
+Note that this in itself won't solve the problem of existing data from say a test in the current run. For this reason I recommend still using the unique identifiers strategy. 
+
+#### Summarising and suggestions for data strategy
+
+
+<table>
+  <thead>
+      <tr>
+        <td width="50%">Create data on the fly strategy</td>
+        <td width="50%">Clear data before test run strategy</td>
+      </tr>
+  </thead>
+
+
+  <tbody>
+      <tr>
+        <td>
+          <ul>
+          <li>Unique identifier should prevent problems.</li>
+
+          <li>Pagination issues may still exist.</li>
+          <li>Tests will cover the same ground multiple times, may start taking a long time.</li>
+          <li> Test data is co-located with the test. 👍 </li>
+
+        </ul>
+        </td>
+       <td>
+          <ul>
+          <li>Data from tests within the same run will still exist.</li>
+          <li>Mitigates pagination somewhat, but not entirely if there were a lot of previous tests in this run.</li>
+          <li>Tests are faster and more straight forward.</li>
+          <li>Test data likely exists in a different place to your tests. Might be hard to make changes to data without breaking tests. 😕</li>
+          <li>A lot more work setting up the application reset and database seeding functionality.</li>
+        </ul>
+        </td>
+        </tr>
+  </tbody>
+</table>
+
+
+My suggestion is to start with the 'create the data on the fly' strategy. 
+
+The main downsides of this strategy is that at some point the tests start taking an unreasonable amount of time to run, and that you will need to deal with pagination. 
+
+However, I would make three points: 
+
+1. Those repeated 'data set up' user flows are user flows that needed to be tested anyway.
+2. Seeding the database isn't going to completely mitigate these redundant flows. There are scenarios where you need to be creating data in your tests (eg. the plain 'create todo' test) and so it's still a good idea to have the uniqueness in place.
+3. Err on the side of getting some useful tests running _now_. In a year's time when your test suite is taking an hour to run, then you're going to have a better picture of just what basic data is needed, and you can populate it then. 
+
+### Low hanging fruit #2 - Component tests for new components
+
+Testing existing components can be difficult, namely if they: 
+
+- Make references to routing (useRoute, useParams, useNavigate etc). 
+- Make references to global state management (useQuery etc).
+- Make API calls directly inside themselves. 
+
+I've written about how [global state management poses challenges for testing here](../testing_strategies). 
+
+So rather than unpicking exactly what's going on with your existing components, I suggest taking an approach of 'going forward, here's how we're going to write new components, and here's how we are going to test them'. 
+
+You can test using a browser based component testing library like Storybook or Cypress. I don't recommend using React Testing Library - [see this blog post why.](./why_ive_gone_off_react_testing_library)
+
+Now, you will still need to make decisions about how you: 
+
+- Use routing in components, and how you test them
+- Use global state in components, and how you test them. 
+
+Maybe you take a 'no global state in our components/pure components only' approach, adopting the strategy of only doing this for new components means that you won't waste a lot of time refactoring existing components, only to find that the strategy is problematic. 
+
+Or say you take a strategy of 'global state is ok, we'll mock using MSW', then this gives you a chance to build up your MSW mock suite slowly, rather than it being a hugely cumbersome task for your more complex components. 
+
+## Test the spots that are giving your problems
+
+You don't need to do comprehensive tests. For example, say you have a button component, you might do a 'when I click it, the click handler is called' test, but you don't need to do a 'pressing space also works' or a 'I can tab to it', _unless those are regressions that had occurred_. 
+
+## The next lowest fruit 
+
+After we've picked off those lowest hanging fruit (this maybe six months or a year's time!) you should have the confidence to start testing some of your more difficult scenarios or hairier parts of your codebase. 
+
+### Test easy existing components 
+
+You might have existing components that fit your component testing strategy, and you can start writing tests for these with minimal refactoring. 
+
+### Test error scenarios and other mocking-required scenarios in your e2e tests. 
+
+Until now you're e2e tests have been running against a real API. This serves as an implicit test of your API, is easier to get running with, and doesn't run in the problem of mocks lying. 
+
+But at some point we do need to start mocking server responses, testing behaviour of error flows is one scenario for why. 
+
+The strategy is - we use a real server by default, and use mocking as the exception. 
+
+
+## The most difficult fruit 
+
+The most difficult fruit will be ones that: 
+
+- Make extensive use of global state management
+- Have a deep component tree, composed of components that also are using global state management. 
+- Have difficult to debug code, such as using useEffects and useRefs.
+
+Writing tests for these is out of the scope for this article, but here's some pointers: 
+
+- Use coverage reports to check for areas of the code that your tests aren't covering. In my opinion, coverage shouldn't be used as target for 'code quality' instead it should be used a short term tool to assist in refactoring. 
+- Use snapshot tests as an easy way to create deterministic unit tests. Keep in mind coverage scenarios though. 
+- You need to read all the code. One of the traps you can run into is assuming 'I know what this component should do', and then rewriting it according to your understanding. In reality there may be a piece of nuanced business logic in there that you didn't think of. 
+- You can take an approach of 'deprecate old component and create a new component that is tested'. This does run the risk of missing that nuanced business logic I mentioned in the previous point.
+- Your e2e tests will start serving as a safety net if you refactor without having deterministic unit tests in place. 
+

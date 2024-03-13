@@ -1,4 +1,5 @@
 import { captureRemixErrorBoundaryError, captureException } from "@sentry/remix";
+
 import { cssBundleHref } from "@remix-run/css-bundle";
 import { json, type LinksFunction, type MetaFunction } from "@remix-run/node";
 import {
