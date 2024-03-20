@@ -1,5 +1,7 @@
 export function loader() {
-    return `
-Sitemap: https://blacksheepcode.com/sitemap.xml
-`
+    return new Response(`Sitemap: https://blacksheepcode.com/sitemap.xml`, {
+        headers: {
+            "Content-Type": "text/plain"
+        }
+    }); 
 }

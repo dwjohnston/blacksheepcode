@@ -1,7 +1,6 @@
 
 import { LoaderArgs } from "@remix-run/node";
-import fsAsync from "fs/promises";
-import { getRss } from "utils/generateRss";
+import { getRss } from "utils/getRss";
 
 export async function loader({request} : LoaderArgs)  {
     const sitemap = getRss();
