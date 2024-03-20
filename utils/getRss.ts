@@ -18,6 +18,7 @@ const metadataArray = Object.values(allMetadata);
             xml += `  <item>\n`;
             xml += `    <title${json.frontmatter.meta.title}</title>\n`;
             xml += `    <description>${json.frontmatter.meta.description}</description>\n`;
+
             xml += `    <link>${rootUrl}/${json.slug}</link>\n`;
             xml += `    <guid>${rootUrl}/${json.slug}</guid>\n`;
             xml += `    <pubDate>${new Date(json.frontmatter.meta.dateCreated).toUTCString()}</pubDate>\n`;
