@@ -121,6 +121,10 @@ export const GameOfLife = (props: GameOfLifeProps) => {
     }, isRunning ? TICK_RATE : null);
 
     function handleCellClick(rowNumber: number, cellNumber: number) {
+
+        if(isRunning){
+            setIsRunning(false);
+        }
         setMap(toggleValueAt(map, rowNumber, cellNumber))
     }
 
