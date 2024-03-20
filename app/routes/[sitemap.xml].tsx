@@ -1,6 +1,7 @@
 
 import { LoaderArgs } from "@remix-run/node";
 import fsAsync from "fs/promises";
+import { generateSitemap } from "@nasa-gcn/remix-seo";
 
 export async function loader({request} : LoaderArgs) {
     const sitemap = await fsAsync.readFile(`app/generated/sitemap/sitemap.xml`); 

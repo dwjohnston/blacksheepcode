@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "npm run generate:mdxjson && npm run generate:sitemaps && npm run generate:rss && remix build --sourcemap && sentry-upload-sourcemaps --org black-sheep-code --project javascript-remix",
+    "build": "npm run generate:mdxjson && npm run generate:sitemaps && remix build --sourcemap && sentry-upload-sourcemaps --org black-sheep-code --project javascript-remix",
     "dev": "remix dev",
     "start": "netlify serve",
     "lint": "eslint .",
