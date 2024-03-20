@@ -3,7 +3,7 @@ import { LoaderArgs } from "@remix-run/node";
 import fsAsync from "fs/promises";
 
 export async function loader({request} : LoaderArgs) {
-    const sitemap = await fsAsync.readFile(`app/generated/sitemap/sitemap.xml`); 
+    const sitemap = await fsAsync.readFile(`app/generated/sitemap/rss.xml`); 
     
 
     return new Response(sitemap, {
