@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 
+import * as allMetadata from "../app/generated/frontmatter/posts/index"; 
 export function generateSitemaps(rootPath: string, xmlPath: string, rootUrl ="https://blacksheepcode.com" ){
 
     const files= fs.readdirSync(rootPath); 
@@ -28,4 +29,19 @@ export function generateSitemaps(rootPath: string, xmlPath: string, rootUrl ="ht
     fs.writeFileSync(xmlPath, xml);
 }
 
-generateSitemaps("app/generated/frontmatter/posts", "app/generated/sitemap/sitemap.xml");
+export function getSitemaps(rootUrl = "https://blacksheepcode.com") : string {
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+    const metadataArray = Object.values(allMetadata);
+    metadataArray.forEach((json : any) => {
+            xml += `  <url>\n`;
+            xml += `    <loc>${rootUrl}/${json.slug}</loc>\n`;
+            xml += `    <lastmod>${new Date(json.frontmatter.meta.dateCreated).toISOString()}</lastmod>\n`;
+            xml += `  </url>\n`     
+    
+    })
+    xml += `</urlset>`;
+    return xml;
+}
+
