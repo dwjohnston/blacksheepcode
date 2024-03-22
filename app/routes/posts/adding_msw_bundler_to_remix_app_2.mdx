@@ -17,13 +17,13 @@ In the [previous post](./adding_msw_bundler_to_remix_app) I outlined how to make
 
 In this post, we'll we'll talk about how to achieve the same effect for use in a serverless platform, such a Netlify or AWS Lambda. 
 
-The solution essentially involves a build time step that extracts the frontmatter to JSON files. These JSON files can then be read at run time. 
+The solution involves a build time step that extracts the frontmatter to JSON files. These JSON files can then be read at runtime. 
 
 ## This solution is for Remix V1
 
-This solution is for Remix V1. The reason is because V2 made changes to Remix's routing - and got rid of nested routing. 
+This solution is for Remix V1. The reason is because V2 made changes to Remix's routing and got rid of nested routing. 
 
-That is, where in V1 we can organise our routing like: 
+Where in V1 we can organise our routing like: 
 
 ```
 /app 
@@ -71,9 +71,11 @@ export {default as adding_msw_bundler_to_remix_app} from './adding_msw_bundler_t
 
 The reason we need to use barrel files is [we can't do dynamic imports with Remix](https://github.com/remix-run/remix/discussions/2936) (though the [change to using Vite](https://remix.run/blog/remix-heart-vite) might have changed this). 
 
-## Remix probably isn't a good solution 
+## Maybe Remix isn't the right tool for the job. 
 
-This is quite a hacky workaround. 
+This is all feeling a bit hacky. When I started this blog it felt 50/50 the race between NextJS and Remix, whereas in 2024 it seems like NextJS is really pulling ahead. If I were to be starting this blog today, I'd be using NextJS or perhaps Astro. 
+
+That said, this is going pretty smoothly, for what it's worth.
 
 
 ## Starting Point - We have frontmatter in our posts 
@@ -83,6 +85,7 @@ For example, here is the frontmatter for this post:
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx#L1-L11"/>
 
 Note that this frontmatter is entirely custom, we're going to need to write handlers for it later. 
+
 
 ## Starting point - We have multiple folders of blog posts 
 
@@ -104,7 +107,7 @@ My file structure looks like this:
        some_other_page.tsx
 ```
 
-This allows me to write draft posts and see how they look, without publishing them. 
+This allows me to write draft posts and see how they look, but selectively only publish the `posts` posts. 
 
 ## Create a validation schema for our custom frontmatter
 
@@ -197,5 +200,6 @@ For one - a blog a good use case for static site generation, [which Remix doesn'
 
 This solution doesn't support an automated created/updated fields - those have to maintained manually. Perhaps some git commands in the build time JSON generation could do it. 
 
+Note that the barrel files are only ever used by Remix loader and meta functions, ie. on the server, so we don't need to worry about them being needlessly pulled in the frontend. If we had thousands of posts this might start posing a problem. 
 
 
