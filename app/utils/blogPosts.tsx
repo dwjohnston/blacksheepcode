@@ -2,10 +2,9 @@ import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
-import type { EnrichedFrontMatterPlusSlug, FrontMatter, FrontMatterPlusSlug } from "utils/frontmatterTypings";
+import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "utils/frontmatterTypings";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
-
 
 export const allMetadata = {
     "drafts": allDraftMetaData as Record<string, FrontMatterPlusSlug>,
@@ -30,7 +29,6 @@ export function getFolderAndFilenameFromSlug(slug: string): {
     if (!fName) {
         throw new Error("Expect fName to exist");
     }
-
     return {
         folder: folder as BlogPostFolders,
         filename: fName,
@@ -53,6 +51,8 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
     }
 
     let seriesFrontmatter   : Array<FrontMatterPlusSlug> | null = null; 
+    
+    // If it's a series, then we get the frontmatter for all of the series, so we can show the table of contents
     if ('series' in data.frontmatter) {
         seriesFrontmatter = (Object.values(allMetadata[folder]).filter((v) => {
             return v.frontmatter.series?.name === data.frontmatter.series?.name

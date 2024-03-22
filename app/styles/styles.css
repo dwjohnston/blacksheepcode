@@ -265,3 +265,44 @@ table td {
     border-radius: 0.2em;
     
 }
+
+
+.aside {
+    width: 300px;
+    margin: 1em;
+    border: 2px solid #666;
+    border-radius: 0.5em;
+    padding: 20px;
+    background-color: #eee;
+    font-size: 0.75em;
+    position: relative;
+    float: right;
+    box-shadow: 2px 2px 2px #ccc ;
+}
+
+.aside:before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #666;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #666;
+    border-bottom: 10px solid transparent;
+    right: -21px;
+    top: 6px;
+
+  }
+
+  .aside:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #eee;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #eee;
+    border-bottom: 10px solid transparent;
+    right: -16px;
+    top: 8px;
+  }

@@ -11,6 +11,7 @@ series:
    
 import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
 import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
+import {Aside} from "../../components/Aside/Aside";
 
 In the [previous post](./adding_msw_bundler_to_remix_app) I outlined how to make use of mdx-bundler to access your frontmatter metadata. This approach requires file system access as the files are parsed at run time. 
 
@@ -58,4 +59,102 @@ For potentially hundreds of files this would get quite messy.
 
 Also note that I don't want to do a 'store the blog posts in a database' solution. This is [something that is recommended in Remix's documentation](https://remix.run/docs/en/main/guides/mdx#example:~:text=Clearly%20this%20is,MDX%20Bundler.) but I don't agree with the reasoning. In my opinion two of the major advantages of using a Github-hosted-MDX-files solution is that you provide a convenient way of allow viewers to submit edit requests, and it provides a handy version history. 
 
-## Starting Point - 
+## This solution uses barrel files
+
+A barrel file is an index file that looks like this: 
+
+```js
+export {default as adding_msw_bundler_to_remix_app_2} from './adding_msw_bundler_to_remix_app_2.json';
+export {default as adding_msw_bundler_to_remix_app} from './adding_msw_bundler_to_remix_app.json';
+//etc
+```
+
+The reason we need to use barrel files is [we can't do dynamic imports with Remix](https://github.com/remix-run/remix/discussions/2936) (though the [change to using Vite](https://remix.run/blog/remix-heart-vite) might have changed this). 
+
+
+## Starting Point - We have frontmatter in our posts 
+
+For example, here is the frontmatter for this post: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx#L1-L11"/>
+
+Note that this frontmatter is entirely custom, we're going to need to write handlers for it later. 
+
+## Starting point - We have multiple folders of blog posts 
+
+My file structure looks like this: 
+
+```
+/app 
+   /routes 
+       /posts
+          blogpost1.mdx
+          blogpost2.mdx
+      /drafts
+          draftpost1.mdx
+      /test 
+          testpost1.mdx
+       posts.tsx 
+       drafts.tsx
+       test.tsx
+       some_other_page.tsx
+```
+
+This allows me to write draft posts and see how they look, without publishing them. 
+
+## Create a validation schema for our custom frontmatter
+
+Here I'm using Zod to create a validation schema: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/frontmatterTypings.ts#L1-L33"/>
+
+What I've done is I've said that title, description and date created are always going to exist. I can continue extending this schema in the future, and adding optional properties. 
+
+
+## A build time tool to generate JSON and barrel files from our frontmatter 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.ts#L1-L109"/>
+
+<Aside>
+  <p>As an aside, this code was largely generated with assistance of ChatGPT, and then I tweaked it as I want.</p>
+  <p>Now looking at it, it looks kind of gross.</p>
+  <p>But right now, I don't care enough. The code is tested, and my philosophy is that 'good code is easy to delete', the interface is fine, we can rewrite this later if we need.</p>
+</Aside>
+
+Essentially the process here is: 
+
+1. Recursively traverse our routes structure, finding the .mdx files
+2. Use the [front-matter](https://www.npmjs.com/package/front-matter) package to parse the MDX files, extracting the front-matter. 
+3. Validate that the frontmatter matches our Zod schema
+4. For each MDX file, create a json file in `app/generated/frontmatter` matching the mdx file path
+5. Once all JSON files have been created, create a index.js barrel file in each folder. 
+
+I have a separate file that runs this code: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.bin.ts#L1-L16"/>
+
+And we have a script in our package.json to calls this: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/package.json#L12-L13"/>
+
+## Example Layout Route
+
+Here's what my posts.tsx layout route is looking like: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/routes/posts.tsx#L1-L29"/>
+
+This is what gives a consistent look feel across all the posts. 
+
+The key things we need to implement are:
+
+- FrontmatterBox - This is blog post specific frame, it contains that series box, as well as can contain things like author, date published, etc. 
+- createLoaderFunction - the Remix loader function, this will need examine the frontmatter jsons.
+- createMetaFunction - the Remix meta function, this will need to examine the frontmatter jsons. 
+
+## createLoaderFunction 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/utils/blogPosts.tsx#L1-L84"/>
+
+Here 
+
+
