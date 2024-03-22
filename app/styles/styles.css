@@ -265,3 +265,66 @@ table td {
     border-radius: 0.2em;
     
 }
+
+
+/**
+
+    Inspired by this: 
+    https://codingislove.com/css-speech-bubbles/
+*/
+.aside {
+    width: 300px;
+    margin: 1em;
+    border: 2px solid #666;
+    border-radius: 0.5em;
+    padding: 20px;
+    background-color: #eee;
+    font-size: 0.75em;
+    position: relative;
+    float: right;
+    box-shadow: 2px 2px 2px #ccc ;
+}
+
+.aside .triangle {
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #666;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #666;
+    border-bottom: 10px solid transparent;
+    right: -21px;
+    top: 6px;
+    z-index:2
+
+}
+
+/**
+This is a bit silly and hacky, but it prevents the slightest bit of overlap of the drop shadow over the line by position behind it
+*/
+.aside .triangle-drop-shadow {
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #f66;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #f66;
+    border-bottom: 10px solid transparent;
+    right: -21px;
+    top: 6px;
+    filter: drop-shadow(2px 2px 2px #ccc);
+    z-index: 1;
+}
+
+  .aside .triangle:after {
+    content: "";
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #eee;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #eee;
+    border-bottom: 10px solid transparent;
+    right: -5px;
+    top: -8px;
+  }
