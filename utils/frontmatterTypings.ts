@@ -4,6 +4,7 @@ const metaSchema = z.object({
     title: z.string(),
     description: z.string(), 
     dateCreated: z.date().or(z.string()),
+    image: z.string().optional(),
   }); 
 
   const seriesSchema = z.object({

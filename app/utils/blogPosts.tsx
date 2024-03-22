@@ -3,6 +3,8 @@ import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
 import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "utils/frontmatterTypings";
+import * as allImages from "../generated/images";
+import { getDomainUrl } from "utils/getDomainUrl";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
@@ -83,6 +85,32 @@ export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
     }
 }
 
+type ImageData = {
+    str: string, 
+    width: number, 
+    height: number,    
+}
+
+export function getImageTags(imageName: string)  {
+
+    //@ts-expect-error
+    const image : ImageData | undefined =  allImages[imageName]; 
+
+
+    if(!image){
+        return {};
+    }
+
+   return {
+    "og:image": `${getDomainUrl()}${image.str}`,  
+    "og:image:width": image.width, 
+    "og:image:height": image.height, 
+    "twitter:image": `${getDomainUrl()}${image.str}`,
+    "twitter:image:width": image.width, 
+    "twitter:image:height": image.height, 
+   }}
+
+   
 
 function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | null) {
 
@@ -92,6 +120,7 @@ function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | n
 
     return {
         ...DEFAULT_METADATA,
+        ...(frontmatter.frontmatter.meta.image ?  getImageTags(frontmatter.frontmatter.meta.image) : {}), 
         title: frontmatter.frontmatter.meta?.title,
         description: frontmatter.frontmatter?.meta?.description,
         "twitter:title": frontmatter.frontmatter.meta?.title,

@@ -10,6 +10,7 @@
     "test:cypress": "cypress open",
     "test:cypress:ci": "cypress run",
     "generate:mdxjson": "rm -rf app/generated/frontmatter && tsx utils/extractFrontMatter.bin.ts",
+    "generate:imagebarrel": "tsx utils/generateImageBarrelFiles.ts",
     "test": "jest --watchAll"
   },
   "dependencies": {
@@ -47,6 +48,7 @@
     "cypress": "^13.4.0",
     "eslint": "^8.38.0",
     "front-matter": "^4.0.2",
+    "image-size": "^1.1.1",
     "jest": "^29.7.0",
     "remark-toc": "^8.0.1",
     "tsx": "^4.7.0",
