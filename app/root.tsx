@@ -72,9 +72,6 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader() {
-
-
-  console.log(process.env.NODE_ENV, process.env.GITHUB_TOKEN);
   return json({
     ENV: {
       GITHUB_TOKEN: process.env.NODE_ENV === 'development' ? process.env.GITHUB_TOKEN : null

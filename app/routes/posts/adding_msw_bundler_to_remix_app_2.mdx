@@ -71,6 +71,10 @@ export {default as adding_msw_bundler_to_remix_app} from './adding_msw_bundler_t
 
 The reason we need to use barrel files is [we can't do dynamic imports with Remix](https://github.com/remix-run/remix/discussions/2936) (though the [change to using Vite](https://remix.run/blog/remix-heart-vite) might have changed this). 
 
+## Remix probably isn't a good solution 
+
+This is quite a hacky workaround. 
+
 
 ## Starting Point - We have frontmatter in our posts 
 
@@ -153,8 +157,41 @@ The key things we need to implement are:
 
 ## createLoaderFunction 
 
+This function creates our Remix [loader](https://remix.run/docs/en/1.19.3/route/loader) function.
+
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/utils/blogPosts.tsx#L1-L84"/>
 
-Here 
+The logic here is a little hardcoded - it won't work for deeper levels of nesting, but essentially we use the location URL to determine the folder and filename to retrieve the metadata json from the correct barrel file. 
 
+Note for the series metadata, I also collate all of the metadata for that series in with response payload. That's how I create the series contents on a given page. 
+
+## createMetaFunction 
+
+This function creates our Remix [meta](https://remix.run/docs/en/1.19.3/route/meta) function.
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/utils/blogPosts.tsx#L87-L115"/>
+
+Importantly, it does things like transforming the title and description into the correct format twitter meta tags. 
+
+## FrontmatterBox 
+
+This is component is responsible for transforming any of metadata into whatever content we want for that post, series contents, 'next post in series', etc. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/components/FrontmatterBox/FrontmatterBox.tsx#L1-L96"/>
+
+## Creating a table of contents
+
+We can create a table of contents on our home page using the `getAllPostFrontmatter` function.
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/routes/index.tsx#L27-L29"/>
+
+## Conclusions and my experience 
+
+Now that I've got this going, it works pretty well. 
+
+One thing that isn't work for me - is that I can't put images in the metadata, which is important for social sharing. However, a similar barrel file approach might work. 
+
+The rigmarole of doing this suggests that Remix might not be the right tool for the job. Astro is something worth considering, also I might look at NextJS. 
+
+For one - a blog a good use case for static site generation, [which Remix doesn't support](https://github.com/remix-run/remix/discussions/2796).
 
