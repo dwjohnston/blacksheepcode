@@ -17,6 +17,7 @@ In the [previous post](./adding_msw_bundler_to_remix_app) I outlined how to make
 
 In this post, we'll we'll talk about how to achieve the same effect for use in a serverless platform, such a Netlify or AWS Lambda. 
 
+
 The solution involves a build time step that extracts the frontmatter to JSON files. These JSON files can then be read at runtime. 
 
 ## This solution is for Remix V1
@@ -77,7 +78,6 @@ This is all feeling a bit hacky. When I started this blog it felt 50/50 the race
 
 That said, this is going pretty smoothly, for what it's worth.
 
-
 ## Starting Point - We have frontmatter in our posts 
 
 For example, here is the frontmatter for this post: 
@@ -85,7 +85,6 @@ For example, here is the frontmatter for this post:
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx#L1-L11"/>
 
 Note that this frontmatter is entirely custom, we're going to need to write handlers for it later. 
-
 
 ## Starting point - We have multiple folders of blog posts 
 
