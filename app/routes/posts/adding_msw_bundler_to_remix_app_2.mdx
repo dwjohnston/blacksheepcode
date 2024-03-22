@@ -1,0 +1,61 @@
+---
+meta:
+  title:  How to configure Remix and mdx-bundler for a serverless platform - barrel files approach, Remix v1
+  description: If using Remix on a serverless platform such as Netlify we can use a build time compilation and barrel files to access frontmatter metadata.
+  dateCreated: 2024-03-22
+
+series: 
+    name: remix_blog
+    part: 3
+---
+   
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {InfoPanel} from "../../components/InfoPanel/InfoPanel"
+
+In the [previous post](./adding_msw_bundler_to_remix_app) I outlined how to make use of mdx-bundler to access your frontmatter metadata. This approach requires file system access as the files are parsed at run time. 
+
+In this post, we'll we'll talk about how to achieve the same effect for use in a serverless platform, such a Netlify or AWS Lambda. 
+
+The solution essentially involves a build time step that extracts the frontmatter to JSON files. These JSON files can then be read at run time. 
+
+## This solution is for Remix V1
+
+This solution is for Remix V1. The reason is because V2 made changes to Remix's routing - and got rid of nested routing. 
+
+That is, where in V1 we can organise our routing like: 
+
+```
+/app 
+   /routes 
+       /posts
+          blogpost1.mdx
+          blogpost2.mdx
+      /drafts
+          draftpost1.mdx
+       posts.tsx 
+       some_other_page.tsx
+
+```
+
+Remix V2 got rid of the ability to use file/folder nesting to determine the URL, the equivalent solution would look like: 
+
+
+```
+/app 
+   /routes 
+
+      posts.blogpost1.mdx
+      posts.blogpost2.mdx
+      drafts.draftpost1.mdx
+      posts.tsx 
+      some_other_page.tsx
+
+```
+
+For potentially hundreds of files this would get quite messy. 
+
+(However, I concede that this is potentially something I could live with). 
+
+Also note that I don't want to do a 'store the blog posts in a database' solution. This is [something that is recommended in Remix's documentation](https://remix.run/docs/en/main/guides/mdx#example:~:text=Clearly%20this%20is,MDX%20Bundler.) but I don't agree with the reasoning. In my opinion two of the major advantages of using a Github-hosted-MDX-files solution is that you provide a convenient way of allow viewers to submit edit requests, and it provides a handy version history. 
+
+## Starting Point - 
