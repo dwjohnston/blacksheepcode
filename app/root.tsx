@@ -156,6 +156,13 @@ export default function App() {
           <div>
             <a href="/">Black Sheep Code</a>
           </div>
+
+          <div>
+            <a href="/rss.xml" className="rss-link">
+            <span className="icon material-symbols-outlined">
+rss_feed
+</span></a>
+          </div>
         </header>
         <div className="main-column">
           <GithubPermalinkProvider githubToken={data.ENV.GITHUB_TOKEN ?? undefined} onError={(err) => {
