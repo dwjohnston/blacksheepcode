@@ -1,5 +1,5 @@
-import dark from "../../assets/bsc-dark.webp";
-import light from "../../assets/bsc-light.webp";
+import dark from "../../assets/bsc_dark.webp";
+import light from "../../assets/bsc_light.webp";
 
 
 import { useMediaQuery } from "react-responsive";
