@@ -1,0 +1,64 @@
+---
+meta:
+  title:  Adding dark mode to a blog - how to avoid flashes of the wrong theme
+  description: I've added dark mode to this blog. Here's a few tricks I've learned. 
+  dateCreated: 2024-06-07
+
+series: 
+    name: remix_blog
+    part: 4
+---
+
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {Aside} from "../../components/Aside/Aside"
+import {ImagePanel} from "../../components/ImagePanel/ImagePanel";
+import {SheepImage} from "../../components/SheepImage/SheepImage";
+
+
+I've added dark mode to this blog. 
+
+I followed [this fantastic guide from LogRocket](https://blog.logrocket.com/dark-mode-react-in-depth-guide/). I'm not going to repeat what they've done there, we'll just mention that they're making using of CSS variables, the `@media (prefers-color-scheme: dark)` query, and the package [`react-responsive`](https://www.npmjs.com/package/react-responsive) for queries inside of React. 
+
+Here's a few additional things that I had to do. 
+
+## Render conditional images client side. 
+
+I'm being a little bit clever with the main blog image on the front page - in light mode I show a sheep during the daytime and in dark mode he's in a dark room illuminated by the laptop screen. 
+
+<ImagePanel
+ images = {[{
+  image: <SheepImage mode="light"/>, 
+  caption: "Light mode image"
+ }, 
+ {
+  image: <SheepImage mode="dark"/>,
+  caption: "Dark mode image"
+ }
+ ]}/>
+
+This is conditionally rendered, the server-side-rendered first render isn't aware of what the users preferred color scheme is, and so that image would aways come through as the light mode image. 
+
+<Aside>
+    All me old fashioned, but I think this is the correct use of animations -  to smooth out jankyness, or call attention to that something has changed. Animations for the sake of themselves are just distracting. 
+</Aside>
+
+<GithubPermalink className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
+
+## Conditionally use stylesheets
+
+This blog uses [`highlight.js`](https://github.com/highlightjs/highlight.js) the plain markdown codeblocks. HighlightJS provides light and dark themes separately. 
+
+Per [this very handy issue thread](https://github.com/highlightjs/highlight.js/issues/3652) - I import both themes, conditionally choose the one matching the user's preference with a `media="(prefers-color-scheme: dark)"`
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/root.tsx#L57-L60"/>
+
+## Other miscellaneous updates 
+
+I needed to update my utterances config
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/PostComments/PostComments.tsx#L27-L28"/>
+
+And I need to make updates to [react-github-permalink](https://www.npmjs.com/package/react-github-permalink) to have it include a user preference responsive theme. 
+
+
+

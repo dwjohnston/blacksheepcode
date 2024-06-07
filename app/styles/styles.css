@@ -1,10 +1,11 @@
 body {
     --color-foreground-paper: black;
+    --color-foreground-secondary: #111; 
 
     /* 
     Secondary and highlight serve the same function 
      Highlight is just a bit zanier */
-    --color-foreground-secondary: #bbb;
+    --color-foreground-border: #bbb;
     --color-foreground-highlight: #555;
     --color-foreground-impact: white;
 
@@ -42,7 +43,9 @@ body {
 @media (prefers-color-scheme: dark) {
     body {
         --color-foreground-paper: white;
-        --color-foreground-secondary: #aaa;
+        --color-foreground-secondary: #ccc; 
+
+        --color-foreground-border: #aaa;
 
 
         --color-foreground-highlight: #55ff5540;
@@ -75,7 +78,6 @@ body {
         background: radial-gradient(circle, black 60%, var(--color-background-paper) 68%, #ddffdd50 69%, var(--color-background-paper) 70%);
     }
 
-    margin-top: 2em;
     width: 200px;
     height: 200px;
     display: flex;
@@ -243,7 +245,7 @@ a:hover {
 table {
     border-spacing: 0px;
     border-collapse: separate;
-    border: 1px solid var(--color-foreground-secondary)
+    border: 1px solid var(--color-foreground-border)
 }
 
 table thead td {
@@ -251,7 +253,7 @@ table thead td {
 }
 
 table td {
-    border: 1px solid var(--color-foreground-secondary);
+    border: 1px solid var(--color-foreground-border);
     padding: 0.5em;
 }
 
@@ -353,7 +355,7 @@ table td {
 
     .series-box {
         padding: 0;
-        border: border 1px solid var(--color-foreground-secondary);
+        border: border 1px solid var(--color-foreground-border);
         border-width: 0 0 1px;
     }
 
@@ -393,23 +395,23 @@ table td {
 .aside {
     width: 300px;
     margin: 1em;
-    border: 1px solid var(--color-foreground-secondary);
+    border: 1px solid var(--color-foreground-border);
     border-radius: 0.5em;
     padding: 20px;
     background-color: var(--color-background-paper-secondary);
     font-size: 0.75em;
     position: relative;
     float: right;
-    box-shadow: 2px 2px 2px var(--color-foreground-secondary);
+    box-shadow: 2px 2px 2px var(--color-foreground-border);
 }
 
 .aside .triangle {
     width: 0px;
     height: 0px;
     position: absolute;
-    border-left: 10px solid var(--color-foreground-secondary);
+    border-left: 10px solid var(--color-foreground-border);
     border-right: 10px solid transparent;
-    border-top: 10px solid var(--color-foreground-secondary);
+    border-top: 10px solid var(--color-foreground-border);
     border-bottom: 10px solid transparent;
     right: -21px;
     top: 6px;
@@ -427,4 +429,33 @@ table td {
     border-bottom: 10px solid transparent;
     right: -5px;
     top: -8px;
+}
+
+.clear-right {
+    clear: right;
+}
+
+
+.image-panel {
+    display: flex; 
+    flex-flow: row wrap; 
+    justify-content: space-around;
+
+    background-color: var(--color-background-paper-secondary);
+    border: solid 1px var(--color-foreground-border); 
+    border-radius: 0.25em;
+    padding: 0.25em;
+
+    .image-panel-single {
+        background-color: var(--color-background-paper); 
+        padding: 1em; 
+        border: solid 1px var(--color-background-paper-secondary);
+        border-radius: 0.25em;
+    }
+
+    .image-panel-caption {
+        text-align: center; 
+        color: var(--color-foreground-secondary);
+        font-size: 0.75em;
+    }
 }
