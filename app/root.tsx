@@ -16,7 +16,6 @@ import {
 
 import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.css";
 
-import styles from 'highlight.js/styles/vs2015.css';
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 import { GithubPermalinkProvider } from "react-github-permalink";
@@ -56,7 +55,9 @@ export const meta: MetaFunction = (...args) => {
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
 
-  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css", media: "(prefers-color-scheme: dark)" },
+  { rel: "stylesheet", href: "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css", media:"(prefers-color-scheme: light)" },
+
   {
     rel: "stylesheet", href: ourStyles,
   },
@@ -78,7 +79,6 @@ export async function loader() {
     },
   });
 }
-
 
 export const ErrorBoundary = () => {
   const error = useRouteError();
@@ -159,9 +159,9 @@ export default function App() {
 
           <div>
             <a href="/rss.xml" className="rss-link">
-            <span className="icon material-symbols-outlined">
-rss_feed
-</span></a>
+              <span className="icon material-symbols-outlined">
+                rss_feed
+              </span></a>
           </div>
         </header>
         <div className="main-column">

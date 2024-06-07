@@ -25,7 +25,7 @@ const PostComments = () => {
             // define a custom label that you want added to your posts.
             commentScript.setAttribute('label', 'blog-comment')
             // define if you want to use dark or light theme.
-            commentScript.setAttribute('theme', 'github-light')
+            commentScript.setAttribute('theme', 'preferred-color-scheme')
             commentScript.setAttribute('crossorigin', 'anonymous')
             // we will append this script as a child to the ref element we have created above
         }
