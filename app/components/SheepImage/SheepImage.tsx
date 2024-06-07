@@ -20,6 +20,4 @@ export function SheepImage() {
     return <div className="sheep-image-wrapper">
         {ready && <img src={isDarkMode ? dark : light} alt="A black sheep typing at a computer" />}
     </div>
-
-
 }
