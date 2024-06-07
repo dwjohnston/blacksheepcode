@@ -59,6 +59,15 @@ body {
 
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 
 .sheep-image-wrapper {
 
@@ -66,6 +75,7 @@ body {
         background: radial-gradient(circle, black 60%, var(--color-background-paper) 68%, #ddffdd50 69%, var(--color-background-paper) 70%);
     }
 
+    margin-top: 2em;
     width: 200px;
     height: 200px;
     display: flex;
@@ -79,6 +89,10 @@ body {
         left: 25%;
         height: 60%;
         width: 60%;
+
+        animation: fadeIn 0.1s ease-in-out;
+
+
     }
 
 }

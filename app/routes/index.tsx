@@ -37,13 +37,11 @@ export default function Index() {
     <div className="main">
 
       <div className="headline">
-      <SheepImage />
-
+       <SheepImage />
         <div>
           <h1>Black Sheep Code</h1>
           <p>Tech writings from David Johnston.</p>
         </div>
-
       </div>
       <div>
         <h2>Work</h2>
