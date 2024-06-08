@@ -3,6 +3,7 @@ import { getAllPostFrontmatter } from "~/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
 import { DatePublished } from "~/components/DatePublished/DatePublished";
+import { SheepImage } from "~/components/SheepImage/SheepImage";
 
 
 
@@ -14,7 +15,7 @@ export function ListOfArticles(props: {
       return <Link to={v.slug} key={v.slug} className="homepage-article-link" data-testid="bsc-homepage-article-preview-box">
         <div>
           <p className="homepage-article-link-title">{v.frontmatter.meta?.title ?? v.slug}</p>
-          {v.frontmatter.meta?.dateCreated && <DatePublished date={v.frontmatter.meta.dateCreated}/>}
+          {v.frontmatter.meta?.dateCreated && <DatePublished date={v.frontmatter.meta.dateCreated} />}
           <p className="homepage-article-link-description">{v.frontmatter.meta?.description ?? ''}</p>
         </div>
       </Link>
@@ -36,9 +37,7 @@ export default function Index() {
     <div className="main">
 
       <div className="headline">
-        <div className="logo-container">
-          <img src={mainIcon} alt="A nerdy looking sheep" />
-        </div>
+       <SheepImage />
         <div>
           <h1>Black Sheep Code</h1>
           <p>Tech writings from David Johnston.</p>
@@ -53,14 +52,14 @@ export default function Index() {
 
         <h2>Open Source Projects</h2>
         <ul>
-        <li> <a href="https://www.npmjs.com/package/react-github-permalink" target="_blank" rel="noreferrer">react-github-permalink</a> - Provide a Github permalink and this React component will display the codeblock. I use this component regularly in my blog.</li>
-        <li> <a href="https://github.com/dwjohnston/ts-tutorial-series" target="_blank" rel="noreferrer">TypeScript Tutorial Series</a> - A TypeScript tutorial series, complete with interactive exercises, starting from the very basics and going up to generics and mapped and index types.</li>
+          <li> <a href="https://www.npmjs.com/package/react-github-permalink" target="_blank" rel="noreferrer">react-github-permalink</a> - Provide a Github permalink and this React component will display the codeblock. I use this component regularly in my blog.</li>
+          <li> <a href="https://github.com/dwjohnston/ts-tutorial-series" target="_blank" rel="noreferrer">TypeScript Tutorial Series</a> - A TypeScript tutorial series, complete with interactive exercises, starting from the very basics and going up to generics and mapped and index types.</li>
 
-        <li> <a href="https://github.com/dwjohnston/javascript-101" target="_blank" rel="noreferrer">Javascript 101</a> - A JavaScript tutorial series for people who know nothing about coding. Complete with interactive exercises.</li>
+          <li> <a href="https://github.com/dwjohnston/javascript-101" target="_blank" rel="noreferrer">Javascript 101</a> - A JavaScript tutorial series for people who know nothing about coding. Complete with interactive exercises.</li>
 
 
         </ul>
-        
+
       </div>
 
       <div>
