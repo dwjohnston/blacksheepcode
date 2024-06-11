@@ -15,6 +15,7 @@ import {Aside} from "../../components/Aside/Aside"
 import {ImagePanel} from "../../components/ImagePanel/ImagePanel";
 import {SheepImage} from "../../components/SheepImage/SheepImage";
 
+# Adding dark mode to a blog - how to avoid flashes of the wrong theme
 
 I've added dark mode to this blog. 
 
@@ -40,7 +41,7 @@ I'm being a little bit clever with the main blog image on the front page - in li
 This is conditionally rendered, the server-side-rendered first render isn't aware of what the users preferred color scheme is, and so that image would aways come through as the light mode image. 
 
 <Aside>
-    All me old fashioned, but I think this is the correct use of animations -  to smooth out jankyness, or call attention to that something has changed. Animations for the sake of themselves are just distracting. 
+    Call me old fashioned, but I think this is the correct use of animations -  to smooth out jankyness, or call attention to that something has changed. Animations for the sake of themselves are just distracting. 
 </Aside>
 
 <GithubPermalink className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
