@@ -38,19 +38,25 @@ I'm being a little bit clever with the main blog image on the front page - in li
  }
  ]}/>
 
-This is conditionally rendered, the server-side-rendered first render isn't aware of what the users preferred color scheme is, and so that image would aways come through as the light mode image. 
+The server-side-rendered first render isn't aware of what the users preferred color scheme is, and so that image would aways come through as the light mode image.
+
+The solution is to do the conditional check on the client side. We display nothing on first render (the server render) and the second render when we know what the user preference is, we display the image. 
+
+<GithubPermalink className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
+
+This introduces a slight problem of having an image pop of the image suddenly appearing. To mitigate this I use a CSS animation to make it fade in over 100ms. 
 
 <Aside>
     Call me old fashioned, but I think this is the correct use of animations -  to smooth out jankyness, or call attention to that something has changed. Animations for the sake of themselves are just distracting. 
 </Aside>
 
-<GithubPermalink className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
-
 ## Conditionally use stylesheets
 
-This blog uses [`highlight.js`](https://github.com/highlightjs/highlight.js) the plain markdown codeblocks. HighlightJS provides light and dark themes separately. 
+This blog uses [`highlight.js`](https://github.com/highlightjs/highlight.js) the plain markdown codeblocks. HighlightJS provides light and dark themes separately - they don't provide user responsive themes. 
 
-Per [this very handy issue thread](https://github.com/highlightjs/highlight.js/issues/3652) - I import both themes, conditionally choose the one matching the user's preference with a `media="(prefers-color-scheme: dark)"`
+Using the user preference via react-responsive to determine the theme would have the same issue as the conditional rendering of the image above, the server isn't aware of the user preference, and you'd get a style pop when the page loads and the theme switches. 
+
+Fortunately there's a very handy way to conditionally apply CSS. Per [this very handy issue thread](https://github.com/highlightjs/highlight.js/issues/3652) - I import both themes, conditionally choose the one matching the user's preference with a `media="(prefers-color-scheme: dark)"` attribute on the link tag. 
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/root.tsx#L57-L60"/>
 
