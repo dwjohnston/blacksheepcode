@@ -158,7 +158,7 @@ export default function App() {
           </div>
 
           <div>
-            <a href="/rss.xml" className="rss-link">
+            <a href="/rss.xml" className="rss-link" aria-label="rss feed">
               <span className="icon material-symbols-outlined">
                 rss_feed
               </span></a>
