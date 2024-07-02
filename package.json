@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "types": "tsc && tsc -p cypress/tsconfig.json",
     "test:cypress": "cypress open",
-    "test:cypress:ci": "cypress run",
+    "test:cypress:ci": "cypress run --browser chrome",
     "generate:mdxjson": "rm -rf app/generated/frontmatter && tsx utils/extractFrontMatter.bin.ts",
     "generate:imagebarrel": "tsx utils/generateImageBarrelFiles.ts",
     "test": "jest --watchAll"

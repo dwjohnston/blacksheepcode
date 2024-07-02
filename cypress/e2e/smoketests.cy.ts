@@ -89,4 +89,19 @@ describe('Test pages', () => {
       cy.request({url: '/test', failOnStatusCode: false}).its('status').should('be.ok')
 
     })
+
+    it("comment blocks", () => {
+      cy.visit('test/basic_mdx?q=foo'); 
+
+      cy.get("iframe.utterances-frame").should("exist");
+    })
+
+    it ('custom social image works', () => {
+      cy.visit('/test/images'); 
+         
+      cy.get('meta[name="twitter:image"][content="https://blacksheepcode.com/build/_assets/bsc_dark-HMODRY4K.webp"]').should("exist");
+      cy.get('meta[property="og:image"][content="https://blacksheepcode.com/build/_assets/bsc_dark-HMODRY4K.webp"]').should("exist");
+   
+    }); 
+
 })
