@@ -7,7 +7,7 @@ export function getSocialMetas({
     url,
     title = 'Helping people make the world a better place through quality software',
     description = 'Make the world better with software',
-    image = bscImage,
+    image = bscImage.src,
     keywords = '',
   }: {
     image?: string

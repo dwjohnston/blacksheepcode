@@ -1,3 +1,4 @@
+"use client"
 import dark from "../../assets/bsc_dark.webp";
 import light from "../../assets/bsc_light.webp";
 
@@ -31,6 +32,6 @@ export function SheepImage(props: { mode?: "dark" | "light" }) {
     }, [])
 
     return <div className="sheep-image-wrapper">
-        {ready && <img src={imageToUse} alt="A black sheep typing at a computer" />}
+        {ready && <img src={imageToUse.src} alt="A black sheep typing at a computer" />}
     </div>
 }
