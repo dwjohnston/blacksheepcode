@@ -1,9 +1,6 @@
 import { Outlet, useLocation, useNavigate } from "@remix-run/react"
-import { useEffect } from "react";
-import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
-import { FrontmatterBox } from "~/components/FrontmatterBox/FrontmatterBox";
+import { BlogPostFrame } from "~/components/BlogPostFrame/BlogPostFrame";
 import { IndexRoute } from "~/components/IndexRoute";
-import PostComments from "~/components/PostComments/PostComments";
 import { createLoaderFunction, createMetaFunction } from "~/utils/blogPosts";
 
 
@@ -19,10 +16,8 @@ export default () => {
     }
 
     return <>
-        <FrontmatterBox>
+        <BlogPostFrame pathname={params.pathname}>
             <Outlet />
-        </FrontmatterBox>
-        <EditWithGithub postName={params.pathname} />
-        <PostComments />
+        </BlogPostFrame>
     </>
 }

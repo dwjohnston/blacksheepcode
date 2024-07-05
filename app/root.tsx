@@ -19,8 +19,8 @@ import githubPermalinkStyle from "react-github-permalink/dist/github-permalink.c
 import ourStyles from "~/styles/styles.css";
 import bscImage from "./assets/blacksheep_fb_wide.webp";
 import { GithubPermalinkProvider } from "react-github-permalink";
-import { Page404 } from "./error_pages/Page404";
-import { Page500 } from "./error_pages/Page500";
+import { Page404 } from "./components/error_pages/Page404";
+import { Page500 } from "./components/error_pages/Page500";
 
 declare global {
   interface Window {
