@@ -21,7 +21,7 @@ async function _appendIndexFile(filePath:string, fileName: string) {
 }
 
 async function _generateSubfolder(subPath: string) : Promise<string> {
-  const basePath = path.join(process.cwd(), "app", "generated", "frontmatter", subPath);
+  const basePath = path.join(process.cwd(), "src", "generated", "frontmatter", subPath);
   await fsAsync.mkdir(basePath, { recursive: true }); 
   return basePath; 
 }

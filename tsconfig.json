@@ -17,7 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["src/*"]
     },
     "skipLibCheck": true,
 

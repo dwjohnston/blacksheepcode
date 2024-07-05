@@ -1,0 +1,119 @@
+---
+meta:
+  title: I am the title
+  description: I am the description
+  dateCreated: 2022-11-28
+---
+
+
+List of things: 
+
+- X permalink Code blocks work~~
+- X Comments work
+- X Table of contents works
+- X Post series works 
+- Caching, sitemap, Xrss, robots.tsx work 
+- Jest tests
+- Cypress Tests
+- X Metadata works
+- X Social image works 
+- Edit with github
+- Robots.txt, sitemap
+
+
+
+
+
+
+
+1. Scaffold a new app with create-next-app
+
+2. Copy paste components folder over. 
+    FrontMatterBox imports a bunch of utils and those have dependencies I don't have installed (eg. frontmatter, jest) so I'm just going to delete it for now. 
+    Index route
+
+
+3. Run script to migrate mdx files 
+
+
+
+
+5. Test blog post 
+
+http://localhost:3000/posts/tools_i_like_gci
+
+http://localhost:3000/posts/adding_dark_mode_to_the_blog
+
+Errors -> `react-github-permalink`. 
+
+6. Install github permalink
+
+7. `http://localhost:3000/posts/adding_dark_mode_to_the_blog` is erroring because of relative imports. 
+
+Update script to change to aliased imports. 
+
+8. Components are erroring because they're not marked use client. Manually go through and mark them "use client"; 
+
+
+9. Components are erroring because assets don't exist. Copy them 
+
+
+10. This error: 
+
+Error: Super expression must either be null or a function
+
+Looks like it's going to be from react-github-permalink - so let's add the "use client" annoation to react-github-permalink 
+
+
+Running into this issue: 
+
+https://stackoverflow.com/questions/75261466/unsupported-server-component-type-undefined-next-js-13
+
+
+
+
+
+
+11. Front matter
+
+Next doesn't have an opinion on doing frontmatter - and I'd found in my remix experience that the out of the box experience wasn't working for me, so let's retain our existing
+frontmatter solution. 
+
+That is, they're yaml headers and we have a build time process to generate barrel files we can reference. 
+
+I would actually prefer to move away from yaml I can just do an 'export const metadata : Metadata = ...` and get the advantages of typing, but for now, let's continue with what we've got. 
+
+I have jest tests with my utils, and I'm going to need them. I'm keen to have a play with Vitest, but lets stick with Jest for now. 
+
+Note I'm not actually using Jest for testing any React functionality - so I shouldn't need any next specific configuration. I'll just copy the config over from my existin app. 
+
+... nope, that'll involve installing babel, and I don't want that. So let's do Next's thing. 
+
+
+12. Now for the harder stuff, generating layouts etc, based on the barrel files. 
+
+Here I was using remix specific functionality, this stuff we'll probably need to rewrite. 
+
+
+13. Table of contents
+
+Table of contents is reproduced pretty straight forward. 
+
+
+14. Common post layout 
+
+
+
+
+
+
+
+
+replace link. 
+convert frontmatter box to async comp
+
+
+https://github.com/vercel/next.js/discussions/64753
+
+
+Alright, this isn't going to work, I need to do a proper fledged do my own MDX solution. 
