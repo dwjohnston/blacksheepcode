@@ -1,6 +1,6 @@
 import { GithubPermalink, GithubPermalinkProvider, GithubIssueLink} from "react-github-permalink"
 
-export default function() {
+export default function TsxFile() {
     return <div>I am a .tsx file
 
 <GithubPermalinkProvider githubToken="foo">

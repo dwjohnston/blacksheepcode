@@ -5,8 +5,6 @@ import { SheepImage } from "@/components/SheepImage/SheepImage";
 import { getAllPostFrontmatter } from "@/utils/blogPosts";
 import { Metadata } from "next";
 
-import Content from "../generated/mdx/posts/adding_dark_mode_to_the_blog";
-
 async function getAllArticles() {
   return getAllPostFrontmatter()
 }

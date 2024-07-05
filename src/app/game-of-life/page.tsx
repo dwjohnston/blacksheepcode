@@ -144,8 +144,8 @@ export const GameOfLife = (props: GameOfLifeProps) => {
 
 
 
-            <h1>Conway's Game of Life</h1>
-            <p>Conway's game of life is a classic zero player game that makes for a fun programming exercise.</p>
+            <h1>Conway&apos;s Game of Life</h1>
+            <p>Conway&apos;s game of life is a classic zero player game that makes for a fun programming exercise.</p>
             <p>See the <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">wikipedia article here.</a></p>
             <p>Maybe we can play around with alternative rule sets, or investigate performance optimisation.</p>
             <div>
