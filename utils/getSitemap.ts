@@ -1,4 +1,4 @@
-import * as allMetadata from "../app/generated/frontmatter/posts/index"; 
+import * as allMetadata from "../src/generated/frontmatter/posts/index"; 
 
 export function getSitemaps(rootUrl = "https://blacksheepcode.com") : string {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;

@@ -5,7 +5,7 @@ const path = require('path');
 
 function generateRoutes(folders) {
   return folders.map((folder) => {
-    const currentPath = `./app/routes/${folder}`
+    const currentPath = `./src/routes/${folder}`
     const files = fs.readdirSync(currentPath);
     const routes = files.map((file) => {
       const filePath = path.join(currentPath, file);
@@ -22,7 +22,7 @@ function generateRoutes(folders) {
         }
         
         const routePath = path.basename(file).split('.')[0];
-        const filePathRelativeToApp = path.relative('app', filePath);
+        const filePathRelativeToApp = path.relative('src', filePath);
         return ([routePath, filePathRelativeToApp]); 
       }
     });
@@ -38,6 +38,7 @@ const routeDefinitions = generateRoutes(['posts', 'test', 'drafts']);
 
 module.exports = {
   ignoredRouteFiles: ["**/.*"],
+  appDirectory: "src",
   server:
     process.env.NETLIFY || process.env.NETLIFY_LOCAL
       ? "./server.ts"

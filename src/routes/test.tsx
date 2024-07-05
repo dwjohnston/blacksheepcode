@@ -1,7 +1,7 @@
 import { Outlet, useLocation,  } from "@remix-run/react"
-import { BlogPostFrame } from "~/components/BlogPostFrame/BlogPostFrame";
-import { IndexRoute } from "~/components/IndexRoute";
-import { createLoaderFunction, createMetaFunction } from "~/utils/blogPosts";
+import { BlogPostFrame } from "src/components/BlogPostFrame/BlogPostFrame";
+import { IndexRoute } from "src/components/IndexRoute";
+import { createLoaderFunction, createMetaFunction } from "src/utils/blogPosts";
 
 
 export const loader = createLoaderFunction("test");

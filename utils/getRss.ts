@@ -1,4 +1,4 @@
-import * as allMetadata from "../app/generated/frontmatter/posts/index";
+import * as allMetadata from "../src/generated/frontmatter/posts/index";
 export function getRss(rootUrl ="https://blacksheepcode.com") {
 
 const metadataArray = Object.values(allMetadata);

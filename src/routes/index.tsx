@@ -1,8 +1,8 @@
-import { getAllPostFrontmatter } from "~/utils/blogPosts";
+import { getAllPostFrontmatter } from "src/utils/blogPosts";
 import { Link, useLoaderData } from "@remix-run/react";
 import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
-import { SheepImage } from "~/components/SheepImage/SheepImage";
-import { ListOfArticles } from "~/components/ListOfArticles/ListOfArticles";
+import { SheepImage } from "src/components/SheepImage/SheepImage";
+import { ListOfArticles } from "src/components/ListOfArticles/ListOfArticles";
 
 
 export async function loader() {

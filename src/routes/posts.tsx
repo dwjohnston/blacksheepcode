@@ -1,10 +1,10 @@
 import { Outlet, useLocation } from "@remix-run/react"
-import { EditWithGithub } from "~/components/EditWithGithub/EditWithGithub"
-import PostComments from "~/components/PostComments/PostComments";
-import { createLoaderFunction, createMetaFunction } from "~/utils/blogPosts";
-import { FrontmatterBox } from "~/components/FrontmatterBox/FrontmatterBox";
-import { IndexRoute } from "~/components/IndexRoute";
-import { BlogPostFrame } from "~/components/BlogPostFrame/BlogPostFrame";
+import { EditWithGithub } from "src/components/EditWithGithub/EditWithGithub"
+import PostComments from "src/components/PostComments/PostComments";
+import { createLoaderFunction, createMetaFunction } from "src/utils/blogPosts";
+import { FrontmatterBox } from "src/components/FrontmatterBox/FrontmatterBox";
+import { IndexRoute } from "src/components/IndexRoute";
+import { BlogPostFrame } from "src/components/BlogPostFrame/BlogPostFrame";
 
 
 

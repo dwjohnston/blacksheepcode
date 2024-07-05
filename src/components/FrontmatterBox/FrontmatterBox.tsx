@@ -1,7 +1,7 @@
 import type { PropsWithChildren} from "react";
 import React, { useEffect, useState } from "react";
 import {  Link,useLocation } from "@remix-run/react";
-import { getFrontmatterFromSlug } from "~/utils/blogPosts";
+import { getFrontmatterFromSlug } from "src/utils/blogPosts";
 import type { EnrichedFrontMatterPlusSlug } from "utils/frontmatterTypings";
 
 type FrontmatterBoxProps = {
