@@ -1,7 +1,7 @@
-
+"use client"
 import React, { useState } from 'react';
 import { useInterval } from 'usehooks-ts';
-import { RaiseAnIssue } from 'src/components/RaiseAnIssue/RaiseAnIssue';
+import { RaiseAnIssue } from '@/components/RaiseAnIssue/RaiseAnIssue';
 export type GameOfLifeProps = {
 };
 

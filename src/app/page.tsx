@@ -1,23 +1,31 @@
-import { getAllPostFrontmatter } from "src/utils/blogPosts";
-import { Link, useLoaderData } from "@remix-run/react";
-import type { FrontMatterPlusSlug } from "utils/frontmatterTypings";
-import { SheepImage } from "src/components/SheepImage/SheepImage";
-import { ListOfArticles } from "src/components/ListOfArticles/ListOfArticles";
+import Image from "next/image";
+import styles from "./page.module.css";
+import { ListOfArticles } from "@/components/ListOfArticles/ListOfArticles";
+import { SheepImage } from "@/components/SheepImage/SheepImage";
+import { getAllPostFrontmatter } from "@/utils/blogPosts";
+import { Metadata } from "next";
 
+import Content from "../generated/mdx/posts/adding_dark_mode_to_the_blog";
 
-export async function loader() {
-  return await getAllPostFrontmatter();
+async function getAllArticles() {
+  return getAllPostFrontmatter()
 }
 
-export default function Index() {
 
-  const allArticles = useLoaderData<Array<FrontMatterPlusSlug>>();
+export const metadata: Metadata = {
+  title: "Black Sheep Code",
+  description: "A blog about modern web development"
+}
+
+export default async function Home() {
+
+  const articles = await getAllArticles();
 
   return (<>
     <div className="main">
 
       <div className="headline">
-       <SheepImage />
+        <SheepImage />
         <div>
           <h1>Black Sheep Code</h1>
           <p>Tech writings from David Johnston.</p>
@@ -45,7 +53,7 @@ export default function Index() {
       <div>
         <h2>Just For Fun</h2>
         <ul>
-          <li><a href="/game-of-life">Conway's Game of Life</a>
+          <li><a href="/game-of-life">Conway&apos;s Game of Life</a>
           </li>
         </ul>
       </div>
@@ -56,11 +64,10 @@ export default function Index() {
     <div className="main">
 
       <h2>Blog</h2>
-      <ListOfArticles allFrontmatter={allArticles} />
+      <ListOfArticles allFrontmatter={articles} />
     </div>
 
     <p className="open-source">I support open source: <a href="https://opencollective.com/blacksheepcode" target="_blank" rel="noreferrer">Open Collective</a>
     </p>
-  </>
-  );
+  </>);
 }
