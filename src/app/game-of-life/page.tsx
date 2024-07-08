@@ -104,12 +104,6 @@ function processMap(map: Array<Array<boolean>>): Array<Array<boolean>> {
     return map2;
 }
 
-
-export const metadata = {
-    title: "Conway's Game of Life - Black Sheep Code"
-}
-
-
 export const GameOfLife = (props: GameOfLifeProps) => {
 
     const [map, setMap] = useState(generateEmptyMap(SIZE, SIZE));
