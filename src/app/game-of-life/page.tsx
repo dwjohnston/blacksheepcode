@@ -105,7 +105,9 @@ function processMap(map: Array<Array<boolean>>): Array<Array<boolean>> {
 }
 
 
-
+export const metadata = {
+    title: "Conway's Game of Life - Black Sheep Code"
+}
 
 
 export const GameOfLife = (props: GameOfLifeProps) => {
@@ -122,7 +124,7 @@ export const GameOfLife = (props: GameOfLifeProps) => {
 
     function handleCellClick(rowNumber: number, cellNumber: number) {
 
-        if(isRunning){
+        if (isRunning) {
             setIsRunning(false);
         }
         setMap(toggleValueAt(map, rowNumber, cellNumber))
@@ -167,7 +169,7 @@ export const GameOfLife = (props: GameOfLifeProps) => {
                 })}
             </div>
 
-            <RaiseAnIssue/>
+            <RaiseAnIssue />
         </div>
     );
 };

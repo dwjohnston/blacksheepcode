@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "react-github-permalink/dist/github-permalink.css";
+import { mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
 const inter = Inter({ subsets: ["latin"] });
+
+
+
+export const metadata: Metadata = mergeFrontmatterAndDefaultMetadata({
+  title: "Black Sheep Code",
+  description: "A blog about modern web development"
+}
+)
 
 export default function RootLayout({
   children,

@@ -1,9 +1,12 @@
+import { Metadata, } from "next";
+import { StaticImageData } from "next/image"
 import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
 import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "../../utils/frontmatterTypings";
 import * as allImages from "../generated/images";
-import { getDomainUrl } from "../../utils/getDomainUrl";
+import DEFAULT_IMAGE from "@/assets/blacksheep_100x100.webp";
+import { getDomainUrl, getSiteName } from "../../utils/getDomainUrl";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
@@ -14,7 +17,10 @@ export const allMetadata = {
 }
 
 
-const DEFAULT_METADATA = {}
+const DEFAULT_METADATA = {
+    title: "Black Sheep Code",
+    description: "A blog about modern web development"
+} satisfies Metadata
 
 export function getFolderAndFilenameFromSlug(slug: string): {
     folder: BlogPostFolders,
@@ -23,8 +29,6 @@ export function getFolderAndFilenameFromSlug(slug: string): {
 } {
 
     const [, folder, fName] = slug.split(/[?/#]/);
-
-
 
     if (!folder) {
         throw new Error("Expected folder to exist");
@@ -86,47 +90,60 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
 // }
 
 type ImageData = {
-    str: string,
+    str: StaticImageData,
     width: number,
     height: number,
 }
 
-export function getImageTags(imageName: string) {
+export function getImageTags(imageName?: string): {
+    url: string;
+    width: number;
+    height: number;
+} {
 
     //@ts-expect-error
-    const image: ImageData | undefined = allImages[imageName];
-
-
-    if (!image) {
-        return {};
-    }
+    const image: ImageData = allImages[imageName] ?? { str: DEFAULT_IMAGE };
 
     return {
-        "og:image": `${getDomainUrl()}${image.str}`,
-        "og:image:width": image.width,
-        "og:image:height": image.height,
-        "twitter:image": `${getDomainUrl()}${image.str}`,
-        "twitter:image:width": image.width,
-        "twitter:image:height": image.height,
+        url: image.str.src,
+        height: image.str.height,
+        width: image.str.width
     }
 }
 
 
 
-function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | null) {
+export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlusSlug["frontmatter"]["meta"]> | null): Metadata {
 
-    if (!frontmatter) {
+    if (!meta) {
         return DEFAULT_METADATA;
     }
 
-    return {
-        ...DEFAULT_METADATA,
-        ...(frontmatter.frontmatter.meta.image ? getImageTags(frontmatter.frontmatter.meta.image) : {}),
-        title: frontmatter.frontmatter.meta?.title,
-        description: frontmatter.frontmatter?.meta?.description,
-        "twitter:title": frontmatter.frontmatter.meta?.title,
-        "twitter:description": frontmatter.frontmatter?.meta?.description,
+    const image = getImageTags(meta.image);
+
+    const data = {
+        title: meta?.title ?? DEFAULT_METADATA.title,
+        description: meta?.description ?? DEFAULT_METADATA.description,
+        openGraph: {
+            title: meta?.title ?? DEFAULT_METADATA.title,
+            description: meta?.description ?? DEFAULT_METADATA.description,
+            url: getDomainUrl(),
+            siteName: getSiteName(),
+            type: "website",
+            locale: "en_AU",
+            images: [
+                image
+            ]
+        }
+
+
     }
+    return data;
+}
+
+export async function getMetadata(slug: string): Promise<Metadata> {
+    const metadata = await getFrontmatterFromSlug(slug);
+    return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta);
 }
 
 

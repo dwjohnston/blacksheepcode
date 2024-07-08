@@ -1,15 +1,10 @@
-import { getAllPostFrontmatter } from "@/utils/blogPosts";
+import { getAllPostFrontmatter, mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
 import { ListOfArticles } from "@/components/ListOfArticles/ListOfArticles";
 import { notFound } from "next/navigation";
-
-export const metadata = {
-    title: "hello"
-}
 
 async function getAllArticles() {
     return getAllPostFrontmatter("test")
 }
-
 
 export default async function PageLayout() {
     if(process.env.NODE_ENV === "production") {
