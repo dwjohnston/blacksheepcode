@@ -14,7 +14,7 @@ export default async function PageLayout(props: PropsWithChildren<{
         slug: string
     }
 }>) {
-    if(process.env.NODE_ENV === "production") {
+    if(process.env.SHOW_DRAFT_PAGES !== "true") {
         notFound();
     }
 

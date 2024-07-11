@@ -4,7 +4,7 @@
   "scripts": {
     "build:base": "next build",
     "build": "npm run generate:all && npm run build:base",
-    "dev": "next dev",
+    "dev": "SHOW_TEST_PAGES=true next dev",
     "start": "netlify serve",
     "lint": "eslint .",
     "types": "tsc && tsc -p cypress/tsconfig.json",

@@ -7,7 +7,7 @@ async function getAllArticles() {
 }
 
 export default async function PageLayout() {
-    if(process.env.NODE_ENV === "production") {
+    if(process.env.SHOW_TEST_PAGES !== "true") {
         notFound();
     }
     const articles = await getAllArticles();

@@ -15,7 +15,7 @@ export default async function PageLayout(props: PropsWithChildren<{
     }
 }>) {
 
-    if(process.env.NODE_ENV === "production") {
+    if(process.env.SHOW_TEST_PAGES !== "true") {
         notFound();
     }
     const data = await import(`../../../generated/mdx/test/${props.params.slug}`)
