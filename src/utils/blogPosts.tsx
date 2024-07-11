@@ -121,7 +121,8 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
 
     const image = getImageTags(meta.image);
 
-    const data = {
+    const data: Metadata = {
+        metadataBase: new URL(getDomainUrl()),
         title: meta?.title ?? DEFAULT_METADATA.title,
         description: meta?.description ?? DEFAULT_METADATA.description,
         openGraph: {
@@ -132,7 +133,11 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
             type: "website",
             locale: "en_AU",
             images: [
-                image
+                {
+                    ...image,
+                    // fix for: https://github.com/vercel/next.js/issues/66957
+                    url: `${getDomainUrl()}${image.url}`
+                }
             ]
         }
 
