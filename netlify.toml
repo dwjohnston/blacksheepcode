@@ -4,3 +4,7 @@
 [build]
   command = "npm run build"
   publish = ".next"
+
+
+[context.branch-deploy.environment]
+  NODE_ENV = "test"

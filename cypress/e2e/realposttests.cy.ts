@@ -47,8 +47,8 @@ describe("real pages", () => {
         cy.get('meta[name="description"][content="If using Remix on a serverless platform such as Netlify we can use a build time compilation and barrel files to access frontmatter metadata."]').should("exist");
         cy.get('meta[name="twitter:description"][content="If using Remix on a serverless platform such as Netlify we can use a build time compilation and barrel files to access frontmatter metadata."]').should("exist");
         
-        cy.get('meta[name="twitter:image"][content="https://blacksheepcode.com/build/_assets/blacksheep_fb_wide-SVEOQKU6.webp"]').should("exist");
-        cy.get('meta[property="og:image"][content="https://blacksheepcode.com/build/_assets/blacksheep_fb_wide-SVEOQKU6.webp"]').should("exist");
+        cy.get('meta[name="twitter:image"][content="https://blacksheepcode.com/_next/static/media/blacksheep_100x100.f7b856af.webp"]').should("exist");
+        cy.get('meta[property="og:image"][content="https://blacksheepcode.com/_next/static/media/blacksheep_100x100.f7b856af.webp"]').should("exist");
       })
   
   
@@ -63,8 +63,8 @@ describe("real pages", () => {
   
   
            
-        cy.get('meta[name="twitter:image"][content="https://blacksheepcode.com/build/_assets/bsc_dark-HMODRY4K.webp"]').should("exist");
-        cy.get('meta[property="og:image"][content="https://blacksheepcode.com/build/_assets/bsc_dark-HMODRY4K.webp"]').should("exist");
+        cy.get('meta[name="twitter:image"][content="https://blacksheepcode.com/_next/static/media/bsc_dark.3b1c38e3.webp"]').should("exist");
+        cy.get('meta[property="og:image"][content="https://blacksheepcode.com/_next/static/media/bsc_dark.3b1c38e3.webp"]').should("exist");
      
       }); 
 }); 
