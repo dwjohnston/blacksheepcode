@@ -131,9 +131,9 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
             siteName: getSiteName(),
             type: "website",
             locale: "en_AU",
-            images: [
-                image
-            ]
+            // images: [
+            //     image
+            // ]
         }
 
 
