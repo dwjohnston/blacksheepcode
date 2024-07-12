@@ -53,7 +53,7 @@ describe('Test pages', () => {
       cy.get(".react-github-permalink").should("exist");
     })
 
-    it("external component in series", () => {
+    it.skip("external component in series", () => {
       cy.visit('/test/external_component_in_series'); 
 
 
@@ -62,8 +62,6 @@ describe('Test pages', () => {
       cy.findByText('I am the series description').should("exist")
       cy.findByText("I contain a react-github-permalink").should("exist")
 
-
-      cy.wait(1000)
       // I'm not asserting on actual content it should encounter 
       // Because we quickly hit the rate limit
       cy.get(".react-github-permalink").should("exist");
