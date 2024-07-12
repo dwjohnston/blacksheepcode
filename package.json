@@ -25,6 +25,7 @@
     "@mdx-js/react": "^3.0.1",
     "@netlify/plugin-nextjs": "^4.41.3",
     "@next/mdx": "^14.2.4",
+    "@sentry/nextjs": "^8.17.0",
     "@types/mdx": "^2.0.13",
     "front-matter": "^4.0.2",
     "image-size": "^1.1.1",

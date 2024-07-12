@@ -464,8 +464,20 @@ I wrapped one around my PostComments component all of the a sudden the three iss
 
 Status: The Cypress tests are passing on branch preview. We're almost ready to go!
 
+My debugging of Cypress tests consisted of repeatedly running the test to see if we encountered the errors. 
+
+Ultimately I found three sources of errors: 
+
+- The PostComments component - wrapping it in a Suspense appears to have fixed it 
+- The GithubPermalink - wrapping it in Suspense boundary appears to have fixed it
+- The SeriesBox - removing the NextJS Links appears to fix it, but I can't do that. 
+
+I have not yet been able to create a reliable reproduction of this, so maybe I'm off on a wild goose chase here. 
+
 
 #### Phase 6: Get Sentry working 
+
+I added Sentry [using their wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/). 
 
 
 
