@@ -42,7 +42,7 @@ describe('Test pages', () => {
 
     })
 
-    it.skip("external component", () => {
+    it("external component", () => {
       cy.visit('/test/external_component'); 
 
 
@@ -86,7 +86,7 @@ describe('Test pages', () => {
       cy.findByText("This is some text").should("exist");
     })
 
-    it.only("/test will show a test index page", () => {
+    it("/test will show a test index page", () => {
       cy.visit('test').its("status"); 
 
       cy.findByText("Test Posts").should("exist")
@@ -95,7 +95,7 @@ describe('Test pages', () => {
 
     })
 
-    it.skip("comment blocks", () => {
+    it("comment blocks", () => {
       cy.visit('test/basic_mdx?q=foo'); 
 
       cy.get("iframe.utterances-frame").should("exist");
