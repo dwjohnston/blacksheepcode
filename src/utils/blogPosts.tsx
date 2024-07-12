@@ -1,10 +1,12 @@
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { Metadata, } from "next";
+import { StaticImageData } from "next/image"
 import * as allDraftMetaData from "../generated/frontmatter/drafts";
 import * as allPostMetaData from "../generated/frontmatter/posts";
 import * as allTestMetaData from "../generated/frontmatter/test";
-import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "utils/frontmatterTypings";
+import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "../../utils/frontmatterTypings";
 import * as allImages from "../generated/images";
-import { getDomainUrl } from "utils/getDomainUrl";
+import DEFAULT_IMAGE from "@/assets/blacksheep_100x100.webp";
+import { getDomainUrl, getSiteName } from "../../utils/getDomainUrl";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
@@ -15,7 +17,10 @@ export const allMetadata = {
 }
 
 
-const DEFAULT_METADATA = {}
+const DEFAULT_METADATA = {
+    title: "Black Sheep Code",
+    description: "A blog about modern web development"
+} satisfies Metadata
 
 export function getFolderAndFilenameFromSlug(slug: string): {
     folder: BlogPostFolders,
@@ -46,20 +51,19 @@ export function getFolderAndFilenameFromSlug(slug: string): {
  */
 export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFrontMatterPlusSlug> {
     const { folder, filename } = getFolderAndFilenameFromSlug(slug);
-
     const data = allMetadata[folder][filename];
     if (!data) {
         throw new Error(`Frontmatter did not exist for slug: '${slug}`)
     }
 
-    let seriesFrontmatter   : Array<FrontMatterPlusSlug> | null = null; 
-    
+    let seriesFrontmatter: Array<FrontMatterPlusSlug> | null = null;
+
     // If it's a series, then we get the frontmatter for all of the series, so we can show the table of contents
     if ('series' in data.frontmatter) {
         seriesFrontmatter = (Object.values(allMetadata[folder]).filter((v) => {
             return v.frontmatter.series?.name === data.frontmatter.series?.name
-        }) ).sort((a, b) => {
-            return (a.frontmatter.series?.part ?? 0)  - (b.frontmatter.series?.part ?? 0)
+        })).sort((a, b) => {
+            return (a.frontmatter.series?.part ?? 0) - (b.frontmatter.series?.part ?? 0)
         });
     }
 
@@ -67,78 +71,90 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
 }
 
 
-export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
-    return async (loaderArgs) => {
+// export function createLoaderFunction(folder: BlogPostFolders): LoaderFunction {
+//     return async (loaderArgs) => {
 
-        // Unfortunately we don't have access to the path via loader args, so we have to manually extract
-        // it from the request. 
-        const url = loaderArgs.request.url;
+//         // Unfortunately we don't have access to the path via loader args, so we have to manually extract
+//         // it from the request. 
+//         const url = loaderArgs.request.url;
 
-        const path = new URL(url).pathname; 
+//         const path = new URL(url).pathname; 
 
-        if(path.slice(1) === folder) {
-            return null; 
-        }
-        
-        
-        return getFrontmatterFromSlug(path)
-    }
-}
+//         if(path.slice(1) === folder) {
+//             return null; 
+//         }
+
+
+//         return getFrontmatterFromSlug(path)
+//     }
+// }
 
 type ImageData = {
-    str: string, 
-    width: number, 
-    height: number,    
+    str: StaticImageData,
+    width: number,
+    height: number,
 }
 
-export function getImageTags(imageName: string)  {
+export function getImageTags(imageName?: string): {
+    url: string;
+    width: number;
+    height: number;
+} {
 
     //@ts-expect-error
-    const image : ImageData | undefined =  allImages[imageName]; 
+    const image: ImageData = allImages[imageName] ?? { str: DEFAULT_IMAGE };
 
-
-    if(!image){
-        return {};
+    return {
+        url: image.str.src,
+        height: image.str.height,
+        width: image.str.width
     }
+}
 
-   return {
-    "og:image": `${getDomainUrl()}${image.str}`,  
-    "og:image:width": image.width, 
-    "og:image:height": image.height, 
-    "twitter:image": `${getDomainUrl()}${image.str}`,
-    "twitter:image:width": image.width, 
-    "twitter:image:height": image.height, 
-   }}
 
-   
 
-function mergeFrontmatterAndDefaultMetadata(frontmatter: FrontMatterPlusSlug | null) {
+export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlusSlug["frontmatter"]["meta"]> | null): Metadata {
 
-    if (!frontmatter) {
+    if (!meta) {
         return DEFAULT_METADATA;
     }
 
-    return {
-        ...DEFAULT_METADATA,
-        ...(frontmatter.frontmatter.meta.image ?  getImageTags(frontmatter.frontmatter.meta.image) : {}), 
-        title: frontmatter.frontmatter.meta?.title,
-        description: frontmatter.frontmatter?.meta?.description,
-        "twitter:title": frontmatter.frontmatter.meta?.title,
-        "twitter:description": frontmatter.frontmatter?.meta?.description,
+    const image = getImageTags(meta.image);
+
+    const data: Metadata = {
+        metadataBase: new URL(getDomainUrl()),
+        title: meta?.title ?? DEFAULT_METADATA.title,
+        description: meta?.description ?? DEFAULT_METADATA.description,
+        openGraph: {
+            title: meta?.title ?? DEFAULT_METADATA.title,
+            description: meta?.description ?? DEFAULT_METADATA.description,
+            url: getDomainUrl(),
+            siteName: getSiteName(),
+            type: "website",
+            locale: "en_AU",
+            images: [
+                {
+                    ...image,
+                    // fix for: https://github.com/vercel/next.js/issues/66957
+                    url: `${getDomainUrl()}${image.url}`
+                }
+            ]
+        }
+
+
     }
+    return data;
 }
 
-export function createMetaFunction(folder: BlogPostFolders): MetaFunction {
-    return (metaInput) => {
-        const loaderResult = metaInput.data as FrontMatterPlusSlug | null;
-        return mergeFrontmatterAndDefaultMetadata(loaderResult ?? null);
-    }
-
+export async function getMetadata(slug: string): Promise<Metadata> {
+    const metadata = await getFrontmatterFromSlug(slug);
+    return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta);
 }
 
 
-export async function getAllPostFrontmatter() :  Promise<Array<FrontMatterPlusSlug>> {
-    return Object.values(allPostMetaData as Record<string, FrontMatterPlusSlug>).sort((a,b) => {
+
+export async function getAllPostFrontmatter(group: BlogPostFolders = "posts"): Promise<Array<FrontMatterPlusSlug>> {
+    return Object.values(allMetadata[group] as Record<string, FrontMatterPlusSlug>).sort((a, b) => {
         return new Date(b.frontmatter.meta?.dateCreated ?? 0).valueOf() - new Date(a.frontmatter.meta?.dateCreated ?? 0).valueOf();
     });
 }

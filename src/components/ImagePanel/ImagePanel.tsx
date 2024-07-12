@@ -14,8 +14,8 @@ export function ImagePanel(props: {
 
 
     return <div className="image-panel">
-        {images.map((v) => {
-            return <div className="image-panel-single">
+        {images.map((v,i) => {
+            return <div className="image-panel-single" key={i}>
                 {v.image}
                 <p className="image-panel-caption">{v.caption}</p>
             </div>

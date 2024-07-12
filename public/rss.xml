@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel><title>Black Sheep Code</title><description>Modern web development - testability, extensibility, declarative APIs, declarative code from open specs and more.</description><language>en-AU</language><link>https://blacksheepcode.com</link><image>
+    <url>https://blacksheepcode.com/blacksheep_fb_wide.webp</url>
+  </image>
+      <item>
+    <title>Adding dark mode to a blog - how to avoid flashes of the wrong theme</title>
+    <description>I've added dark mode to this blog. Here's a few tricks I've learned.</description>
+    <link>https://blacksheepcode.com/posts/adding_dark_mode_to_the_blog</link>
+    <guid>https://blacksheepcode.com/posts/adding_dark_mode_to_the_blog</guid>
+    <pubDate>Fri, 07 Jun 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>How to configure Remix and mdx-bundler (with file system access)</title>
+    <description>How to use Remix and mdx-bundler to use of frontmatter headers. This will allow adding publication dates, or grouping posts into series, adding tags, etc. This solution works for a non-serverless solution - it requires file system access.</description>
+    <link>https://blacksheepcode.com/posts/adding_msw_bundler_to_remix_app</link>
+    <guid>https://blacksheepcode.com/posts/adding_msw_bundler_to_remix_app</guid>
+    <pubDate>Sun, 19 Nov 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>How to configure Remix and mdx-bundler for a serverless platform - barrel files approach, Remix v1</title>
+    <description>If using Remix on a serverless platform such as Netlify we can use a build time compilation and barrel files to access frontmatter metadata.</description>
+    <link>https://blacksheepcode.com/posts/adding_msw_bundler_to_remix_app_2</link>
+    <guid>https://blacksheepcode.com/posts/adding_msw_bundler_to_remix_app_2</guid>
+    <pubDate>Fri, 22 Mar 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Advice for unemployed, experienced devs, in the current job market downturn</title>
+    <description>AKA don't make the mistakes I did.</description>
+    <link>https://blacksheepcode.com/posts/advice_for_unemployed_devs</link>
+    <guid>https://blacksheepcode.com/posts/advice_for_unemployed_devs</guid>
+    <pubDate>Mon, 20 May 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Agnostic state and service management in React</title>
+    <description>Avoid make state framework specific calls inside of your React components, and instead access them via hooks. This reduces the cognitive overhead in understanding your components, and likely allows reuse of those data fetching functions elsewhere.</description>
+    <link>https://blacksheepcode.com/posts/agnostic_state_managment_in_react</link>
+    <guid>https://blacksheepcode.com/posts/agnostic_state_managment_in_react</guid>
+    <pubDate>Thu, 05 May 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Run a Docker image on AWS ECS + Postgres using Terraform CDK</title>
+    <description>CDKTF is a tool that allows us to use fully fledged programming languages to do Terraform deployments, having the advantage of being type safe for one.</description>
+    <link>https://blacksheepcode.com/posts/cdktf_postgres_and_ecs</link>
+    <guid>https://blacksheepcode.com/posts/cdktf_postgres_and_ecs</guid>
+    <pubDate>Wed, 21 Feb 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Dependency injection when using redux.</title>
+    <description>An unconventional strategy to inject the behaviour of your state management in testing contexts</description>
+    <link>https://blacksheepcode.com/posts/dependency_injecting_when_using_redux</link>
+    <guid>https://blacksheepcode.com/posts/dependency_injecting_when_using_redux</guid>
+    <pubDate>Mon, 01 Aug 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Different Approaches to Form Element State Management in React</title>
+    <description>Working with lists of data for form inputs such as radio buttons or checkboxes is non-trivial. I outline three approaches.</description>
+    <link>https://blacksheepcode.com/posts/different_approaches_to_form_element_state_in_react</link>
+    <guid>https://blacksheepcode.com/posts/different_approaches_to_form_element_state_in_react</guid>
+    <pubDate>Wed, 27 Jul 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>A model of extensible changes.</title>
+    <description>Making changes in an extensible manner avoids having to do significant code rewrites or being disruptive to downstream consumers of your API.</description>
+    <link>https://blacksheepcode.com/posts/extensible_changes</link>
+    <guid>https://blacksheepcode.com/posts/extensible_changes</guid>
+    <pubDate>Wed, 10 Aug 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Why use OpenAPI?</title>
+    <description>OpenAPI is a spec for describing HTTP APIs. It has a healthy ecosystem of tooling that supports it.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part1</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part1</guid>
+    <pubDate>Fri, 25 Nov 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Generating server and client code using OpenAPI tooling?</title>
+    <description>We'll use openapi-generators to generate a Go backend and a React frontend.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part2</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part2</guid>
+    <pubDate>Mon, 28 Nov 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Generating MSW mocks from an OpenAPI spec.</title>
+    <description>We're using msw-auto-mock to generate MSW mocks to test our React application.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part3</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part3</guid>
+    <pubDate>Tue, 17 Jan 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Postman and OpenAPI</title>
+    <description>Syncing Postman with our Github repo, generating queries from our OpenAPI spec.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part4a</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part4a</guid>
+    <pubDate>Mon, 17 Apr 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Postman and OpenAPI - Automated Tests</title>
+    <description>Postman has an automated testing feature, but how well does it work?</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part4b</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part4b</guid>
+    <pubDate>Mon, 17 Apr 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>OpenAPI and contract tests with Jest</title>
+    <description>Using good ol' Jest to write some contract tests with our OpenAPI generated client SDK.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part5a</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part5a</guid>
+    <pubDate>Wed, 26 Apr 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>OpenAPI contract tests - Performance testing</title>
+    <description>We can use a tool called jest-timing-reporter to provide a performance diff in our Github pull request.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part6</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part6</guid>
+    <pubDate>Fri, 28 Apr 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Black box contract testing - third party API mocking using Mockbin</title>
+    <description>We have an API that makes calls out to a third party - how do we test it? We can use .HAR files to configure a tool like Mockbin to act as the third party service.</description>
+    <link>https://blacksheepcode.com/posts/generating_apps_from_openapi_part7</link>
+    <guid>https://blacksheepcode.com/posts/generating_apps_from_openapi_part7</guid>
+    <pubDate>Mon, 14 Aug 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>How to effectively hire contractors</title>
+    <description>Contractors are best utilised to plough through a well defined scope of work.</description>
+    <link>https://blacksheepcode.com/posts/how_to_effectively_hire_contractors</link>
+    <guid>https://blacksheepcode.com/posts/how_to_effectively_hire_contractors</guid>
+    <pubDate>Mon, 11 Apr 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>How to get started testing a React codebase that has no tests.</title>
+    <description>You've inherited a React codebase that has no tests. You're having trouble with regressions and think that tests might help, but how do you get started?</description>
+    <link>https://blacksheepcode.com/posts/how_to_get_started_testing</link>
+    <guid>https://blacksheepcode.com/posts/how_to_get_started_testing</guid>
+    <pubDate>Tue, 12 Mar 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>I'm playing with Remix</title>
+    <description>Using Remix to generate a static blog.</description>
+    <link>https://blacksheepcode.com/posts/i_am_playing_with_remix</link>
+    <guid>https://blacksheepcode.com/posts/i_am_playing_with_remix</guid>
+    <pubDate>Mon, 28 Nov 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Testing Easy Markdown Editor</title>
+    <description>Easy Markdown Editor is a handy markdown editor with formatting keyboard shortcuts. This post outlines how to write tests for applications using it, using either Testing Library or Cypress.</description>
+    <link>https://blacksheepcode.com/posts/testing_easy_mde</link>
+    <guid>https://blacksheepcode.com/posts/testing_easy_mde</guid>
+    <pubDate>Thu, 19 Oct 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Various approaches for testing an Single Page Application as it relates to state management</title>
+    <description>The presence of state management is often what makes testing an Single Page Application difficult. Various approaches such as API mocking, dependency injection, component composition and error boundaries can help.</description>
+    <link>https://blacksheepcode.com/posts/testing_strategies</link>
+    <guid>https://blacksheepcode.com/posts/testing_strategies</guid>
+    <pubDate>Tue, 10 Oct 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>The case for blackbox tests</title>
+    <description>Blackbox tests do not require knowledge of the implementation details - they're a 'how the consumer sees it' style of test.</description>
+    <link>https://blacksheepcode.com/posts/the_case_for_blackbox_tests</link>
+    <guid>https://blacksheepcode.com/posts/the_case_for_blackbox_tests</guid>
+    <pubDate>Mon, 17 Apr 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>The case for splitting Cypress tests into multiple it blocks</title>
+    <description>Cypress recommends long running tests with lots of assertions. I argue that it would be helpful if we had granular visibility of the parts of the test.</description>
+    <link>https://blacksheepcode.com/posts/the_case_for_splitting_tests_into_multiple_it_blocks</link>
+    <guid>https://blacksheepcode.com/posts/the_case_for_splitting_tests_into_multiple_it_blocks</guid>
+    <pubDate>Fri, 11 Nov 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>The horseshoe model for software development</title>
+    <description>I propose that the designer and the QA should be one and the same.</description>
+    <link>https://blacksheepcode.com/posts/the_horse_shoe_theory_of_software_development_lifecycle</link>
+    <guid>https://blacksheepcode.com/posts/the_horse_shoe_theory_of_software_development_lifecycle</guid>
+    <pubDate>Fri, 11 Aug 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>This blog now features comments</title>
+    <description>You can very easily add comment functionality to a webpage via the Github-powered Utterances plugin</description>
+    <link>https://blacksheepcode.com/posts/this_blog_now_features_comments</link>
+    <guid>https://blacksheepcode.com/posts/this_blog_now_features_comments</guid>
+    <pubDate>Fri, 24 Mar 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Thoughts about JSON API</title>
+    <description>JSON API is an opinionated REST API structuring spec. I think it has some good ideas about what can be useful in a RESTful API, but ultimately the complexity of using it makes it not worth using.</description>
+    <link>https://blacksheepcode.com/posts/thoughts_about_json_api</link>
+    <guid>https://blacksheepcode.com/posts/thoughts_about_json_api</guid>
+    <pubDate>Mon, 06 Mar 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Today I learned: The Etc/GMT+x timezones actually mean UTC-x</title>
+    <description>Counter-intuitively Etc/GMT+x timezones means the opposite of how they appear in an ISO 8601 formatted date string.</description>
+    <link>https://blacksheepcode.com/posts/til_etc_timezone_is_backward</link>
+    <guid>https://blacksheepcode.com/posts/til_etc_timezone_is_backward</guid>
+    <pubDate>Mon, 21 Aug 2023 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>git checkout interactive</title>
+    <description>micro: gci is an interactive CLI utility to select a git branch with arrow keys.</description>
+    <link>https://blacksheepcode.com/posts/tools_i_like_gci</link>
+    <guid>https://blacksheepcode.com/posts/tools_i_like_gci</guid>
+    <pubDate>Wed, 12 Jun 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>User Experience reflects data the underlying data structure</title>
+    <description>I propose a variation of Conway's Law.</description>
+    <link>https://blacksheepcode.com/posts/user_experience_reflects_data_structures</link>
+    <guid>https://blacksheepcode.com/posts/user_experience_reflects_data_structures</guid>
+    <pubDate>Thu, 01 Dec 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>What is the role of QA and how should their tests fit into the development process?</title>
+    <description>If we're doing shift left testing, and developers are writing their own tests - then where does that leave QA?</description>
+    <link>https://blacksheepcode.com/posts/whats_the_role_of_qa</link>
+    <guid>https://blacksheepcode.com/posts/whats_the_role_of_qa</guid>
+    <pubDate>Tue, 19 Apr 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Why I don't like API mocking as a necessary frontend testing strategy</title>
+    <description>A lot of state management frameworks recommend doing API mocking as the testing strategy. I think dependency injection is a better approach.</description>
+    <link>https://blacksheepcode.com/posts/why_i_dont_like_api_mocking</link>
+    <guid>https://blacksheepcode.com/posts/why_i_dont_like_api_mocking</guid>
+    <pubDate>Mon, 12 Dec 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>Why I've gone off React Testing Library</title>
+    <description>React Testing Library is perhaps the most popular tool for testing React applications. However its use of JSDOM under-the-hood means we often spend time dealing with browser APIs that JSDOM has not implemented.</description>
+    <link>https://blacksheepcode.com/posts/why_ive_gone_off_react_testing_library</link>
+    <guid>https://blacksheepcode.com/posts/why_ive_gone_off_react_testing_library</guid>
+    <pubDate>Thu, 08 Feb 2024 00:00:00 GMT</pubDate>
+  </item>
+</channel></rss>
