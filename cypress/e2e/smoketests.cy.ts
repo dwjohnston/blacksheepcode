@@ -42,10 +42,24 @@ describe('Test pages', () => {
 
     })
 
+
     it("external component", () => {
       cy.visit('/test/external_component'); 
 
+      cy.findByText("I contain a react-github-permalink").should("exist")
 
+      // I'm not asserting on actual content it should encounter 
+      // Because we quickly hit the rate limit
+      cy.get(".react-github-permalink").should("exist");
+    })
+
+    it("external component in series", () => {
+      cy.visit('/test/external_component_in_series'); 
+
+
+      // For some reason the presence of the series causes issues with the external components
+      cy.findByText("I am series - post 1 content").should("exist"); 
+      cy.findByText('I am the series description').should("exist")
       cy.findByText("I contain a react-github-permalink").should("exist")
 
 

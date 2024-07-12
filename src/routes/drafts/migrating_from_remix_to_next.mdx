@@ -281,6 +281,9 @@ I copy my CSS file (I'm writing just vanilla CSS) and that all works fine.
 
 #### 1.7 Populate my root layout 
 
+Difficulty: Easy. 
+
+
 Here I take the logic from my Remix `root.tsx` and put it in `src/app/layout.tsx`
 
 The Remix style `LinksFunction` objects 
@@ -292,6 +295,9 @@ are converted to plain HTML rendering:
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/layout.tsx#L25-L35"/>
 
 #### 1.8 Generate sitemap.xml, rss.xml 
+
+Difficulty: Easy. 
+
 
 In Remix these files can be handled with a `[sitemap.xml].tsx` file - which is pretty convenient. 
 
@@ -388,6 +394,8 @@ At this point lots of my cypress tests are failing, so we'll go through an fix t
 
 #### 5.1 Assertions on static resources
 
+Difficulty: Easy. 
+
 One expected error is my tests that look like:
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L99-L105"/>
@@ -395,6 +403,8 @@ One expected error is my tests that look like:
 That file path can obviously be expected to differ in the way the Remix and Next render it - so I go through and change those. Straight forward. 
 
 #### 5.2 Link clicks not being followed
+
+Difficulty: Difficult. 
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L54-L69"/>
 
@@ -408,7 +418,11 @@ As a workaround - we can add `{force:true}` to click command.
 
 This is a thoroughly unsatisfying resolution though. 
 
+**Actual Solution:** See solution is 5.3. 
+
 #### 5.2 Mysterious Minified React error #329 / Unknown root exit status error. 
+
+Difficulty: Difficult. 
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L46-L52"/>
 
@@ -424,11 +438,15 @@ I don't have a resolution for this - I'm skipping those tests.
 
 Note minified React errors only seem to occur when visiting the application via Cypress. This is an issue that I've encountered before with my tests against Remix as well , so that they exist doesn't especially concern me.  
 
+**Actual Solution:** See solution is 5.3. 
+
 <GithubIssueLink issueLink ="https://github.com/cypress-io/cypress/issues/27204"/>
 
 But does concern me is that in NextJS these errors cause functional problems - in Remix the functionality of the application would continue to work. 
 
 #### 5.3 iframe not found 
+
+Difficulty: Difficult. 
 
 <GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/76d9dcedff02f5968ac11656e3c0bbd9a5b75c56/cypress/e2e/smoketests.cy.ts#L98-L102"/>
 
@@ -436,18 +454,15 @@ In this test the Utterances comment section iframe fails to appear.
 
 This test fails sporadically. We are seeing a lot of minified React errors, and it could be something to do with that #329 error above. 
 
+**Actual Solution:** It appears that this iframe is the offender for all of the issues. [This comment](https://github.com/cypress-io/cypress/issues/27204#issuecomment-1625490068) in the above Cypress issue suggests wrapping scripts in a suspense boundary. 
+
+I wrapped one around my PostComments component all of the a sudden the three issues mentioned here are resolved. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ebc330a751e835d378e96fa31a1fa50034774f6c/src/components/BlogPostFrame/BlogPostFrame.tsx#L13-L15"/>
+
 #### End of phase 5 
 
 Status: The Cypress tests are passing on branch preview. We're almost ready to go!
-
-The issue with the Cypress tests is the most disconcerting part of this experiencing. 
-
-Practically speaking - this is a small blog, I can verify that things are working manually, and even if I break things it doesn't really matter. 
-
-But imagine we scale this up - it's a larger Remix code base with Cypress tests - there might quite a lot of tests that I'm having to skip. 
-
-We could look at Playwright - see if it handles this better - but rewriting _all_ of your tests to do a migration seems like a step in the wrong direction. 
-
 
 
 #### Phase 6: Get Sentry working 

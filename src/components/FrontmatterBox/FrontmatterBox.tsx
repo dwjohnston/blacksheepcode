@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import React, { useEffect, useState } from "react";
+import React  from "react";
 import { getFrontmatterFromSlug } from "@/utils/blogPosts";
 import type { EnrichedFrontMatterPlusSlug } from "../../../utils/frontmatterTypings";
 import Link from "next/link";
