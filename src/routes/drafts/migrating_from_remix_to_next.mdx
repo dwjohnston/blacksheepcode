@@ -1,118 +1,435 @@
 ---
 meta:
-  title: I am the title
-  description: I am the description
-  dateCreated: 2022-11-28
+  title: Migrating from Remix to NextJS
+  description: NextJS appears to well and truely established. These are the steps I followed to migrate from Remix 1.9.3 to Next 14. 
+  dateCreated: 2023-07-12
 ---
 
-
-List of things: 
-
-- X permalink Code blocks work~~
-- X Comments work
-- X Table of contents works
-- X Post series works 
-- Caching, sitemap, Xrss, robots.tsx work 
-- Jest tests
-- Cypress Tests
-- X Metadata works
-- X Social image works 
-- Edit with github
+import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {Aside} from "@/components/Aside/Aside";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
 
 
 
+I've migrated this blog to use NextJS. There's two main reasons I did this: 
+
+- Static Site Generation - Remix doesn't support SSG - and this being a blog a static site makes a lot of sense. The more I can make responses instant - the better. My Netlify hosted Remix site has a 300ms wait for server and a 120ms content download. 
+- NextJS and RSCs are well adopted in the industry and it makes sense from a professional standpoint to be familiar with it. 
+
+## Core Principles
+
+1.  I want to keep the same codebase - retaining my git history, I don't want to create a brand new codebase. 
+
+2.  Try not to change everything. While I might also want to considering moving to Vercel - bundling all those little changes into the one migration makes a large task larger and becomes death by a thousands cuts. 
+
+Some examples of things that I might consider changing, but am avoiding in the first iteration of the migration are: 
+
+- Platform: Netlify -> Vercel
+- Browser based testing framework: Cypress -> Playwright
+- Test Framework: Jest -> Vitest
+- Images: img -> NextJS Image
+
+## The Plan Of Attack 
+
+<InfoPanel level="warning">
+  In practise it was not nearly as smooth as this blog post suggests. There were missteps in the wrong direction and course reversals that I'm leaving out for the sake brevity.
+</InfoPanel>
+
+1. Create a new project, scaffolded with create-next-app, get all of the blog functionality working generally.   
+2. While I'm doing that, also create a preparation pull request to the existing codebase that will: 
+ - Minimise the diff
+ - Add tests to detect things that were broken. 
+
+3. Copy paste the new project over. Fix anything that's broken. 
+4. Get the build deploying on Netlify. 
+5. Get the Cypress tests working. 
+6. Get Sentry working. 
+
+## TL;DR Conclusions 
+
+1. The actual migration of core functionality was fine. In fact if anything several things were much easier to do using NextJS - for example where dynamic imports work fine under NextJS whereas they didn't work for me with Remix. 
+
+2. The fact that I had tests for some of my build-time scripts made it _so_ much easier to modify those scripts, using ChatGPT, and use the tests to check the functionality. 
+
+3. Cypress has been a nightmare. 
+
+## The Execution 
+
+### Phase 1: Create a new application using create-next-app - reproduce the functionality there. 
+
+I scaffold a new application using [create-next-app](https://nextjs.org/docs/pages/api-reference/create-next-app) at [this repository.](https://github.com/dwjohnston/blacksheepcode-next)
+
+#### 1.1 File structure for the blog posts
+
+Difficulty: Not hard once I got my head around it, but there were some false starts. 
+
+
+The existing file structure looked like this: 
+
+```plaintext
+
+app/ <--  nb. this is Remix's default 'src' directory, it has nothing to do with Next's app router. 
+   routes/ 
+      posts/ 
+         a_blog_post.mdx
+         another_post.mdx
+      test/ 
+         test_post.mdx
+      drafts/ 
+         draft_post.mdx
+          
+```
+(Test posts are ones I run cypress tests against, and draft posts are where I put my posts while I'm working on them, and then I move them to posts when I 'publish' them)
+
+Now I _could_ (and in fact I did go down this path until I realised it wouldn't work for me) go down the path of doing [Next's file based MDX routing](https://nextjs.org/docs/app/building-your-application/configuring/mdx) and have a structure like this:
+
+```plaintext
+src/ 
+   app/ 
+      posts/
+        a_blog_post/ 
+            page.mdx
+        another_post/ 
+            page.mdx
+      test/
+        test_post/ 
+            page.mdx
+      drafts/
+        draft_post/ 
+            page.mdx
+```
+
+##### File based MDX routing doesn't work for me 
+
+
+This all comes down to the Frontmatter Metadata attached in the posts.
+
+I make use of [Frontmatter](https://jekyllrb.com/docs/front-matter/) to provide metadata in this posts like the title and description, but also to create the blog series sections, create the list of blog posts, etc.
+
+The difficulty is, each blog post needs to be wrapped in what I'm calling a BlogPostFrame - this contains the standard layout, the 'edit with github', the comments section, as well as that series box at the top, if the post is part of the series. 
+
+That sounds like a [NextJS layout component](https://nextjs.org/docs/app/api-reference/file-conventions/layout) right? 
+
+Maybe we do something like this? 
+
+```
+src/ 
+   app/ 
+      posts/
+        layout.tsx <-- Put the BlogPostFrame here 
+        a_blog_post/ 
+            page.mdx
+        another_post/ 
+            page.mdx
+```
+
+The problem is - this layout.tsx has no way of knowing what page we're on, or what the metadata is supposed to be. 
+
+##### My Approach: Compile the MDX myself + Use dynamic routes 
+
+The folder structure I use looks like this: 
+
+```
+src/ 
+   app/ 
+      posts/
+        [slug]/
+           page.mdx
+      test/
+        [slug]/
+           page.mdx
+      drafts/
+        [slug]/
+           page.mdx
+   routes/ <-- This is the existing Remix routes folder, but there is no file based routing occurring here any more, these files will be compiled at build time
+      posts/ 
+         a_blog_post.mdx
+         another_post.mdx
+      test/ 
+         test_post.mdx
+      drafts/ 
+         draft_post.mdx
+```
+
+I then have build-time scripts that run to compile the mdx files into a structure that looks like this: 
+
+```
+src/
+   app/
+       generated/
+           mdx/ 
+               posts/
+                  a_blog_post.mjs   <-- MDX Compiled into plain React JavaScript
+                  another_post.mjs
+               test/
+                  test_post.mjs
+               drafts/
+                  draft_post.mjs
+           frontmatter/
+               posts/
+                  a_blog_post.json <--  Frontmatter extracted to JSON format
+                  another_post.json
+               test/
+                  test_post.json
+               drafts/
+                  draft_post.json
+
+```
+
+<Aside>
+<p>
+The whole process of separately generating frontmatter JSONs may look unnecessary - the  [remark-mdx-frontmatter](https://github.com/remcohaszing/remark-mdx-frontmatter) package can export the frontmatter as part of the same compiled MDX file. 
+</p>
+<p>
+However, my existing tooling also included: 
+
+<ul>
+<li>
+Validating the metadata is of a consistent format. I want a build time error if the metadata is not the right shape.
+</li>
+<li>
+Additional munging relating to post series - when it's a post series I need to also collect a reference too all other posts in the series, and my existing tooling was already doing this for me. 
+</li>
+</ul>
+</p>
+</Aside>
+
+The generation of the frontmatter json files is something I did in my Remix solution, [you can read about this here](./adding_msw_bundler_to_remix_app_2). 
+
+
+The plain rendering of my page then just uses dynamic import to retrieve the javascript it needs and renders that: 
+
+<p className="clear-right"></p>
+
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L13-L25"/>
+
+The metadata rendering is done in a similar fashion, I export a [NextJS generateMetatdata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata) function. This function is what causes our meta tags etc to put in the HTML head. The generateMetadata function asynchronously fetches the metadata based on the slug. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L6-L12"/>
+
+#### 1.2 Change import aliases 
+
+Difficulty: Easy. 
+
+
+NextJS by default uses `@/` aliases, whereas my Remix config had `~/` as an alias, so use find replace to update these. 
+
+#### 1.3 Migrate components - Update Links, Images 
+
+Difficulty: Easy. 
+
+I copy paste over my `app/components` folder, which has various miscellaneous components, like the info boxes. 
+
+
+
+<Aside>
+<p>
+The linter gives me a warning about maybe I should use NextJS `<Image/>` tags - but in the philosophy of 'try not to change everything' that can be a job for another day. 
+</p>
+</Aside>
+
+The main things to be done where: 
+
+1. Links - Change Remix links to NextJS links 
+2. Images - Remix image imports resolve as a string, whereas NextJS image imports resolve as a `{src: string, height: number, width: number}` and so my use of images are changed to: `<img src ={image.src}/>`.
 
 
 
 
-1. Scaffold a new app with create-next-app
+#### 1.4 Migrate components - add "use client" directive
 
-2. Copy paste components folder over. 
-    FrontMatterBox imports a bunch of utils and those have dependencies I don't have installed (eg. frontmatter, jest) so I'm just going to delete it for now. 
-    Index route
+Difficulty: Easy. 
 
-
-3. Run script to migrate mdx files 
+Because I'm using NextJS's app router any of my components that have a useEffect etc in them, need to be prefixed with "use client". 
 
 
+#### 1.5 Migrate components - update react-github-permalink 
 
+Difficulty: Easy with a twist.
 
-5. Test blog post 
+I maintain a package [react-github-permalink](https://www.npmjs.com/package/react-github-permalink) to display the codeblocks here. Pages with the codeblocks error with:
 
-http://localhost:3000/posts/tools_i_like_gci
-
-http://localhost:3000/posts/adding_dark_mode_to_the_blog
-
-Errors -> `react-github-permalink`. 
-
-6. Install github permalink
-
-7. `http://localhost:3000/posts/adding_dark_mode_to_the_blog` is erroring because of relative imports. 
-
-Update script to change to aliased imports. 
-
-8. Components are erroring because they're not marked use client. Manually go through and mark them "use client"; 
-
-
-9. Components are erroring because assets don't exist. Copy them 
-
-
-10. This error: 
-
+```plaintext
 Error: Super expression must either be null or a function
+```
 
-Looks like it's going to be from react-github-permalink - so let's add the "use client" annoation to react-github-permalink 
+which appears to relate to client components running in a RSC. 
 
+To fix, I [updated react-github-permalink](https://github.com/dwjohnston/react-github-permalink/pull/22) to add a "use client" directive everywhere. 
 
-Running into this issue: 
+The plan is to eventually have react-github-permalink behave as a RSC but for now client component will do. 
 
-https://stackoverflow.com/questions/75261466/unsupported-server-component-type-undefined-next-js-13
+One little gnarl I ran into is this error: 
 
+```plaintext
+"Unsupported Server Component type: undefined"
+```
 
+According to [this Stack Overflow answer](https://stackoverflow.com/a/75955626/1068446) not only do we need to add the "use client" directive to the components, but if doing an `export * from` we also need to add the directive to that. 
 
-
-
-
-11. Front matter
-
-Next doesn't have an opinion on doing frontmatter - and I'd found in my remix experience that the out of the box experience wasn't working for me, so let's retain our existing
-frontmatter solution. 
-
-That is, they're yaml headers and we have a build time process to generate barrel files we can reference. 
-
-I would actually prefer to move away from yaml I can just do an 'export const metadata : Metadata = ...` and get the advantages of typing, but for now, let's continue with what we've got. 
-
-I have jest tests with my utils, and I'm going to need them. I'm keen to have a play with Vitest, but lets stick with Jest for now. 
-
-Note I'm not actually using Jest for testing any React functionality - so I shouldn't need any next specific configuration. I'll just copy the config over from my existin app. 
-
-... nope, that'll involve installing babel, and I don't want that. So let's do Next's thing. 
+<GithubPermalink permalink="https://github.com/dwjohnston/react-github-permalink/blob/09f6f7dfbcfab104691d199dd7bb8266d3f75919/src/export.ts#L1-L4"/>
 
 
-12. Now for the harder stuff, generating layouts etc, based on the barrel files. 
+#### 1.6 Add the CSS in 
 
-Here I was using remix specific functionality, this stuff we'll probably need to rewrite. 
+Difficulty: Easy. 
+
+At this point I'm just checking that the pages are rendering without error. 
+
+I copy my CSS file (I'm writing just vanilla CSS) and that all works fine. 
+
+#### 1.7 Populate my root layout 
+
+Here I take the logic from my Remix `root.tsx` and put it in `src/app/layout.tsx`
+
+The Remix style `LinksFunction` objects 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/src/root.tsx#L55-L73"/>
+
+are converted to plain HTML rendering: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/layout.tsx#L25-L35"/>
+
+#### 1.8 Generate sitemap.xml, rss.xml 
+
+In Remix these files can be handled with a `[sitemap.xml].tsx` file - which is pretty convenient. 
+
+NextJS is a bit simpler - as part of the build process - I generate the files and put them in my `public` folder directly. 
 
 
-13. Table of contents
+#### End of Phase 1
 
-Table of contents is reproduced pretty straight forward. 
-
-
-14. Common post layout 
+Status: I have a standalone project separate from my main blog that is running and appears to be functional.
 
 
+### Phase 2: Preparation pull request for migration 
+
+As I encountered errors while creating the new application - I wrote them down in a list, and created cypress tests for them. 
+
+I also made sure that Cypress was testing core pieces of functionality like that the 404 pages were working, the rss.xml was working etc. 
+
+I renamed the root level `app` folder of Remix to `src`. It appears the in Remix you can configure what the root directory is, but in NextJs you can't. 
+
+I otherwise moved some other files about as part of a tidy up. 
+
+#### End of Phase 2
+
+Status: No major changes to the main blog. Some extra tests are running. I've renamed the root folder. 
+
+[The pull request for this change is here](https://github.com/dwjohnston/blacksheepcode/pull/116). 
+
+
+### Phase 3: Copy the files 
+
+#### 3.1 Update the package.json
+
+This is a fairly manual process, I need to remove all the Remix dependencies and add the NextJS dependencies.
+
+I also add a convenience `generate:all` script which run all of my build steps except the main application build.
+
+#### 3.2 Copy over the main files
+
+This is basically updates to everything in my `src` folder and `utils` folder (which is a badly named folder, it contains all of the build time scripts).
+
+#### 3.3 Remove remix specific files 
+
+Removes remix.config.js, entry.client.tsx, entry.server.tsx, root.tsx etc. 
+
+#### 3.4 Add NextJS specific files 
+
+Replaces the eslint config with the NextJS provided one.
+
+Replaces the tsconfig with the NextJS provided one. 
+
+At time of writing I'm noticing that I neglected to copy across next.config.mjs and it appears to work fine 🤷‍♂️
+
+#### 3.5 Replace jest with vitest
+
+The reason I did this was that I didn't want to keep babel around just so I can run my jest tests. 
+
+I feel like I had a better reason than this, but if I did, I didn't write it down in my notes. 
+
+Updating the tests themselves was pretty simple - it's just a matter of replacing references to `jest` with `vitest`, and some minor changes to how vitest types it's `fn` function. 
+
+#### End of Phase 3 
+
+Status: I can run the blog locally. 
+
+[The PR for this change is here.](https://github.com/dwjohnston/blacksheepcode/pull/118)
+
+At time of writing, the PR has 87 file changes, these can be broken down roughly as follows : 
+
+- 10 files are additional or modifications to build time scripts
+- ~14 are package.json, removing babel, jest, tsconfig.json etc. 
+- ~12 are the new app router, dynamic routes etc
+- ~8 are removing remix files 
+- ~14 are small updates to components (updating images, links, path aliases) 
+- ~12 are updates to blog posts (aliases)
+
+### Phase 4: Get it running on Netlify 
+
+Turns out this is pretty simple. 
+
+I remove my server.ts and make the netlify.toml be: 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/netlify.toml#L1-L7"/>
+
+I use Netlify's branch previews to verify that it's working. 
+
+### End of Phase 4
+
+Status: Branch previews are deploying properly, but the Cypress tests are failing
+
+
+### Phase 5: Get the Cypress tests working 
+
+At this point lots of my cypress tests are failing, so we'll go through an fix them. 
+
+#### 5.1 Assertions on static resources
+
+One expected error is my tests that look like:
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L99-L105"/>
+
+That file path can obviously be expected to differ in the way the Remix and Next render it - so I go through and change those. Straight forward. 
+
+#### 5.2 Link clicks not being followed
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L54-L69"/>
+
+This test is failing on line 65 - the link is clicked but the page doesn't redirect and the subsequent content isn't found. 
+
+This test fails consistently, but we can't reproduce the error manually. 
+
+This [very helpful Stack Overflow](https://stackoverflow.com/a/66371021/1068446) helps us shed some light. The link element is found, and we click it, but by the time we click it the element is detached from the DOM and the click doesn't register. 
+
+As a workaround - we can add `{force:true}` to click command.
+
+This is a thoroughly unsatisfying resolution though. 
+
+#### 5.2 Mysterious Minified React error #329 / Unknown root exit status error. 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L46-L52"/>
+
+In this test the Github Permalinks fail to render. 
+
+This test fails consistently, but we can't reproduce the error manually. 
+
+This appears to be _something_ to do with NextJS, but it's unclear what. 
+
+I don't have a resolution for this - I'm skipping those tests. 
 
 
 
 
 
 
-replace link. 
-convert frontmatter box to async comp
 
 
-https://github.com/vercel/next.js/discussions/64753
 
 
-Alright, this isn't going to work, I need to do a proper fledged do my own MDX solution. 
+
+
+
+      cy.findByText("I contain a react-github-permalink").should("exist")

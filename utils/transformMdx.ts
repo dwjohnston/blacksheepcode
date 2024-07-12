@@ -46,7 +46,7 @@ export async function compileMDXFiles(inputPath: string, outputPath: string, wri
 
             const compiledJS = await compile(mdxContent, {
                 remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-                rehypePlugins: [rehypeHighlight]
+                rehypePlugins: [[rehypeHighlight, {detect: true}]]
             });
 
             await writeFileFn(outputFilePath, String(compiledJS));

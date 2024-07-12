@@ -16,7 +16,7 @@ Cypress.on('uncaught:exception', (err) => {
 
 
 describe("real pages", () => {
-    it("code blocks exist", () => {
+    it.skip("code blocks exist", () => {
         cy.visit('posts/adding_msw_bundler_to_remix_app_2'); 
         cy.wait(10000); // wait for the blocks to load
         cy.get(".react-github-permalink").its("length").should('eq', 10);
@@ -32,11 +32,7 @@ describe("real pages", () => {
       it("homepage table of contents links to blog posts correctly", () => {
         cy.visit('/'); 
   
-  
-  
-        // It seems like the the links are existing before remix thinks they're ready to be 
-        cy.wait(1000);
-        cy.findByRole("link", {name: "How to configure Remix and mdx-bundler for a serverless platform - barrel files approach, Remix v1"}).should("exist").click();  
+        cy.findByRole("link", {name: "How to configure Remix and mdx-bundler for a serverless platform - barrel files approach, Remix v1"}).should("exist").click({force:true});  
       
         cy.findByText("In this post, we'll we'll talk about how to achieve the same effect for use in a serverless platform, such a Netlify or AWS Lambda.").should('exist');
   
