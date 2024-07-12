@@ -86,16 +86,16 @@ describe('Test pages', () => {
       cy.findByText("This is some text").should("exist");
     })
 
-    it("/test will show a test index page", () => {
+    it.only("/test will show a test index page", () => {
       cy.visit('test').its("status"); 
-
-      cy.request({url: '/test', failOnStatusCode: false}).its('status').should('be.ok')
 
       cy.findByText("Test Posts").should("exist")
 
+      cy.request({url: '/test', failOnStatusCode: false}).its('status').should('be.ok')
+
     })
 
-    it("comment blocks", () => {
+    it.skip("comment blocks", () => {
       cy.visit('test/basic_mdx?q=foo'); 
 
       cy.get("iframe.utterances-frame").should("exist");

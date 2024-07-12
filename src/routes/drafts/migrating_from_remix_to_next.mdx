@@ -414,22 +414,45 @@ This is a thoroughly unsatisfying resolution though.
 
 In this test the Github Permalinks fail to render. 
 
+We see [Minified React error #329, (Unknown root exit status)](https://react.dev/errors/329) in the console. 
+
 This test fails consistently, but we can't reproduce the error manually. 
 
 This appears to be _something_ to do with NextJS, but it's unclear what. 
 
 I don't have a resolution for this - I'm skipping those tests. 
 
+Note minified React errors only seem to occur when visiting the application via Cypress. This is an issue that I've encountered before with my tests against Remix as well , so that they exist doesn't especially concern me.  
+
+<GithubIssueLink issueLink ="https://github.com/cypress-io/cypress/issues/27204"/>
+
+But does concern me is that in NextJS these errors cause functional problems - in Remix the functionality of the application would continue to work. 
+
+#### 5.3 iframe not found 
+
+<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/76d9dcedff02f5968ac11656e3c0bbd9a5b75c56/cypress/e2e/smoketests.cy.ts#L98-L102"/>
+
+In this test the Utterances comment section iframe fails to appear. 
+
+This test fails sporadically. We are seeing a lot of minified React errors, and it could be something to do with that #329 error above. 
+
+#### End of phase 5 
+
+Status: The Cypress tests are passing on branch preview. We're almost ready to go!
+
+The issue with the Cypress tests is the most disconcerting part of this experiencing. 
+
+Practically speaking - this is a small blog, I can verify that things are working manually, and even if I break things it doesn't really matter. 
+
+But imagine we scale this up - it's a larger Remix code base with Cypress tests - there might quite a lot of tests that I'm having to skip. 
+
+We could look at Playwright - see if it handles this better - but rewriting _all_ of your tests to do a migration seems like a step in the wrong direction. 
+
+
+
+#### Phase 6: Get Sentry working 
 
 
 
 
 
-
-
-
-
-
-
-
-      cy.findByText("I contain a react-github-permalink").should("exist")

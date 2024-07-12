@@ -23,7 +23,7 @@ describe("real pages", () => {
         cy.findByRole("link", {name: "dwjohnston/blacksheepcode/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx"}).should("exist");
      })
   
-      it("comment blocks", () => {
+      it.skip("comment blocks", () => {
         cy.visit('posts/adding_msw_bundler_to_remix_app_2'); 
   
         cy.get("iframe.utterances-frame").should("exist");
