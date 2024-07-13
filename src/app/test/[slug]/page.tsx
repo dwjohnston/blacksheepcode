@@ -1,7 +1,16 @@
 import { BlogPostFrame } from "@/components/BlogPostFrame/BlogPostFrame";
-import { getMetadata } from "@/utils/blogPosts";
+import { getAllPostFrontmatter, getMetadata } from "@/utils/blogPosts";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
+
+export async function generateStaticParams() {
+
+    const allFrontMatter = await getAllPostFrontmatter("test");
+    return allFrontMatter.map((v) => {
+
+        return { slug: v.slug.replace("test/", "") }
+    })
+}
 
 export async function generateMetadata({ params }: { params: {
     slug: string
