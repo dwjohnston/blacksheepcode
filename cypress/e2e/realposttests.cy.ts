@@ -17,14 +17,12 @@ Cypress.on('uncaught:exception', (err) => {
 
 
 describe("real pages", () => {
-    it.skip("code blocks exist", () => {
+    it("code blocks exist", () => {
         cy.visit('posts/adding_msw_bundler_to_remix_app_2'); 
-        cy.wait(10000); // wait for the blocks to load
         cy.get(".react-github-permalink").its("length").should('eq', 10);
-        cy.findByRole("link", {name: "dwjohnston/blacksheepcode/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx"}).should("exist");
      })
   
-      it.skip("comment blocks", () => {
+      it("comment blocks", () => {
         cy.visit('posts/adding_msw_bundler_to_remix_app_2'); 
   
         cy.get("iframe.utterances-frame").should("exist");

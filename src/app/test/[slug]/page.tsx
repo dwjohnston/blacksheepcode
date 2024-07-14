@@ -1,5 +1,5 @@
 import { BlogPostFrame } from "@/components/BlogPostFrame/BlogPostFrame";
-import { getAllPostFrontmatter, getMetadata } from "@/utils/blogPosts";
+import { getAllPostFrontmatter, getBlogContent, getMetadata } from "@/utils/blogPosts";
 import { notFound } from "next/navigation";
 import { PropsWithChildren } from "react";
 
@@ -27,9 +27,9 @@ export default async function PageLayout(props: PropsWithChildren<{
     if(process.env.SHOW_TEST_PAGES !== "true") {
         notFound();
     }
-    const data = await import(`../../../generated/mdx/test/${props.params.slug}`)
+    const content = await getBlogContent( props.params.slug,"test");
     return <BlogPostFrame pathname={`/test/${props.params.slug}`}>
-        {data.default()}
+        {content}
     </BlogPostFrame>
 
 }

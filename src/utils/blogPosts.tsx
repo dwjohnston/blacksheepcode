@@ -7,6 +7,7 @@ import type { EnrichedFrontMatterPlusSlug, FrontMatterPlusSlug } from "../../uti
 import * as allImages from "../generated/images";
 import DEFAULT_IMAGE from "@/assets/blacksheep_100x100.webp";
 import { getDomainUrl, getSiteName } from "../../utils/getDomainUrl";
+import { notFound } from "next/navigation";
 
 export type BlogPostFolders = "drafts" | "posts" | "test";
 
@@ -53,7 +54,7 @@ export async function getFrontmatterFromSlug(slug: string): Promise<EnrichedFron
     const { folder, filename } = getFolderAndFilenameFromSlug(slug);
     const data = allMetadata[folder][filename];
     if (!data) {
-        throw new Error(`Frontmatter did not exist for slug: '${slug}`)
+        throw new Error(`Frontmatter did not exist for slug: '${slug}'`)
     }
 
     let seriesFrontmatter: Array<FrontMatterPlusSlug> | null = null;
@@ -147,8 +148,25 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
 }
 
 export async function getMetadata(slug: string): Promise<Metadata> {
-    const metadata = await getFrontmatterFromSlug(slug);
-    return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta);
+    try {
+        const metadata = await getFrontmatterFromSlug(slug);   
+        return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta);
+
+    }
+    catch(err){
+        return DEFAULT_METADATA;
+    }
+}
+
+//@ts-expect-error
+export async function getBlogContent(slug: string, folder: BlogPostFolders = "posts") : Promise<React.ReactNode> {
+    try {
+        const data= await import(`../generated/mdx/${folder}/${slug}`)
+        return data.default();
+    } catch(err){
+        notFound();
+
+   }
 }
 
 
