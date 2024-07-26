@@ -1,0 +1,280 @@
+---
+meta:
+  title: The problem of testability in React
+  description: It seems like there are no perfect solutions for testing in React
+  dateCreated: 2024-07-25
+---
+
+import {Aside} from "@/components/Aside/Aside"
+
+I've [written previously about testing strategies as it relates to React](./testing_strategies). 
+
+This post is intended to serve as a summary of the various approaches and their pros and cons. 
+
+## The two easy approaches 
+
+As far as I see it, there are two 'easy' approaches as it testing React applications 
+
+
+### 1. Write pure/presentational components 
+
+In this approach, as much as possible we write components that don't ever rely on context<sup>*</sup> or reach into global state, they're a function props only. 
+
+eg. 
+
+```tsx
+type UserCardProps = {
+    userId: string; 
+    userName: string; 
+    userAvatar: string; 
+}
+
+export function UserCard(props: UserCardProps) {
+
+    // no calls into global state
+
+    //implementation here 
+    return <div> 
+      {JSON.stringify(props)}
+    </div>
+}
+```
+
+
+<sup>*</sup> There may be some amounts of context that we assume always exists. For example if we are using Material UI we assume that we're always operating with a `ThemeProvider` context. 
+
+The advantage of these components is that when it comes to write tests, their requisite data is explicit - you're going to get type errors in your IDE if you haven't provided it. 
+
+#### The cons
+
+**Lends itself to prop drilling** 
+
+Components of this sort require that their parent has the data to pass in, if that parent is also a pure component, then its parent also needs to have the data to pass in, and we end up with long chains of passing data down via props. This can be tedious and make extending functionality difficult. 
+
+For example, let's say we wanted to extend the `UserCard` to show the user's role: 
+
+```diff
+
+type UserCardProps = {
+    userId: string; 
+    userName: string; 
+    userAvatar: string; 
++    role: "admin" | "user"; 
+}
+```
+
+If we make this change like this, this will be breaking change for every component, (and let's assume this is dozens of places) that includes a `UserCard` as they're not passing in that mandatory `role` property. 
+
+We can make it a non-breaking change by making `role` an additional optional property, and we simply don't display the user role if it's not provided. In this scenario if would be up those dozens of components to update their component to also provide the role. And if those in turn were nested, their parents would also need to provide the role. 
+
+It should be said - in some contexts this might be a valid strategy - that we shouldn't change how the `UserCard` displays without allowing the consumers to opt in. 
+
+On the other hand it might far more practical to make this update without requiring all the of the consumers to make changes in order to recieve the new functionality. 
+
+In the case, what we really want to do is something like this: 
+
+```tsx
+type UserCardProps = {
+    userId: string; 
+}
+
+export function UserCard(props: UserCardProps) {
+
+    // gets all of the relevant user data - role, name etc
+    const userData = useUser(props.userId); 
+
+    //implementation here 
+    return <div> 
+      {JSON.stringify(props)}
+    </div>
+}
+```
+
+But of course now the problem is there are implicit dependencies in using this component - any consumer of this component, or a consumer of a component that has this as a child, has a hidden dependency on this data retrieval. In my opinion,  this kind of strategy moves testing into the harder basket. 
+
+
+**What about routing context?** 
+
+(Assume here we are using react-router, but this kind of problem may exist for other routers too)
+
+Let's say our `UserCard` wanted to include a link to the user's profile: 
+
+```tsx
+export function UserCard(props: UserCardProps) {
+    return <div> 
+      return <Link to={`/user/${props.userId}`}/>
+    </div>
+}
+```
+
+Unless our tests having including the router context this kind of test will fail. 
+
+The resolution for this can be that we include the routing context as one of those aforementioned 'contexts that we assume will always exist', using the [`MemoryRouter`](https://reactrouter.com/en/main/router-components/memory-router) for example. 
+
+### 2. Browser-based E2E tests (eg. Cypress, Playwright)
+
+For testing pure components the assumption is that we need to be aware of the dependencies in order to test, and therefore we should make knowing what those dependencies are, and how to configure them, as easy as possible. 
+
+Browser-based E2E tests are in the easy basket for kind of the opposite reason - browser-based E2E tests assume _no_ knowledge of the code structure. This is liberating for the practise of testing - our tests involve just looking at the final output of the code in the browser's DOM. This means that we can write tests now, regardless of what structure the code has - so long as we have a deployed application we run our tests against. (See more: [The Case For Blackbox Tests](./the_case_for_blackbox_tests))
+
+#### The cons
+
+**Getting the data into the right shape** 
+
+The obvious challenge with browser-based E2E tests is getting the right test data to exist so that we can make assertions about it. 
+
+See [more about the problem of test data in E2E tests here](https://blacksheepcode.com/posts/how_to_get_started_testing#the-problem-of-data-in-e2e-tests). 
+
+**Test environment stability and performance** 
+
+In a previous role at a small startup I had good success using Cypress to improve our test coverage, challenges relating to test data notwithstanding. The strategy involved running the Cypress tests each night against a freshly deployed test environment that had a clean slate of data. 
+
+However, in another, larger,  organisation I worked out, the test environment was a lot slower, and various endpoints were frequently broken - this makes running the test suite an unreliable measure. 
+
+Obviously 'well, make your test environment stable' is the answer here - but that's no simple task!
+
+
+## The harder baskets 
+
+### 1. A preexisting suite of data mocks
+
+This approach involves mocking the data that your application seeks to retrieve.
+
+There are a variety of strategies or tools that we can use, notably they are: 
+
+- [MSW](https://mswjs.io/) to mock API calls 
+- Fetch mocking to mock API calls
+- Some kind of dependency/service injection structure to change the behaviour of service calls in your application 
+
+ This can solve some of the problems mentioned above: 
+
+- Unreliabilty issues with browser-based E2E tests - because we no longer need to interact with a real API. 
+- Components can now reach into global state to retrieve data and get _something_ though as we'll see, what they're getting unclear. 
+
+Note that the suggestion here is _not_ that we mock our data ad hoc on a per-test basis. 
+
+We _could_ do this, but this sounds incredibly tedious.
+
+For example, let's say we have some code like: 
+
+```tsx
+function ServiceTicket(props) {
+
+  return <div>   
+    <ServiceTicketHeader data={props.data}/>
+  </div>
+}
+
+function ServiceTicketHeader() {
+
+  return <div> 
+      <UserCard userId={props.data.userId}/>
+  </div>
+}
+
+function UserCard(props) {
+    // gets all of the relevant user data - role, name etc
+    const userData = useUser(props.userId); 
+    return <div> 
+      {JSON.stringify(props)}
+    </div>
+}
+```
+
+And somewhere else, we're creating a new component 
+
+```tsx
+
+function IncidentsList(props) {
+  return <div> 
+      {props.incidents.map((v) => <ServiceTicket data={v.ticketData}/>)}
+  </div>
+  }
+
+```
+
+When we go to write a test for this: 
+
+First - we might not be aware that we need to provide some kind of mocking behaviour to get that user data. Our tests would fail and we would spend time tracking down what part is wrong. And remember we might need to repeat this several times. 
+
+Second - our test would now include a bunch of mocking logic, _just to make the test work_. When reading the test it would become unclear which parts are relevant to the actual test logic, and which parts are 'just there to make it work'. 
+
+So the suggestion is, when it our tests run, they run in a context where the we have predefined suites of test data. 
+
+For example we might have a test that looks like this: 
+
+```tsx
+    describe(IncidentsList, () => {
+
+      it("does the things", () => {
+           render(<TestContext scenario="scenario-1">
+                <IncidentsList incidents={[...]}/>
+            </TestContext>
+           )
+      })
+    })
+```
+
+Where that `"scenario-1"` means we have our endpoints configured such that we have users Andy, Briar, and Charlie, and tickets 1,2,3, etc. 
+
+We might have multiple suites of data, maybe `"scenario-1"` covers a scenario where the user is a regular user, while `"scenario-2"` covers where the user is an admin and see extra data, `"scenario-3"` covers when maybe a particular endpoint is erroring etc. 
+
+#### The cons 
+
+I need to be clear here - _I do not have experience with actually working with or implementing this technique_. 
+
+The main con here is setting up, and potentially maintaining these suites of test data will be _a lot_ of work. 
+
+<Aside>
+Say `"scenario-1"` is a 'blue sky' scenario, and we're extending our `UserCard` to include usage of a new role type, `"super-admin"`. We add a user Deanna with the role `"super-admin"` - the problem is elsewhere in the codebase we have a bunch of tests that assert of on the number of users in a user list, and these now break. Instead of going through and updating all of those tests, we now create `"scenario-d"` - which is just `"scenario-a"` + our extra user. 
+
+Before long, we're up to `"scenario-z"` and nobody knows what all these scenarios do, but we can't modify them for fear of breaking someone's tests. 
+
+</Aside>
+
+
+Additionally, mocking the behaviour of endpoints that modifify the data (eg. submitting a new todo, and then asserting that the list now has all the data) entails additonal complexity - essentially we end up rewriting our application for a test environment. 
+
+##### There are tools that can help 
+
+If you have a OpenAPI spec there are tools that can help generate your test behaviour based on the spec. 
+
+For example there's [msw-auto-mock](https://github.com/zoubingwu/msw-auto-mock), which [I wrote about here](./generating_apps_from_openapi_part3). This tool will configure the behaviour of MSW based on your OpenAPI spec. 
+
+If there is any body who has worked with this 'suites of test data' approach - please let me know how it has worked for you - is it a lot of work maintaining the test data?
+
+### An interim easy-ish solution - error boundaries. 
+
+In this approach we wrap error boundaries around those deeply nested components that require data, and allow them to reach into global state. If the global state isn't provided, they error out to the error boundary, but parent components can still be rendered. 
+
+This allows us to render those parent components without having to understand what is happening in each of the children. 
+
+#### The cons 
+
+The problem is whenever we _do_ need to include a properly working deeply nested component, then our difficulties with testing are right back with us. 
+
+For example, say that deeply nested component is a user selector, and the component we are testing is a form that requires us to select a user. 
+
+This approach also won't solve issues relating to test environment reliability. 
+
+## Conclusions 
+
+I am confident in my belief that pure/presentational components are the easiest to test, and so when you are tempted to be reaching into global state, do take a minute to think again. 
+
+Using this approach of pure components can have us in a situation where we have comprehensive tests of the pure components, and then we resort to a tool like browser-based E2E tests to test that the whole application is glued together correctly. 
+
+Issues around test environment reliability or creating suites of test data are a kind of problem that's easier to solve by getting it right from start - i.e. if you're creating a start up, making sure your test environment is performant and reliable should be a priority. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
