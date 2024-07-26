@@ -4,7 +4,7 @@ import remarkFrontmatter from "remark-frontmatter";
 import rehypeHighlight from "rehype-highlight";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { frontMatterSchema } from "./frontmatterTypings";
-import { matter } from "vfile-matter"
+import rehypeSlug from "rehype-slug";
 
 
 
@@ -46,7 +46,7 @@ export async function compileMDXFiles(inputPath: string, outputPath: string, wri
 
             const compiledJS = await compile(mdxContent, {
                 remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-                rehypePlugins: [[rehypeHighlight, {detect: true}]]
+                rehypePlugins: [[rehypeHighlight, {detect: true}], rehypeSlug]
             });
 
             await writeFileFn(outputFilePath, String(compiledJS));
