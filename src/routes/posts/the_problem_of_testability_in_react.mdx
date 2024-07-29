@@ -13,12 +13,12 @@ This post is intended to serve as a summary of the various approaches and their 
 
 ## The two easy approaches 
 
-As far as I see it, there are two 'easy' approaches as it testing React applications 
+As far as I see it, there are two 'easy' approaches as it testing React applications: 
 
 
 ### 1. Write pure/presentational components 
 
-In this approach, as much as possible we write components that don't ever rely on context<sup>*</sup> or reach into global state, they're a function props only. 
+In this approach, as much as possible we write components that don't ever rely on context<sup>*</sup> or reach into global state, they're a function of props only. 
 
 eg. 
 
@@ -69,9 +69,9 @@ We can make it a non-breaking change by making `role` an additional optional pro
 
 It should be said - in some contexts this might be a valid strategy - that we shouldn't change how the `UserCard` displays without allowing the consumers to opt in. 
 
-On the other hand it might far more practical to make this update without requiring all the of the consumers to make changes in order to recieve the new functionality. 
+On the other hand it might be far more practical to make this update without requiring all the of the consumers to make changes in order to recieve the new functionality. 
 
-In the case, what we really want to do is something like this: 
+In this case, what we really want to do is something like this: 
 
 ```tsx
 type UserCardProps = {
@@ -90,7 +90,7 @@ export function UserCard(props: UserCardProps) {
 }
 ```
 
-But of course now the problem is there are implicit dependencies in using this component - any consumer of this component, or a consumer of a component that has this as a child, has a hidden dependency on this data retrieval. In my opinion,  this kind of strategy moves testing into the harder basket. 
+But of course now the problem is that there are implicit dependencies in using this component - any consumer of this component, or a consumer of a component that has this as a child, has a hidden dependency on this data retrieval. In my opinion,  this kind of strategy moves testing into the harder basket. 
 
 
 **What about routing context?** 
@@ -230,6 +230,8 @@ Say `"scenario-1"` is a 'blue sky' scenario, and we're extending our `UserCard` 
 
 Before long, we're up to `"scenario-z"` and nobody knows what all these scenarios do, but we can't modify them for fear of breaking someone's tests. 
 
+Possibly there's a solution here, were we create our test data in an extensible manner. ie. we never change data that exists, we can always add more data. Our tests are written in a manner that also respects this, for example we don't assert "there are three users in the list", we assert ("there are at least three users in the list").  
+
 </Aside>
 
 
@@ -253,7 +255,7 @@ This allows us to render those parent components without having to understand wh
 
 The problem is whenever we _do_ need to include a properly working deeply nested component, then our difficulties with testing are right back with us. 
 
-For example, say that deeply nested component is a user selector, and the component we are testing is a form that requires us to select a user. 
+For example, say that deeply nested component is a user selector, and the component we are testing is a form that requires us to select a user. We now need a way to have the user selector have some data so we can proceed with filling the form. 
 
 This approach also won't solve issues relating to test environment reliability. 
 
