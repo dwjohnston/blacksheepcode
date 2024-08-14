@@ -6,6 +6,8 @@ meta:
 ---
 
 import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc} from "react-github-permalink/rsc";
+
 import {Aside} from "@/components/Aside/Aside";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
 
@@ -202,7 +204,7 @@ The plain rendering of my page then just uses dynamic import to retrieve the jav
 <p className="clear-right"></p>
 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L13-L25"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L13-L25"/>
 
 The metadata rendering is done in a similar fashion, I export a [NextJS generateMetatdata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata) function. This function is what causes our meta tags etc to put in the HTML head. The generateMetadata function asynchronously fetches the metadata based on the slug. 
 
