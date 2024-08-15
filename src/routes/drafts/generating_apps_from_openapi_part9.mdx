@@ -5,7 +5,7 @@ meta:
   dateCreated: 2024-02-13
 ---
 
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 In the [previous post](./generating_apps_from_openapi_part8) we dockerised our application. 
 
@@ -49,13 +49,13 @@ Note also, I've removed the S3 bucket, and Postgres database.
 
 The final product looks like this: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L1-L574"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L1-L574"/>
 
 I'm not going to go through each part, this'll perhaps be a post for another time, but I'll point out some things. 
 
 ## Building the Docker image
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L107-L138"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/infra/main2.ts#L107-L138"/>
 
 This is the logic that determines a unique tag for our docker image, based on the contents of what is going into the Docker image. 
 

@@ -5,7 +5,7 @@ meta:
   dateCreated: 2024-02-13
 ---
 
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 # Dockerising our application
 
@@ -15,13 +15,13 @@ Let's look at how we do that:
 
 ### 1. Create a Dockerfile
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L28"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L28"/>
 
 Let's walk through some individual parts of this: 
 
 #### Build frontend 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L7"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L1-L7"/>
 
 Here, we use a use a docker container to build our frontend resources.
 
@@ -35,13 +35,13 @@ The reason for this is [Docker layer caching](https://docs.docker.com/build/cach
 
 #### Build backend 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L9-L15"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L9-L15"/>
 
 The backend build is much the same. We use the same technique of allowing docker the cache the dependencies layer before copying and compiling from the source files. 
 
 #### Build the Docker image 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L20-L28"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/Dockerfile#L20-L28"/>
 
 Here we: 
 
@@ -62,7 +62,7 @@ We use supervisord as [suggested in Docker's documentation](https://docs.docker.
 
 Our supervisord.conf looks like this: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/supervisord.conf#L1-L18"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/supervisord.conf#L1-L18"/>
 
 There's not much to it. We do need to add those lines `stdout_logfile` lines to tell supervisord to redirect the process logs to the containers std out. 
 
@@ -70,11 +70,11 @@ There's not much to it. We do need to add those lines `stdout_logfile` lines to 
 
 Our nginx config is a pretty standard one 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L1-L48"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L1-L48"/>
 
 The important part is here: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L33-L41"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/bf2bae791464a7ce0506d3b91102212ed0beeb3d/nginx.conf#L33-L41"/>
 
  where we redirect anything starting with `/api` to the go application, and everything else to the static resources directory. 
 

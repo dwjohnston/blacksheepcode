@@ -10,7 +10,7 @@ series:
     part: 4
 ---
 
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 import {Aside} from "@/components/Aside/Aside"
 import {ImagePanel} from "@/components/ImagePanel/ImagePanel";
 import {SheepImage} from "@/components/SheepImage/SheepImage";
@@ -42,7 +42,7 @@ The server-side-rendered first render isn't aware of what the users preferred co
 
 The solution is to do the conditional check on the client side. We display nothing on first render (the server render) and the second render when we know what the user preference is, we display the image. 
 
-<GithubPermalink className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
+<GithubPermalinkRsc className="clear-right" permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/SheepImage/SheepImage.tsx#L8-L23"/>
 
 This introduces a slight problem of having an image pop of the image suddenly appearing. To mitigate this I use a CSS animation to make it fade in over 100ms. 
 
@@ -58,13 +58,13 @@ Using the user preference via react-responsive to determine the theme would have
 
 Fortunately there's a very handy way to conditionally apply CSS. Per [this very handy issue thread](https://github.com/highlightjs/highlight.js/issues/3652) - I import both themes, conditionally choose the one matching the user's preference with a `media="(prefers-color-scheme: dark)"` attribute on the link tag. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/root.tsx#L57-L60"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/root.tsx#L57-L60"/>
 
 ## Other miscellaneous updates 
 
 I needed to update my utterances config
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/PostComments/PostComments.tsx#L27-L28"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/72ee472bfa896df255ae42ef017ad0cca96b2333/app/components/PostComments/PostComments.tsx#L27-L28"/>
 
 I also [made updates](https://github.com/dwjohnston/react-github-permalink/pull/16) to [react-github-permalink](https://www.npmjs.com/package/react-github-permalink) to have it include a user preference responsive theme. 
 

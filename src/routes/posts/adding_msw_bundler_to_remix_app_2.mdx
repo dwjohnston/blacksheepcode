@@ -9,7 +9,7 @@ series:
     part: 3
 ---
    
-import {WrappedGithubPermalink} from "@/components/WrappedGithubPermalink/WrappedGithubPermalink"; 
+import {GithubPermalinkRsc} from "react-github-permalink/dist/rsc"; 
 
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
 import {Aside} from "@/components/Aside/Aside";
@@ -83,7 +83,7 @@ That said, this is going pretty smoothly, for what it's worth.
 
 For example, here is the frontmatter for this post: 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx#L1-L11"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/app/routes/posts/adding_msw_bundler_to_remix_app_2.mdx#L1-L11"/>
 
 Note that this frontmatter is entirely custom, we're going to need to write handlers for it later. 
 
@@ -113,14 +113,14 @@ This allows me to write draft posts and see how they look, but selectively only 
 
 Here I'm using Zod to create a validation schema: 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/frontmatterTypings.ts#L1-L33"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/frontmatterTypings.ts#L1-L33"/>
 
 What I've done is I've said that title, description and date created are always going to exist. I can continue extending this schema in the future, and adding optional properties. 
 
 
 ## A build time tool to generate JSON and barrel files from our frontmatter 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.ts#L1-L109"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.ts#L1-L109"/>
 
 <Aside>
   <p>As an aside, this code was largely generated with assistance of ChatGPT, and then I tweaked it as I want.</p>
@@ -138,17 +138,17 @@ Essentially the process here is:
 
 I have a separate file that runs this code: 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.bin.ts#L1-L16"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.bin.ts#L1-L16"/>
 
 And we have a script in our package.json to calls this: 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/package.json#L12-L13"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/package.json#L12-L13"/>
 
 ## Example Layout Route
 
 Here's what my posts.tsx layout route is looking like: 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/routes/posts.tsx#L1-L29"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/routes/posts.tsx#L1-L29"/>
 
 This is what gives a consistent look feel across all the posts. 
 
@@ -162,7 +162,7 @@ The key things we need to implement are:
 
 This function creates our Remix [loader](https://remix.run/docs/en/1.19.3/route/loader) function.
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/utils/blogPosts.tsx#L1-L84"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/73fc879238d86bcd78538344632ad5e4ee2c0d00/app/utils/blogPosts.tsx#L1-L84"/>
 
 The logic here is a little hardcoded - it won't work for deeper levels of nesting, but essentially we use the location URL to determine the folder and filename to retrieve the metadata json from the correct barrel file. 
 
@@ -172,7 +172,7 @@ Note for the series metadata, I also collate all of the metadata for that series
 
 This function creates our Remix [meta](https://remix.run/docs/en/1.19.3/route/meta) function.
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/utils/blogPosts.tsx#L87-L115"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/utils/blogPosts.tsx#L87-L115"/>
 
 Importantly, it does things like transforming the title and description into the correct format twitter meta tags. 
 
@@ -180,13 +180,13 @@ Importantly, it does things like transforming the title and description into the
 
 This is component is responsible for transforming any of metadata into whatever content we want for that post, series contents, 'next post in series', etc. 
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/components/FrontmatterBox/FrontmatterBox.tsx#L1-L96"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/components/FrontmatterBox/FrontmatterBox.tsx#L1-L96"/>
 
 ## Creating a table of contents
 
 We can create a table of contents on our home page using the `getAllPostFrontmatter` function.
 
-<WrappedGithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/routes/index.tsx#L27-L29"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/e3162ffa0b512a0079a41937b6dcaf85b971fd91/app/routes/index.tsx#L27-L29"/>
 
 ## Conclusions and my experience 
 

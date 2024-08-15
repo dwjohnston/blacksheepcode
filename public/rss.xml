@@ -179,6 +179,13 @@
     <pubDate>Fri, 11 Aug 2023 00:00:00 GMT</pubDate>
   </item>
   <item>
+    <title>The problem of testability in React</title>
+    <description>It seems like there are no perfect solutions for testing in React</description>
+    <link>https://blacksheepcode.com/posts/the_problem_of_testability_in_react</link>
+    <guid>https://blacksheepcode.com/posts/the_problem_of_testability_in_react</guid>
+    <pubDate>Thu, 25 Jul 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
     <title>This blog now features comments</title>
     <description>You can very easily add comment functionality to a webpage via the Github-powered Utterances plugin</description>
     <link>https://blacksheepcode.com/posts/this_blog_now_features_comments</link>
