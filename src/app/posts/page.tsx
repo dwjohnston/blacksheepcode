@@ -11,9 +11,6 @@ export default async function PageLayout() {
 
     const articles = await getAllArticles();
     return <div>
-
-        Test Posts
-
         <ListOfArticles allFrontmatter={articles} />
     </div>
 }
