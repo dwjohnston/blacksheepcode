@@ -137,6 +137,13 @@
     <pubDate>Tue, 12 Mar 2024 00:00:00 GMT</pubDate>
   </item>
   <item>
+    <title>How to configure NextJS to proxy its requests</title>
+    <description>We may wish to proxy the requests NextJS makes, for example through a tool like mitmproxy in order to analyse traffic or generate test data</description>
+    <link>https://blacksheepcode.com/posts/how_to_proxy_nextjs</link>
+    <guid>https://blacksheepcode.com/posts/how_to_proxy_nextjs</guid>
+    <pubDate>Mon, 19 Aug 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
     <title>I'm playing with Remix</title>
     <description>Using Remix to generate a static blog.</description>
     <link>https://blacksheepcode.com/posts/i_am_playing_with_remix</link>

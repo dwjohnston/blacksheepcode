@@ -27,7 +27,7 @@ export default async function PageLayout(props: PropsWithChildren<{
 
     const content = await getBlogContent( props.params.slug,"posts");
     return <BlogPostFrame pathname={`/posts/${props.params.slug}`}>
-        {content};
+        {content}
     </BlogPostFrame>
 
 }
