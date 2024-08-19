@@ -5,7 +5,8 @@ meta:
   dateCreated: 2023-07-12
 ---
 
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+
 import {Aside} from "@/components/Aside/Aside";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
 
@@ -202,11 +203,11 @@ The plain rendering of my page then just uses dynamic import to retrieve the jav
 <p className="clear-right"></p>
 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L13-L25"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L13-L25"/>
 
 The metadata rendering is done in a similar fashion, I export a [NextJS generateMetatdata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata) function. This function is what causes our meta tags etc to put in the HTML head. The generateMetadata function asynchronously fetches the metadata based on the slug. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L6-L12"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L6-L12"/>
 
 #### 1.2 Change import aliases 
 
@@ -268,7 +269,7 @@ One little gnarl I ran into is this error:
 
 According to [this Stack Overflow answer](https://stackoverflow.com/a/75955626/1068446) not only do we need to add the "use client" directive to the components, but if doing an `export * from` we also need to add the directive to that. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/react-github-permalink/blob/09f6f7dfbcfab104691d199dd7bb8266d3f75919/src/export.ts#L1-L4"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-github-permalink/blob/09f6f7dfbcfab104691d199dd7bb8266d3f75919/src/export.ts#L1-L4"/>
 
 
 #### 1.6 Add the CSS in 
@@ -288,11 +289,11 @@ Here I take the logic from my Remix `root.tsx` and put it in `src/app/layout.tsx
 
 The Remix style `LinksFunction` objects 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/src/root.tsx#L55-L73"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/src/root.tsx#L55-L73"/>
 
 are converted to plain HTML rendering: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/layout.tsx#L25-L35"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/layout.tsx#L25-L35"/>
 
 #### 1.8 Generate sitemap.xml, rss.xml 
 
@@ -379,7 +380,7 @@ Turns out this is pretty simple.
 
 I remove my server.ts and make the netlify.toml be: 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/netlify.toml#L1-L7"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/netlify.toml#L1-L7"/>
 
 I use Netlify's branch previews to verify that it's working. 
 
@@ -398,7 +399,7 @@ Difficulty: Easy.
 
 One expected error is my tests that look like:
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L99-L105"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L99-L105"/>
 
 That file path can obviously be expected to differ in the way the Remix and Next render it - so I go through and change those. Straight forward. 
 
@@ -406,7 +407,7 @@ That file path can obviously be expected to differ in the way the Remix and Next
 
 Difficulty: Difficult. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L54-L69"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L54-L69"/>
 
 This test is failing on line 65 - the link is clicked but the page doesn't redirect and the subsequent content isn't found. 
 
@@ -424,7 +425,7 @@ This is a thoroughly unsatisfying resolution though.
 
 Difficulty: Difficult. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L46-L52"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L46-L52"/>
 
 In this test the Github Permalinks fail to render. 
 
@@ -440,7 +441,7 @@ Note minified React errors only seem to occur when visiting the application via 
 
 **Actual Solution:** See solution is 5.3. 
 
-<GithubIssueLink issueLink ="https://github.com/cypress-io/cypress/issues/27204"/>
+<GithubIssueLinkRsc issueLink ="https://github.com/cypress-io/cypress/issues/27204"/>
 
 But does concern me is that in NextJS these errors cause functional problems - in Remix the functionality of the application would continue to work. 
 
@@ -448,7 +449,7 @@ But does concern me is that in NextJS these errors cause functional problems - i
 
 Difficulty: Difficult. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/76d9dcedff02f5968ac11656e3c0bbd9a5b75c56/cypress/e2e/smoketests.cy.ts#L98-L102"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/76d9dcedff02f5968ac11656e3c0bbd9a5b75c56/cypress/e2e/smoketests.cy.ts#L98-L102"/>
 
 In this test the Utterances comment section iframe fails to appear. 
 
@@ -458,7 +459,7 @@ This test fails sporadically. We are seeing a lot of minified React errors, and 
 
 I wrapped one around my PostComments component all of the a sudden the three issues mentioned here are resolved. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/ebc330a751e835d378e96fa31a1fa50034774f6c/src/components/BlogPostFrame/BlogPostFrame.tsx#L13-L15"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ebc330a751e835d378e96fa31a1fa50034774f6c/src/components/BlogPostFrame/BlogPostFrame.tsx#L13-L15"/>
 
 #### End of phase 5 
 
@@ -469,7 +470,7 @@ My debugging of Cypress tests consisted of repeatedly running the test to see if
 Ultimately I found three sources of errors: 
 
 - The PostComments component - wrapping it in a Suspense appears to have fixed it 
-- The GithubPermalink - wrapping it in Suspense boundary appears to have fixed it
+- The GithubPermalinkRsc - wrapping it in Suspense boundary appears to have fixed it
 - The SeriesBox - removing the NextJS Links appears to fix it, but I can't do that. 
 
 I have not yet been able to create a reliable reproduction of this, so maybe I'm off on a wild goose chase here. 

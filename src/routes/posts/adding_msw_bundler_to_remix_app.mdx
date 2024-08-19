@@ -9,7 +9,7 @@ series:
     part: 2
 ---
    
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
 
 # How to configure Remix and mdx-bundler
@@ -30,7 +30,7 @@ Conveniently, [YAML frontmatter](https://docs.github.com/en/contributing/writing
 
 Some configuration is required - we declare Remark and Rehype plugins in the `remix.config.js`. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/blacksheepcode/blob/69005aa52d9b80ba81904fc6012d5afcc1889bc6/remix.config.js#L13-L23"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/69005aa52d9b80ba81904fc6012d5afcc1889bc6/remix.config.js#L13-L23"/>
 
 ## The Problem
 
@@ -48,7 +48,7 @@ Additional functionality might include including an author tag and creation date
 
 <InfoPanel level="warning">
 This solution is works for mdx-bundler@9.2.1. See the following issue:
-<GithubIssueLink issueLink="https://github.com/kentcdodds/mdx-bundler/issues/217"/>
+<GithubIssueLinkRsc issueLink="https://github.com/kentcdodds/mdx-bundler/issues/217"/>
 </InfoPanel>
 
 <InfoPanel level='info'>
@@ -68,15 +68,15 @@ You are no longer going to use Remix's out-of-the-box file routing for the blog 
 
 ### Update your TSConfig if you haven't already 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/tsconfig.json#L10-L11"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/tsconfig.json#L10-L11"/>
 
 The `module` property will allow us to do dynamic imports later. 
 
 ### Declare .server.ts utility files 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/utils/fs.server.ts#L1-L2"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/utils/fs.server.ts#L1-L2"/>
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/utils/mdx.server.ts#L1-L2"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/utils/mdx.server.ts#L1-L2"/>
 
 The [`.server.ts` file convention](https://remix.run/docs/en/main/file-conventions/-server) causes Remix to not include this code in client bundles - which is important as these use node packages. 
 
@@ -84,39 +84,39 @@ The [`.server.ts` file convention](https://remix.run/docs/en/main/file-conventio
 
 Here we load our MDX files at run time and use MDX Bundler to parse them as components and as frontmatter. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/8c0ae8957e28e742bd22619476f18b8efcf32c9f/app/utils/blogPost.server.ts#L1-L101"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/8c0ae8957e28e742bd22619476f18b8efcf32c9f/app/utils/blogPost.server.ts#L1-L101"/>
 
 ### Create a slug handler
 
 We now handle any requests for our blog posts with `$.tsx` handler. We just pass the entire slug to our utility function, and ask it to return the component and frontmatter. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L19-L32"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L19-L32"/>
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/8c0ae8957e28e742bd22619476f18b8efcf32c9f/app/routes/$.tsx#L63-L75"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/8c0ae8957e28e742bd22619476f18b8efcf32c9f/app/routes/$.tsx#L63-L75"/>
 
 ### Update any relative imports 
 
 Any relative imports may no longer work, as the imports will be relative to the application root, rather than the file doing the importing. So update them accordingly. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/blog-posts/test/images.mdx#L1-L2"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/blog-posts/test/images.mdx#L1-L2"/>
 
 ### Update a pages metadata based on frontmatter
 
 Your Remix meta function can use the frontmatter that the loader returned. Use this to update the page meta tags. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L34-L46"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L34-L46"/>
 
 ### Create a post header based on the post frontmatter 
 
 We can use the loaded frontmatter to create whatever other content (such as tags, author, post title) at the top (and/or bottom) of our post.
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L48-L73"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/9afcfde1475bd1d905dc38d9144cff5b78d158a2/app/routes/$.tsx#L48-L73"/>
 
 ### Create home page list of blog posts
 
 Here we get access the frontmatter across all posts to create a table of contents on our home page. 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/routes/index.tsx#L6-L47"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-remix-app/blob/c5f14a0aff915db3c4bae3ec533f16124edc6b87/app/routes/index.tsx#L6-L47"/>
 
 ---
 

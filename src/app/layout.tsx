@@ -4,9 +4,13 @@ import "./globals.css";
 import "react-github-permalink/dist/github-permalink.css";
 import { mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
 import { Suspense } from "react";
+
+import {githubPermalinkRscConfig} from "react-github-permalink/dist/rsc";
 const inter = Inter({ subsets: ["latin"] });
 
-
+githubPermalinkRscConfig.setConfig({
+  githubToken: process.env.GITHUB_TOKEN
+})
 
 export const metadata: Metadata = mergeFrontmatterAndDefaultMetadata({
   title: "Black Sheep Code",

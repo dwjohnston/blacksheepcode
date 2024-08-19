@@ -6,7 +6,7 @@ meta:
 
 ---
 
-import {GithubPermalink, GithubIssueLink} from "react-github-permalink";
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 
 In the [previous post](./generating_apps_from_openapi_part9) we got our application deployed to AWS using CDKTF. 
@@ -19,7 +19,7 @@ First, make sure you have a k6 account, and the k6 CLI installed via the [instru
 
 ## Our first test 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_100.js#L1-L25"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_100.js#L1-L25"/>
 
 We run our test with 
 
@@ -61,7 +61,7 @@ So 95% of of requests take 112.63ms or less. That seems reasonable.
 Let's ramp up the number of simultaneous requests, this time we'll try 1000vus
 
 
-<GithubPermalink permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_1000.js#L1-L29"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/open-api-go-and-typescript/blob/f57cf5d8a579654c22ba0ebd7dd0c79b6a119ac6/load-tests/k6-20sec_at_1000.js#L1-L29"/>
 
 
 Output: 

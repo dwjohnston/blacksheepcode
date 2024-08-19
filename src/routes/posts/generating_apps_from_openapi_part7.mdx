@@ -8,7 +8,7 @@ series:
   name: generating_apps_from_open_ai
   part: 8
 ---
-import { GithubIssueLink} from "react-github-permalink";
+import { GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 
 # Black box contract testing - third party API mocking 
@@ -84,7 +84,7 @@ Our HAR file is [here](https://github.com/dwjohnston/open-api-go-and-typescript/
 
 The above HAR file doesn't work with Mockbin. It runs into some kind of decompression issue, see the following issue:  
 
-<GithubIssueLink issueLink="https://github.com/Kong/mockbin/issues/128"/>
+<GithubIssueLinkRsc issueLink="https://github.com/Kong/mockbin/issues/128"/>
 
 
 To resolve it, I manually munged the HAR file until it works - we remove the headers and set `headerSize` to 0. [The file I use is here](https://github.com/dwjohnston/open-api-go-and-typescript/blob/23c48792194e0de95cabd87d10956822d4603c87/api-test-runner-jest/harfiles/jsonplaceholder.har.json#L1-L15), this is actually just the response part we need, it's not a complete HAR file. 
