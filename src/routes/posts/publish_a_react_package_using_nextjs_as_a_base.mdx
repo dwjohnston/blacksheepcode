@@ -1,0 +1,127 @@
+---
+meta:
+  title: How to publish a React component package, using NextJS as the compiler
+  description: Although your component library may not be making use of React Server Components and the like, it can be helpful to see how the component behaves in a NextJS context
+  dateCreated: 2024-08-23
+---
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+
+# How to publish a React component package, using NextJS as the compiler
+
+This is a short guide on publishing a React component library package to NPM, using NextJS as the compiler. 
+
+## Motivation 
+
+Your component may be a straight client component with client hooks, and as such doesn't fall in to the [React Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components) behaviour. 
+
+However, there are two reasons we might still want to use NextJS as our base: 
+
+1. Server side rendering will still occur for your component, essentially the first render of the component will be rendered server side. 
+2. In the future you might want to include RSCs in your component library, and so it's easier to make it work now. 
+
+## Example code
+
+All code for this tutorial can be found in [this repo](https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling).
+
+## Step 1: Scaffold your project using `create-next-app`
+
+Run `npx create-next-app` and follow the prompts
+
+## Step 2: Create a `src/library` folder and create your components 
+
+This is where you will create your component(s) for publishing. 
+
+Everything else will still be a regular NextJS project. You can use this as a sandbox for development, it won't be packaged for export. 
+
+## Step 3: Create a `src/exports.ts` to export your files 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/src/exports.ts#L1"/>
+
+## Step 4: Add a `tsconfig.build.json`
+
+You now have two tsconfigs, one for the regular NextJS application, and one specifically for building the package for publishing. 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/tsconfig.build.json#L1-L29"/>
+
+## Step 5: Add build and publish scripts
+
+At this step I also like to prefix the existing `start`, `build` scripts with `next:` - because we need to distinguish between 'build the NextJS application' and 'build the package'.  
+
+Also, add the `main` and `files` properties to your package.json 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/package.json#L1-L15"/>
+
+## Step 6: Mark React a dev + peer dependency, Next a dev dependency 
+
+The only items in your dependencies object should be things that are required for your package to run in the context it's installed. 
+
+By marking them as dev dependencies they're available to you while developing the package but won't be needlessly installed by the application that uses it. 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/package.json#L16-L30"/>
+
+## Step 7: Preview your package behaviour in another application using npm link 
+
+At this point it will be helpful to check if your package is building and configured correctly, and that another project is able to use it. 
+
+We can use [`npm link`](https://docs.npmjs.com/cli/v10/commands/npm-link) to emulate using the package, without really publishing to NPM before we are ready. 
+
+```
+npm run build 
+npm link 
+```
+
+And in the other project
+
+``` 
+npm link an-example-react-package-built-with-nextjs-tooling
+```
+
+You should now be able to use the package as if it were any other package. 
+
+## Step 8: Client components 
+
+If you have a client component like: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/ede0876fd4406d5be8fdcb602dc9e3b755e6d59d/src/library/MyClientComponent.tsx#L1-L11"/>
+
+With an exports file like: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/ede0876fd4406d5be8fdcb602dc9e3b755e6d59d/src/exports.ts#L1-L2"/>
+
+Then at this point you may be seeing this error: 
+
+```
+Error: Unsupported Server Component type: undefined
+```
+
+This appears to be a pitfall with RSCs and NextJS [see this Stack Overflow question](https://stackoverflow.com/questions/75261466/unsupported-server-component-type-undefined-next-js-13).
+
+The resolution is to export either your RSCs or your client components separately, like: 
+
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/9d67e42e38b1018a51d2d0b2d9cc3f26a3016e8f/src/export-client.ts#L1-L2"/>
+
+and be sure to add this new exports file to your `tsconfig.build.json` 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/9d67e42e38b1018a51d2d0b2d9cc3f26a3016e8f/tsconfig.build.json#L24-L27"/>
+
+and then have users import the component like: 
+
+```js
+import {MyComponent } from "an-example-react-package-built-with-nextjs-tooling";
+import {MyClientComponent} from "an-example-react-package-built-with-nextjs-tooling/dist/export-client";
+```
+
+## Step 9: npm publish
+
+Run npm publish and see your published package!
+
+This package is published [here](https://www.npmjs.com/package/an-example-react-package-built-with-nextjs-tooling).
+
+
+## Addendum: Add other tooling you want to use
+
+At this point you could add tools like [Storybook for NextJS](https://storybook.js.org/docs/get-started/frameworks/nextjs), or set up your unit tests etc.
+
+
+

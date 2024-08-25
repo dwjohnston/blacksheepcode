@@ -158,6 +158,7 @@ export async function getMetadata(slug: string): Promise<Metadata> {
     }
 }
 
+
 //@ts-expect-error
 export async function getBlogContent(slug: string, folder: BlogPostFolders = "posts") : Promise<React.ReactNode> {
     try {
