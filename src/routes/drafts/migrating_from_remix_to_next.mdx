@@ -178,10 +178,8 @@ src/
 ```
 
 <Aside>
-<p>
 The whole process of separately generating frontmatter JSONs may look unnecessary - the  [remark-mdx-frontmatter](https://github.com/remcohaszing/remark-mdx-frontmatter) package can export the frontmatter as part of the same compiled MDX file. 
-</p>
-<p>
+
 However, my existing tooling also included: 
 
 <ul>
@@ -192,7 +190,6 @@ Validating the metadata is of a consistent format. I want a build time error if 
 Additional munging relating to post series - when it's a post series I need to also collect a reference too all other posts in the series, and my existing tooling was already doing this for me. 
 </li>
 </ul>
-</p>
 </Aside>
 
 The generation of the frontmatter json files is something I did in my Remix solution, [you can read about this here](./adding_msw_bundler_to_remix_app_2). 
@@ -225,9 +222,7 @@ I copy paste over my `app/components` folder, which has various miscellaneous co
 
 
 <Aside>
-<p>
 The linter gives me a warning about maybe I should use NextJS `<Image/>` tags - but in the philosophy of 'try not to change everything' that can be a job for another day. 
-</p>
 </Aside>
 
 The main things to be done where: 
