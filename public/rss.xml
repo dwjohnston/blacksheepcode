@@ -151,6 +151,13 @@
     <pubDate>Mon, 28 Nov 2022 00:00:00 GMT</pubDate>
   </item>
   <item>
+    <title>How to publish a React component package, using NextJS as the compiler</title>
+    <description>Although your component library may not be making use of React Server Components and the like, it can be helpful to see how the component behaves in a NextJS context</description>
+    <link>https://blacksheepcode.com/posts/publish_a_react_package_using_nextjs_as_a_base</link>
+    <guid>https://blacksheepcode.com/posts/publish_a_react_package_using_nextjs_as_a_base</guid>
+    <pubDate>Fri, 23 Aug 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
     <title>Testing Easy Markdown Editor</title>
     <description>Easy Markdown Editor is a handy markdown editor with formatting keyboard shortcuts. This post outlines how to write tests for applications using it, using either Testing Library or Cypress.</description>
     <link>https://blacksheepcode.com/posts/testing_easy_mde</link>

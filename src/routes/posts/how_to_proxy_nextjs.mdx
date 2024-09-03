@@ -52,7 +52,7 @@ In this scenario the request is made on the server as a RSC. We need a way to in
 
 This is the same scenario but we're using node-fetch instead of native fetch. 
 
-## Solution - native fetch and rewrites 
+## Solution - native fetch
 
 To enable proxying native fetch requests, as well as the rewrites, add this to you `next.config.js`
 
@@ -68,6 +68,23 @@ For node fetch we use this code
 
 You may wish to export a fetch wrapper so you're not repeating the agent logic everywhere you you want to fetch data. 
 
+## Solution - rewrites
+
+I don't know. I am not currently aware of a mechanism to proxy the rewrites directly. 
+
+I have a [discussion here](https://github.com/vercel/next.js/discussions/69558) requesting this functionality. 
+
+Perhaps the way to go is to run a seperate process that acts as a simple proxy server in place of our API service, and because we have control of it, we proxy its traffic via mitmproxy. 
+
+Even more simply, mitmproxy probably has a mechanism for making direct requests to it and forwarding them to the right place.
+
+## SSL/TSL Certificates 
+
+Your secure requests will remain using the secure protocol, and as such your application needs to trust your proxies certificates. 
+
+Using the `NODE_EXTRA_CA_CERTS` env var will work will work for both `fetch()` and `node-fetch`. 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/85edce69f5dc0537dff05e9b54b308525196faa6/package.json#L7-L8"/>
 
 
 
