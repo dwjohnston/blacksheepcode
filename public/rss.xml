@@ -39,6 +39,13 @@
     <pubDate>Thu, 05 May 2022 00:00:00 GMT</pubDate>
   </item>
   <item>
+    <title>An overview of configuring proxy behaviour in applications</title>
+    <description>You may wish to proxy node requests via service like mitmproxy for the purpose of analysing the requests its making or generating test data. Here's a quick reference sheet for setting this behaviour up.</description>
+    <link>https://blacksheepcode.com/posts/an_overview_of_configuring_proxy_behaviour_for_node_apps</link>
+    <guid>https://blacksheepcode.com/posts/an_overview_of_configuring_proxy_behaviour_for_node_apps</guid>
+    <pubDate>Thu, 05 Sep 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
     <title>Run a Docker image on AWS ECS + Postgres using Terraform CDK</title>
     <description>CDKTF is a tool that allows us to use fully fledged programming languages to do Terraform deployments, having the advantage of being type safe for one.</description>
     <link>https://blacksheepcode.com/posts/cdktf_postgres_and_ecs</link>

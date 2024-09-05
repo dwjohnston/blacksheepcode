@@ -1,0 +1,132 @@
+---
+meta:
+  title: An overview of configuring proxy behaviour in applications
+  description: You may wish to proxy node requests via service like mitmproxy for the purpose of analysing the requests its making or generating test data. Here's a quick reference sheet for setting this behaviour up.
+  dateCreated: 2024-09-05
+
+---
+
+How you set proxying behaviour up depends on whether you are using `fetch()`, `node-fetch` or something else. 
+
+## Approach 1 - Agnostic secondary proxy 
+
+This is I've found the simplest approach, and it has the advantage of not caring what http client you are using. 
+
+Simply run a service that looks like this: 
+
+```js
+//proxy.js
+
+var http = require('http');
+var httpProxy = require('http-proxy');
+
+const {HttpsProxyAgent} = require('https-proxy-agent');
+
+const agent = new HttpsProxyAgent("https://127.0.0.1:8080")   // The address of your target proxy
+
+var proxy = httpProxy.createProxyServer({"agent": agent});
+
+http.createServer(function(req, res) {
+    proxy.web(
+        req,
+        res,
+        {
+            changeOrigin: true,
+            target: 'http://jsonplaceholder.typicode.com'} // The address of upstream
+    ); 
+}).listen(3001);
+```
+
+
+And in your application where you were doing: 
+
+```js
+
+fetch('http://jsonplaceholder.typicode.com/posts'); 
+
+//or 
+
+nodeFetch('http://jsonplaceholder.typicode.com/posts'); 
+
+//or
+
+axios('http://jsonplaceholder.typicode.com/posts'); 
+
+```
+
+replace with: 
+
+```js
+fetch(`${process.env.UPSTREAM_URL}/posts`); 
+
+//or 
+
+nodeFetch(`${process.env.UPSTREAM_URL}posts`); 
+
+//or
+
+axios(`${process.env.UPSTREAM_URL}/posts`); 
+```
+
+
+
+## Approach 2 - Proxying native fetch with undici ProxyAgent
+
+Add this to the entrypoint of your application:
+
+```js
+import { setGlobalDispatcher, ProxyAgent } from "undici";
+const dispatcher = new ProxyAgent({uri: new URL("https://127.0.0.1:8080").toString() });
+setGlobalDispatcher(dispatcher);
+```
+
+Done. 
+
+
+## Approach 3 - Proxying node-fetch with https-proxy-agent
+
+Modify your requests to include the proxy agent:
+
+```js
+import {HttpsProxyAgent} from 'https-proxy-agent';
+
+import nodeFetch from"node-fetch";
+
+const agent = new HttpsProxyAgent("https://127.0.0.1:8080")
+
+async function getData() {
+    const result = await nodeFetch("https://jsonplaceholder.typicode.com/posts/6", {
+        agent: agent
+    })
+    return result.json();
+}
+```
+
+This has the disadvantage that you need to set the proxy agent on every request, so you may wish to expose your own wrapper fetch instead: 
+
+```typescript 
+import nodeFetch from"node-fetch";
+
+const agent = new HttpsProxyAgent("https://127.0.0.1:8080")
+
+export const myNodeFetch: typeof nodeFetch = (url, options) => {
+
+    if(options?.agent){
+        console.warn("options.agent was provided to myNodeFetch, this will be clobbered!")
+    }
+
+    const newOptions = {
+        ...(options ?? {}),
+        agent
+    };
+
+    return nodeFetch(url, newOptions)
+}
+```
+
+## SSL/TSL Certificates for approaches #2 and #3 
+
+Your secure requests will remain using the secure protocol, and as such your application needs to trust your proxies certificates. 
+
+Using the `NODE_EXTRA_CA_CERTS` env var will work will work for both `fetch()` and `node-fetch`. 
+
