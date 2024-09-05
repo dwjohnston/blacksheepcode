@@ -39,6 +39,13 @@
     <pubDate>Thu, 05 May 2022 00:00:00 GMT</pubDate>
   </item>
   <item>
+    <title>An overview of configuring proxy behaviour in applications</title>
+    <description>You may wish to proxy node requests via service like mitmproxy for the purpose of analysing the requests its making or generating test data. Here's a quick reference sheet for setting this behaviour up.</description>
+    <link>https://blacksheepcode.com/posts/an_overview_of_configuring_proxy_behaviour_for_node_apps</link>
+    <guid>https://blacksheepcode.com/posts/an_overview_of_configuring_proxy_behaviour_for_node_apps</guid>
+    <pubDate>Thu, 05 Sep 2024 00:00:00 GMT</pubDate>
+  </item>
+  <item>
     <title>Run a Docker image on AWS ECS + Postgres using Terraform CDK</title>
     <description>CDKTF is a tool that allows us to use fully fledged programming languages to do Terraform deployments, having the advantage of being type safe for one.</description>
     <link>https://blacksheepcode.com/posts/cdktf_postgres_and_ecs</link>
@@ -149,6 +156,13 @@
     <link>https://blacksheepcode.com/posts/i_am_playing_with_remix</link>
     <guid>https://blacksheepcode.com/posts/i_am_playing_with_remix</guid>
     <pubDate>Mon, 28 Nov 2022 00:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <title>How to publish a React component package, using NextJS as the compiler</title>
+    <description>Although your component library may not be making use of React Server Components and the like, it can be helpful to see how the component behaves in a NextJS context</description>
+    <link>https://blacksheepcode.com/posts/publish_a_react_package_using_nextjs_as_a_base</link>
+    <guid>https://blacksheepcode.com/posts/publish_a_react_package_using_nextjs_as_a_base</guid>
+    <pubDate>Fri, 23 Aug 2024 00:00:00 GMT</pubDate>
   </item>
   <item>
     <title>Testing Easy Markdown Editor</title>
