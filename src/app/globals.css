@@ -31,6 +31,10 @@ body {
   --color-warn-secondary: #fffcd3;
 
 
+  --color-foreground-darken: #00000010;
+  --color-background-darken: #00000015;
+
+
   --color-info-primary: #40c4ff;
   --color-info-contrast: black;
   --color-info-secondary: #b3e5fc;
@@ -57,6 +61,11 @@ body {
 
       --color-background-paper: #222;
       --color-background-paper-secondary: #444;
+
+      --color-foreground-darken: #ffffff20;
+      --color-background-darken: #00000030;
+      
+
 
       --color-background-deep: black;
       --color-background-impact: #black;
@@ -150,6 +159,25 @@ body {
 
 .open-source {
   text-align: center;
+}
+
+
+details {
+  padding: 1.5em;
+  padding-bottom: 1em;
+  margin-bottom: 0.25em;
+  background-color: var(--color-background-darken);
+  border: var(--color-foreground-darken) solid 1px;
+  
+
+}
+
+
+
+summary {
+  >* {
+    display: inline;
+  }
 }
 
 

@@ -2,7 +2,7 @@
 meta:
   title: Migrating from Remix to NextJS
   description: NextJS appears to well and truely established. These are the steps I followed to migrate from Remix 1.9.3 to Next 14. 
-  dateCreated: 2023-07-12
+  dateCreated: 2023-09-09
 ---
 
 import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
@@ -56,13 +56,23 @@ Some examples of things that I might consider changing, but am avoiding in the f
 
 ## The Execution 
 
+
+<details>
+<summary>
 ### Phase 1: Create a new application using create-next-app - reproduce the functionality there. 
+</summary>
 
 I scaffold a new application using [create-next-app](https://nextjs.org/docs/pages/api-reference/create-next-app) at [this repository.](https://github.com/dwjohnston/blacksheepcode-next)
 
-#### 1.1 File structure for the blog posts
 
-Difficulty: Not hard once I got my head around it, but there were some false starts. 
+<details>
+<summary>
+<h4>1.1 File structure for the blog posts</h4>
+</summary>
+
+
+
+**Difficulty:** 🟠 - Not hard once I got my head around it, but there were some false starts. 
 
 
 The existing file structure looked like this: 
@@ -206,16 +216,29 @@ The metadata rendering is done in a similar fashion, I export a [NextJS generate
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/posts/[slug]/page.tsx#L6-L12"/>
 
-#### 1.2 Change import aliases 
+</details>
 
-Difficulty: Easy. 
+
+<details>
+<summary>
+#### 1.2 Change import aliases 
+</summary>
+
+
+**Difficulty:** 🟢 - Easy. 
 
 
 NextJS by default uses `@/` aliases, whereas my Remix config had `~/` as an alias, so use find replace to update these. 
 
-#### 1.3 Migrate components - Update Links, Images 
+</details>
 
-Difficulty: Easy. 
+<details>
+<summary>
+#### 1.3 Migrate components - Update Links, Images 
+</summary>
+
+
+**Difficulty:** 🟢 - Easy. 
 
 I copy paste over my `app/components` folder, which has various miscellaneous components, like the info boxes. 
 
@@ -231,18 +254,31 @@ The main things to be done where:
 2. Images - Remix image imports resolve as a string, whereas NextJS image imports resolve as a `{src: string, height: number, width: number}` and so my use of images are changed to: `<img src ={image.src}/>`.
 
 
+</details>
 
 
+
+<details>
+<summary>
 #### 1.4 Migrate components - add "use client" directive
+</summary>
 
-Difficulty: Easy. 
+
+**Difficulty:** 🟢 - Easy. 
 
 Because I'm using NextJS's app router any of my components that have a useEffect etc in them, need to be prefixed with "use client". 
 
 
-#### 1.5 Migrate components - update react-github-permalink 
+</details>
 
-Difficulty: Easy with a twist.
+<details>
+<summary>
+#### 1.5 Migrate components - update react-github-permalink 
+</summary>
+
+
+
+**Difficulty:** 🟢 - Easy with a twist. 
 
 I maintain a package [react-github-permalink](https://www.npmjs.com/package/react-github-permalink) to display the codeblocks here. Pages with the codeblocks error with:
 
@@ -267,17 +303,32 @@ According to [this Stack Overflow answer](https://stackoverflow.com/a/75955626/1
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-github-permalink/blob/09f6f7dfbcfab104691d199dd7bb8266d3f75919/src/export.ts#L1-L4"/>
 
 
-#### 1.6 Add the CSS in 
+</details>
 
-Difficulty: Easy. 
+
+<details>
+<summary>
+#### 1.6 Add the CSS in 
+</summary>
+
+
+**Difficulty:** 🟢 - Easy. 
 
 At this point I'm just checking that the pages are rendering without error. 
 
 I copy my CSS file (I'm writing just vanilla CSS) and that all works fine. 
 
-#### 1.7 Populate my root layout 
 
-Difficulty: Easy. 
+</details>
+
+
+<details>
+<summary>
+#### 1.7 Populate my root layout 
+</summary>
+
+
+**Difficulty:** 🟢 - Easy. 
 
 
 Here I take the logic from my Remix `root.tsx` and put it in `src/app/layout.tsx`
@@ -290,25 +341,40 @@ are converted to plain HTML rendering:
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/311cadf80627981fe0cbe3fcbd24e8bd5c080d13/src/app/layout.tsx#L25-L35"/>
 
-#### 1.8 Generate sitemap.xml, rss.xml 
 
-Difficulty: Easy. 
+</details>
+
+
+<details>
+<summary>
+#### 1.8 Generate sitemap.xml, rss.xml 
+</summary>
+
+
+**Difficulty:** 🟢 - Easy. 
 
 
 In Remix these files can be handled with a `[sitemap.xml].tsx` file - which is pretty convenient. 
 
 NextJS is a bit simpler - as part of the build process - I generate the files and put them in my `public` folder directly. 
 
+</details>
 
 #### End of Phase 1
 
 Status: I have a standalone project separate from my main blog that is running and appears to be functional.
 
 
-<div className="section-break"/>
+</details>
+ 
 
 
+<details>
+<summary>
 ### Phase 2: Preparation pull request for migration 
+</summary>
+
+
 
 As I encountered errors while creating the new application - I wrote them down in a list, and created cypress tests for them. 
 
@@ -324,26 +390,58 @@ Status: No major changes to the main blog. Some extra tests are running. I've re
 
 [The pull request for this change is here](https://github.com/dwjohnston/blacksheepcode/pull/116). 
 
-<div className="section-break"/>
+
+</details>
+ 
 
 
+<details>
+<summary>
 ### Phase 3: Copy the files 
+</summary>
 
+In this phase I copy over the changes I made in my temporary repo, over to the main repo.
+
+
+
+
+<details>
+<summary>
 #### 3.1 Update the package.json
+</summary>
+
 
 This is a fairly manual process, I need to remove all the Remix dependencies and add the NextJS dependencies.
 
 I also add a convenience `generate:all` script which run all of my build steps except the main application build.
 
+</details>
+
+
+<details>
+<summary>
 #### 3.2 Copy over the main files
+</summary>
+
 
 This is basically updates to everything in my `src` folder and `utils` folder (which is a badly named folder, it contains all of the build time scripts).
 
-#### 3.3 Remove remix specific files 
+</details>
+
+<details>
+<summary>
+#### 3.3  Remix specific files 
+</summary>
 
 Removes remix.config.js, entry.client.tsx, entry.server.tsx, root.tsx etc. 
 
+</details>
+
+<details>
+<summary>
 #### 3.4 Add NextJS specific files 
+</summary>
+
 
 Replaces the eslint config with the NextJS provided one.
 
@@ -351,13 +449,20 @@ Replaces the tsconfig with the NextJS provided one.
 
 At time of writing I'm noticing that I neglected to copy across next.config.mjs and it appears to work fine 🤷‍♂️
 
+</details>
+
+<details>
+<summary>
 #### 3.5 Replace jest with vitest
+</summary>
+
 
 The reason I did this was that I didn't want to keep babel around just so I can run my jest tests. 
 
 I feel like I had a better reason than this, but if I did, I didn't write it down in my notes. 
 
 Updating the tests themselves was pretty simple - it's just a matter of replacing references to `jest` with `vitest`, and some minor changes to how vitest types it's `fn` function. 
+</details>
 
 #### End of Phase 3 
 
@@ -374,9 +479,16 @@ At time of writing, the PR has 87 file changes, these can be broken down roughly
 - ~14 are small updates to components (updating images, links, path aliases) 
 - ~12 are updates to blog posts (aliases)
 
-<div className="section-break"/>
 
+</details>
+ 
+
+
+<details>
+<summary>
 ### Phase 4: Get it running on Netlify 
+</summary>
+
 
 Turns out this is pretty simple. 
 
@@ -390,15 +502,30 @@ I use Netlify's branch previews to verify that it's working.
 
 Status: Branch previews are deploying properly, but the Cypress tests are failing
 
-<div className="section-break"/>
 
+</details>
+
+
+<details>
+<summary>
 ### Phase 5: Get the Cypress tests working 
+</summary>
+
 
 At this point lots of my cypress tests are failing, so we'll go through an fix them. 
 
-#### 5.1 Assertions on static resources
+It is this part of the migration that has given me the most problems. I actually thought I'd stumbled on a solution to many of these problems, but a while later the problems were still apparent - this is one of the difficulties - the issues I'm facing are not reliably reproducible. 
 
-Difficulty: Easy. 
+At time of writing I have not solved these problems, but I don't want to delay publishing this post, so the plan is to document them here and maybe write a second post about Cypress later. 
+
+
+<details>
+<summary>
+#### 5.1 Assertions on static resources
+</summary>
+
+
+ **Difficulty:** 🟢 Easy. 
 
 One expected error is my tests that look like:
 
@@ -406,9 +533,14 @@ One expected error is my tests that look like:
 
 That file path can obviously be expected to differ in the way the Remix and Next render it - so I go through and change those. Straight forward. 
 
+</details>
+<details>
+<summary>
 #### 5.2 Link clicks not being followed
+</summary>
 
-Difficulty: Difficult. 
+
+ **Difficulty:** 🔴 - Difficult. 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L54-L69"/>
 
@@ -421,12 +553,13 @@ This [very helpful Stack Overflow](https://stackoverflow.com/a/66371021/1068446)
 As a workaround - we can add `{force:true}` to click command.
 
 This is a thoroughly unsatisfying resolution though. 
-
-**Actual Solution:** See solution is 5.3. 
-
+</details>
+<details>
+<summary>
 #### 5.2 Mysterious Minified React error #329 / Unknown root exit status error. 
+</summary>
 
-Difficulty: Difficult. 
+ **Difficulty:** 🔴 - Difficult. 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ddf09515d8bb9fc233b35073f1fd928159c5e3e3/cypress/e2e/smoketests.cy.ts#L46-L52"/>
 
@@ -442,15 +575,16 @@ I don't have a resolution for this - I'm skipping those tests.
 
 Note minified React errors only seem to occur when visiting the application via Cypress. This is an issue that I've encountered before with my tests against Remix as well , so that they exist doesn't especially concern me.  
 
-**Actual Solution:** See solution is 5.3. 
-
 <GithubIssueLinkRsc issueLink ="https://github.com/cypress-io/cypress/issues/27204"/>
 
 But it does concern me is that in NextJS these errors cause functional problems - in Remix the functionality of the application would continue to work. 
-
+</details>
+<details>
+<summary>
 #### 5.3 iframe not found 
+</summary>
 
-Difficulty: Difficult. 
+ **Difficulty:** 🔴 - Difficult. 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/76d9dcedff02f5968ac11656e3c0bbd9a5b75c56/cypress/e2e/smoketests.cy.ts#L98-L102"/>
 
@@ -458,35 +592,46 @@ In this test the Utterances comment section iframe fails to appear.
 
 This test fails sporadically. We are seeing a lot of minified React errors, and it could be something to do with that #329 error above. 
 
-**Actual Solution:** It appears that this iframe is the offender for all of the issues. [This comment](https://github.com/cypress-io/cypress/issues/27204#issuecomment-1625490068) in the above Cypress issue suggests wrapping scripts in a suspense boundary. 
+It may be that this iframe is the offender for all of the issues. [This comment](https://github.com/cypress-io/cypress/issues/27204#issuecomment-1625490068) in the above Cypress issue suggests wrapping scripts in a suspense boundary. 
 
-I wrapped one around my PostComments component all of the a sudden the three issues mentioned here are resolved. 
+I wrapped one around my PostComments component and for a bit these issues did seem to be resolved, though they resurfaced.
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/ebc330a751e835d378e96fa31a1fa50034774f6c/src/components/BlogPostFrame/BlogPostFrame.tsx#L13-L15"/>
+</details>
 
 #### End of phase 5 
 
-Status: The Cypress tests are passing on branch preview. We're almost ready to go!
+Status: most of the Cypress tests are passing, and others are erroring and I'm ignoring them. We're almost ready to go!
 
 My debugging of Cypress tests consisted of repeatedly running the test to see if we encountered the errors. 
 
 Ultimately I found three sources of errors: 
 
-- The PostComments component - wrapping it in a Suspense appears to have fixed it 
-- The GithubPermalinkRsc - wrapping it in Suspense boundary appears to have fixed it
+- The PostComments component - wrapping it in a Suspense appeared to have fixed it
+- The GithubPermalinkRsc - wrapping it in Suspense boundary appeared to have fixed it
 - The SeriesBox - removing the NextJS Links appears to fix it, but I can't do that. 
 
-I have not yet been able to create a reliable reproduction of this, so maybe I'm off on a wild goose chase here. 
+I have not yet been able to create a reliable reproduction of these, so maybe I'm off on a wild goose chase here.
 
-<div className="section-break"/>
+</details>
 
-
+<details>
+<summary>
 ### Phase 6: Get Sentry working 
+</summary>
+
+
 
 I added Sentry [using their wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/). 
 
-<div className="section-break"/>
 
+</details>
+ 
+## Conclusions
+
+Migrating to NextJS is not a particularly difficult task. 
+
+Where some pause should be given, is that adjacent tooling, such as Storybook, React Testing Library, Cypress, may not have caught up to the new RSC paradigm - where there may be a mature ecosystem of tooling for conventional SPAs you may find yourself on the bleeding (read: unreliable) edge for RSCs. 
 
 
 
