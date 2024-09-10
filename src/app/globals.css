@@ -31,6 +31,10 @@ body {
   --color-warn-secondary: #fffcd3;
 
 
+  --color-foreground-darken: #00000010;
+  --color-background-darken: #00000015;
+
+
   --color-info-primary: #40c4ff;
   --color-info-contrast: black;
   --color-info-secondary: #b3e5fc;
@@ -38,6 +42,8 @@ body {
 
   color: var(--color-foreground-paper);
   line-height: 1.75;
+
+  --column-width: 1100px; 
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,8 +62,22 @@ body {
       --color-background-paper: #222;
       --color-background-paper-secondary: #444;
 
+      --color-foreground-darken: #ffffff20;
+      --color-background-darken: #00000030;
+      
+
+
       --color-background-deep: black;
       --color-background-impact: #black;
+
+      --color-warn-primary: #d88f41;
+      --color-warn-contrast: rgb(235, 201, 122);
+      --color-warn-secondary: #3c2301;
+    
+    
+      --color-info-primary: #40c4ff;
+      --color-info-contrast: black;
+      --color-info-secondary: #b3e5fc;
   }
 
 }
@@ -107,6 +127,11 @@ body {
   padding: 2em;
 }
 
+.section-break {
+  margin-top: 5em;
+}
+
+
 
 .error-page h1 {
   text-align: center;
@@ -137,6 +162,25 @@ body {
 }
 
 
+details {
+  padding: 1.5em;
+  padding-bottom: 1em;
+  margin-bottom: 0.25em;
+  background-color: var(--color-background-darken);
+  border: var(--color-foreground-darken) solid 1px;
+  
+
+}
+
+
+
+summary {
+  >* {
+    display: inline;
+  }
+}
+
+
 body {
   background-color: var(--color-background-deep);
   font-family: 'Open Sans';
@@ -153,7 +197,7 @@ header {
 }
 
 header>div {
-  max-width: 800px;
+  max-width: var(--column-width);
   margin: 0 auto;
 
 }
@@ -175,7 +219,7 @@ header a:hover {
 
 .main-column {
   background-color: var(--color-background-paper);
-  max-width: 800px;
+  max-width: var(--column-width);
   margin: 0.5em auto;
   padding: 2em;
 
@@ -210,7 +254,6 @@ a,
 a:hover {
   color: var(--color-foreground-paper);
 }
-
 
 
 .game-of-life-cell {
