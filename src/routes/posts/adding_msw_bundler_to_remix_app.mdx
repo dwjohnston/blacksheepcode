@@ -15,7 +15,12 @@ import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
 # How to configure Remix and mdx-bundler
 
 <InfoPanel level="warning">
+  <p>
   The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.
+  </p>
+  <p>
+  If you need a solution for a tool like Netlify, [see this post](./adding_msw_bundler_to_remix_app_2). 
+  </p>
 </InfoPanel>
 
 This post outlines a process I took to improve this blog, although I ultimately abandoned this approach due to the requirement to have access to the file system.
