@@ -96,7 +96,22 @@ body {
 
   @media (prefers-color-scheme: dark) {
       background: radial-gradient(circle, black 60%, var(--color-background-paper) 68%, #ddffdd50 69%, var(--color-background-paper) 70%);
+
+      .light {
+        display: none;
+      }
+      .dark {
+        display: block;
+      }
   }
+  @media (prefers-color-scheme: light) {
+    .dark {
+      display: none;
+    }
+  }
+
+
+
 
   width: 200px;
   height: 200px;
@@ -111,10 +126,6 @@ body {
       left: 25%;
       height: 60%;
       width: 60%;
-
-      animation: fadeIn 0.1s ease-in-out;
-
-
   }
 
 }
