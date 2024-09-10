@@ -159,7 +159,7 @@ export async function getMetadata(slug: string): Promise<Metadata> {
 }
 
 
-//@ts-expect-error
+//@ts-ignore - something weird happening here, sometimes it shows an error, sometimes not
 export async function getBlogContent(slug: string, folder: BlogPostFolders = "posts") : Promise<React.ReactNode> {
     try {
         const data= await import(`../generated/mdx/${folder}/${slug}`)
