@@ -3,14 +3,20 @@ const { withSentryConfig } = require("@sentry/nextjs");
 /** @type {import('next').NextConfig} */
 const nextConfig = {};
 
-module.exports = withSentryConfig(
+
+
+const myWithSentry =  (process.env.NODE_ENV  === "production" ? withSentryConfig : (v) => v)
+
+
+module.exports = myWithSentry(
   nextConfig,
-  {
+   {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options
 
     org: "black-sheep-code",
     project: "javascript-remix",
+
 
     // Only print logs for uploading source maps in CI
     silent: !process.env.CI,
@@ -38,5 +44,5 @@ module.exports = withSentryConfig(
     // https://docs.sentry.io/product/crons/
     // https://vercel.com/docs/cron-jobs
     automaticVercelMonitors: true,
-  }
+  } 
 );

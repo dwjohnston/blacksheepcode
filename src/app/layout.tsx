@@ -9,7 +9,8 @@ import {githubPermalinkRscConfig} from "react-github-permalink/dist/rsc";
 const inter = Inter({ subsets: ["latin"] });
 
 githubPermalinkRscConfig.setConfig({
-  githubToken: process.env.GITHUB_TOKEN
+  // Can't use the prefix GITHUB in github actions so just have a second token just for github actions
+  githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN
 })
 
 export const metadata: Metadata = mergeFrontmatterAndDefaultMetadata({
