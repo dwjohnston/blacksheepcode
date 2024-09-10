@@ -27,7 +27,7 @@ Some examples of things that I might consider changing, but am avoiding in the f
 
 - Platform: Netlify -> Vercel
 - Browser based testing framework: Cypress -> Playwright
-- Test Framework: Jest -> Vitest
+- Test Framework: Jest -> Vitest (though ultimately I found it simpler to move over to Vitest as part of this migration)
 - Images: img -> NextJS Image
 
 ## The Plan Of Attack 
@@ -110,10 +110,12 @@ src/
             page.mdx
 ```
 
+but: 
+
 ##### File based MDX routing doesn't work for me 
 
 
-This all comes down to the Frontmatter Metadata attached in the posts.
+This all comes down to the frontmatter metadata I have included in my MDX files.
 
 I make use of [Frontmatter](https://jekyllrb.com/docs/front-matter/) to provide metadata in this posts like the title and description, but also to create the blog series sections, create the list of blog posts, etc.
 
