@@ -78,9 +78,9 @@ body {
       --color-warn-secondary: #3c2301;
     
     
-      --color-info-primary: #40c4ff;
-      --color-info-contrast: black;
-      --color-info-secondary: #b3e5fc;
+      --color-info-primary: #00a8f5;
+      --color-info-contrast: rgb(253, 253, 253);
+      --color-info-secondary: #033248;
   }
 
 }
