@@ -1,16 +1,11 @@
 "use client"
 import React, { useEffect, useRef } from 'react'
-import Comment from './Comment';
-
 
 const PostComments = () => {
     const commentBox = useRef<HTMLDivElement>(null);
-
     const scriptRef = useRef<HTMLScriptElement | null>(null);
 
     useEffect(() => {
-
-
         if(!scriptRef.current){
             const commentScript = document.createElement('script')
             scriptRef.current = commentScript; 
@@ -48,7 +43,7 @@ const PostComments = () => {
 
     return (
         <>
-            <Comment ref={commentBox} />
+            <div ref={commentBox} className="comments" id="comments" tabIndex={0} />
         </>
     )
 }

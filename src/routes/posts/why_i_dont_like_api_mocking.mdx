@@ -6,9 +6,38 @@ meta:
   
 ---
 
+
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
+
+
 # Why I don't like API mocking as a necessary frontend testing strategy
 
-It seems that API mocking, using tools like msw are the default approach for frontend testing these days.  
+<InfoPanel level="warning">
+  <p>
+    I've done a 180 on this position. 
+  </p>
+  <p>
+    I think the right way to think about testing frontends is to think in units small enough that a developer can hold all of the business logic in their mind. 
+  </p>
+  <p>
+    That is, the API calls and other external interactions a unit of code makes should be encompassed in the test. 
+  </p>
+
+  <p>
+    What this post is a reflection of, and a caution against, is the codebase I was working on at the time of writing, where the state management layer included all sorts of complicated transformations. 
+  </p>
+
+  <p>
+    Keep your state management layer simple, and then API mocking is an acceptable way to write your tests - they're a way of understanding 'these are the external systems this unit of code is interacting with'.
+  </p>
+
+  <p>
+    Where a unit of code becomes too complex to for a developer to keep in mind, then consider strategies that allow cutting branches of logic, eg. Error boundaries or component composition. I [write about this here.](./testing_strategies) 
+  </p>
+</InfoPanel>
+
+
+It seems that API mocking, using tools like MSW, are the default approach for frontend testing these days.  
 
 - Redux explicitly recommend this. Their [docs suggest writing tests that include a real store provider](https://redux.js.org/usage/writing-tests), and mocking the behaviour of API calls with either msw or by injecting the services.
 - React-query recommends API mocking, [docs](https://tanstack.com/query/v4/docs/guides/testing#testing-network-calls). 

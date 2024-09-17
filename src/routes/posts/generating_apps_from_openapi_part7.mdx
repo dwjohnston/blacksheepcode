@@ -9,6 +9,7 @@ series:
   part: 8
 ---
 import { GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
 
 
 # Black box contract testing - third party API mocking 
@@ -50,7 +51,7 @@ Mockbin does require also running a Redis container, which is one more container
 
 I first manually start Mockbin running, [as per their docs](https://github.com/Kong/mockbin/blob/master/docs/install.md#install-with-docker) <sup>[(permalink)](https://github.com/Kong/mockbin/blob/0e1719667e1e3aece9eec0f848fb81fee936c507/docs/install.md)</sup>, just check that it's going to do what I want. 
 
-There does seem to currently be an issue with the Mockbin docker container, as per [this GitHub issue](https://github.com/Kong/mockbin/issues/77), code snippet below reflects using the alternative image. 
+There does seem to currently be an issue with the Mockbin docker container, as per this GitHub issue <GithubIssueLinkRsc issueLink="https://github.com/Kong/mockbin/issues/77" variant="inline"/>, code snippet below reflects using the alternative image. 
 
 ```
 docker run -d --name mockbin_redis redis
@@ -175,6 +176,12 @@ We write a test for it [here](https://github.com/dwjohnston/open-api-go-and-type
 I'm not going to paste the code here. The code snippets are well commented, and I'd basically just be copy pasting them here. (As an aside, I would absolutely love some kind of library or plugin that creates code snippets from Github permalinks, just it does if you paste them as a Github comment, for example [see here](https://github.com/dwjohnston/blacksheepcode/issues/40#issuecomment-1590455651).)
 
 Brilliant!
+
+<InfoPanel level="info">
+  <p>I have since created such a library. It is called [react-github-permalink](https://www.npmjs.com/package/react-github-permalink).</p>
+</InfoPanel>
+
+
 
 ### What I like and don't like about this 
 
