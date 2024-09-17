@@ -1,17 +1,23 @@
 ---
 meta:
   title: This blog now features comments
-  description: You can very easily add comment functionality to a webpage via the Github-powered Utterances plugin
+  description: You can very easily add comment functionality to a webpage via the Github-powered Utterances plugin.
   dateCreated: 2023-03-24
  
 ---
+
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 
 # This blog now features comments
 
 I've add the Github powered comments via [Utterances](https://utteranc.es/). 
 
-I followed this [blog post here](https://abba.dev/blog/blog-comments-with-utterances). It's all pretty straightforward, you can see [my implementation here](https://github.com/dwjohnston/blacksheepcode/blob/edab89b8d02b5eba0bddfeef23fe1c2e09b3f7b1/app/components/PostComments/PostComments.tsx). 
+I followed this [blog post here](https://abba.dev/blog/blog-comments-with-utterances). 
+
+It's all pretty straightforward, here's my implementation:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/8fc3914515be265e55b13823be5e97b4edfb0206/src/components/PostComments/PostComments.tsx#L1-L51"/>
 
 What a fantastic tool. It took all of about 10-15 minutes to set up. 
 

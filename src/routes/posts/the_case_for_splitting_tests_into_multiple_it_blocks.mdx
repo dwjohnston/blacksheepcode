@@ -6,6 +6,7 @@ meta:
 
 ---
 
+import {GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 # The case for splitting tests into multiple it blocks
 
@@ -32,7 +33,7 @@ and
 > **Best Practice**: Add multiple assertions and don't worry about it
 
 
-This [GitHub issue](https://github.com/cypress-io/cypress/issues/2901) asks 'Is the execution order of `it` blocks within a `describe` block deterministic?'. 
+This GitHub issue <GithubIssueLinkRsc issueLink="https://github.com/cypress-io/cypress/issues/2901" variant ="inline"/> asks 'Is the execution order of `it` blocks within a `describe` block deterministic?'. 
 
 To which the answer is 'yes, but we don't recommend doing that', and a pointer to the above best practises documentation. 
 

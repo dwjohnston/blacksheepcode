@@ -237,7 +237,7 @@ foo.value.split(''); // value may not exist to .split on
 ```
 
 
-## A caveat 
+## ⚠️ A caveat 
 
 This model of extensibility assumes that consumers of your API understand this model of extensibility, and specifically the 'returned data can contain additional properties at anytime' part.  
 
@@ -259,8 +259,8 @@ function getSomeData() : UserEnrichmentData {
 
 const user = {
    name: "foo", 
-   type: "student"
-}, 
+   userType: "student"
+};
 
 const userEnrichmentData = getSomeData(); 
 

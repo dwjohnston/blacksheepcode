@@ -1,7 +1,7 @@
 ---
 meta:
   title:  How to configure NextJS to proxy its requests 
-  description: We may wish to proxy the requests NextJS makes, for example through a tool like mitmproxy in order to analyse traffic or generate test data 
+  description: We may wish to proxy the requests NextJS makes, for example through a tool like mitmproxy in order to analyse traffic or generate test data.
   dateCreated: 2024-08-19
   image: mitm
 ---
@@ -56,9 +56,11 @@ This is the same scenario but we're using node-fetch instead of native fetch.
 
 ## Solution - use a secondary proxy
 
-The best solution I've found is to add your own secondary proxy, and have it proxy its traffic through your target proxy. 
+The best solution I've found is to add your own secondary proxy, and have it proxy its traffic through your target proxy.
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/4f6ce764a0c02ff574c8c988bf22d08d2ea32cdf/src/app/page3/page.tsx#L2-L3"/>
+Create a proxy server with this script:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/4f6ce764a0c02ff574c8c988bf22d08d2ea32cdf/proxy.js#L1-L12"/>
 
 Update your requests, whether they're are server side requests or rewrites to reference an environment variable as the upstream. 
 

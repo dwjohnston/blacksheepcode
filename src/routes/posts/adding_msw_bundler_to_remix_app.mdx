@@ -1,7 +1,7 @@
 ---
 meta:
   title:  How to configure Remix and mdx-bundler (with file system access)
-  description: How to use Remix and mdx-bundler to use of frontmatter headers. This will allow adding publication dates, or grouping posts into series, adding tags, etc. This solution works for a non-serverless solution - it requires file system access.
+  description: How to use Remix and mdx-bundler to make use of frontmatter headers. This will allow adding publication dates, or grouping posts into series, adding tags, etc. This solution works for a non-serverless solution - it requires file system access.
   dateCreated: 2023-11-19
 
 series: 
@@ -15,12 +15,8 @@ import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
 # How to configure Remix and mdx-bundler
 
 <InfoPanel level="warning">
-  <p>
-  The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.
-  </p>
-  <p>
-  If you need a solution for a tool like Netlify, [see this post](./adding_msw_bundler_to_remix_app_2). 
-  </p>
+  <p>The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.</p>
+  <p>If you need a solution for a tool like Netlify, [see this post](./adding_msw_bundler_to_remix_app_2).</p>
 </InfoPanel>
 
 This post outlines a process I took to improve this blog, although I ultimately abandoned this approach due to the requirement to have access to the file system.
@@ -57,6 +53,7 @@ This solution is works for mdx-bundler@9.2.1. See the following issue:
 </InfoPanel>
 
 <InfoPanel level='info'>
+
   The code blocks in this post come from this very simple Remix application [repository here](https://github.com/dwjohnston/example-remix-app). 
 </InfoPanel>
 

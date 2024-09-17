@@ -297,6 +297,14 @@ a:hover {
 
 .blog-image {
   max-width: 100%;
+  display: block;
+  margin: 0 auto; 
+}
+
+.invert-colors-on-dark {
+  @media (prefers-color-scheme: dark) {
+      filter: invert(0.89);
+  }
 }
 
 
@@ -376,7 +384,7 @@ table td {
 
   }
 
-  color: var(--color-warn-contrast);
+  color: var(--color-info-contrast);
   border-color: var(--color-info-primary);
   background-color: var(--color-info-secondary);
 }
