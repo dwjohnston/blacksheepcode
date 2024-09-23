@@ -1,12 +1,19 @@
+---
+meta:
+  title: The natural state of software is chaos
+  description: I am the description
+  dateCreated: 2022-11-28
+---
+
 I think there's a tendency of software developers to think of ourselves like civil engineers building bridges, building these well designed perfect structures, like a bridge, that will stand the test of time.
 
-Well OK, it's not quite that simple. Software engineering as a discipline is in its infancy - civil engineering has thousands of years more experience on it. It's the norm of software to be continually evolving, having additional requirements etc, where a bridge typically is built and left alone. 
+Well OK, maybe it's not quite that simple. Software engineering as a discipline is in its infancy - civil engineering has thousands of years more experience on it. It's the norm of software to be continually evolving, having additional requirements etc, where a bridge typically is built and left alone. 
 
 Still, I think that software developers, I myself have thought this way, have this idea that 'there is a perfect code architecture for this given business problem, and it's matter of us as developer learning the right tools and techniques, and putting in the time and effort, and _then_ we'll have nice shiny perfect bridge'.
 
 This is turn has software developers pointing to 'it's our pile of techincal debt that is getting in the way' and 'if we were only using X tool, then our problems would be solved'. 
 
-I want to make the argument that software development is inherently a messy discipline, and outside of a small application like a tic-tac-toe game or tutorial, perfect codebases simply do not exist. 
+I want to make the argument that software development is inherently a messy discipline, and outside of a small application like a tic-tac-toe game or a tutorial, perfect codebases simply do not exist. 
 
 There are a few reasons for this: 
 
@@ -22,10 +29,7 @@ There are a few reasons for this:
 - Generally less risk-to-life for software projects. There are of course plenty of software that does involve risk-to-life, but those tend to have a a commensurate increase in testing rigitity and timelines. 
 - Lower expectations of quality - I think the industry as a whole accepts that software bugs will occur. 
 
-Also, perhaps I'm viewing non-software engineers through a perfect lens, perhaps there plenty of frustrations in the non-software engineering space that I'm simply not privy to - what comes to mind is criticisms of car designers making the job of mechaninics difficult. 
-
-PICTURE HERE 
-
+Also, perhaps I'm viewing non-software engineers through a perfect lens, perhaps there plenty of frustrations in the non-software engineering space that I'm simply not privy to - what comes to mind is criticisms of car designers making the job of mechanics difficult, with difficult to reach bolts and the like.  
 
 As software engineers we attempt to put guard rails in to move our codebase to 'the perfect solution', thinks like: 
 
@@ -58,6 +62,7 @@ For example:
 - A microservices pattern using OpenAPI specs as service boundaries means that individual services can be just replaced wholesale, so long as they adhere to the spec. 
 - Clear code ownership boundaries means that dysfunction or lack of experience in one team doesn't pollute the entire codebase. 
 - Tests that scoped at the appropriate levels means that refactors/rewrites can be made with confidence. 
+   
 
 
 
