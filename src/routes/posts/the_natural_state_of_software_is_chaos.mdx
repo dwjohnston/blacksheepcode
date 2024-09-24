@@ -1,0 +1,87 @@
+---
+meta:
+  title: The natural state of software is chaos
+  description: The perfect codebase is a myth. Abondon the pursuit of it, and instead seek to contain the mess. 
+  dateCreated: 2024-09-24
+  image: bridge
+---
+import Image from "next/image";
+import bridge from "@/assets/bridge.jpeg"; 
+import hardToReach from "@/assets/hard_to_reach.png"; 
+
+
+<Image src={bridge} className="blog-image" style={{maxHeight: 300}} alt="a bridge"/>
+
+I think there's a tendency of software developers to think of ourselves like civil engineers building bridges, building these well designed perfect structures, like a bridge, that will stand the test of time.
+
+Well OK, maybe it's not quite that simple. Software engineering as a discipline is in its infancy - civil engineering has thousands of years more experience on it. It's the norm of software to be continually evolving, having additional requirements etc, where a bridge typically is built and left alone. 
+
+Still, I think that software developers, I myself have thought this way, have this idea that 'there is a perfect code architecture for this given business problem, and it's matter of us as developer learning the right tools and techniques, and putting in the time and effort, and _then_ we'll have nice shiny perfect bridge'.
+
+This is turn has software developers pointing to 'it's our pile of techincal debt that is getting in the way' and 'if we were only using X tool, then our problems would be solved'. 
+
+I want to make the argument that software development is inherently a messy discipline, and outside of a small application like a tic-tac-toe game or a tutorial, perfect codebases simply do not exist. 
+
+There are a few reasons for this: 
+
+- A codebase was often written before better tools were available. For example a React codebase that was written before hooks were a thing will likely have repeated code in components constructor and `componentWillUpdate` methods.
+- Code will have been written when: 
+  - A developer was less experienced and didn't know better.
+  - A developer was simply having a bad day. 
+  - There was a deadline rush and the developer 'stuck with what they know' rather than spending the time investigating a better technique. 
+
+^ I do need to mention that this isn't an especially persuasive argument - if a bridge was built and collapsed, the same excuses would not pass muster. So why do we make such excuses in software engineering? Perhaps it comes down to a combination of: 
+
+- Expectations of faster and cheaper development for software. Afterall one of the reasons that software is useful is that it reproducable for virtually free. 
+- Generally less risk-to-life for software projects. There are of course plenty of software that does involve risk-to-life, but those tend to have a a commensurate increase in testing rigitity and timelines. 
+- Lower expectations of quality - I think the industry as a whole accepts that software bugs will occur. 
+
+Also, perhaps I'm viewing non-software engineers through a perfect lens, perhaps there plenty of frustrations in the non-software engineering space that I'm simply not privy to - what comes to mind is criticisms of car designers making the job of mechanics difficult, with difficult to reach bolts and the like.  
+
+<Image src={hardToReach} className="blog-image" style={{maxHeight: 300}} alt="a hard to reach bolt in a car's engine bay"/>
+
+
+As software engineers we attempt to put guard rails in to move our codebase to 'the perfect solution', thinks like: 
+
+- Linting rules
+- Static typing
+- CI pipelines running on every commit
+- Unit tests 
+- Contracts defined with common standards like OpenAPI
+- Infrastructure-as-code
+- Observability and monitoring 
+
+The point I would make here is that while these tools and techniques will help us have a more usable codebase, it's not a matter of collecting the right set of tools, techniques and convetions and boom you've got yourself a perfect codebase. 
+
+You could collect the perfect set of tools, techniques and conventions, your codebase would be good for a while, but then if you left it on its own, the entropic principle would take over and your codebase would tend to chaos: 
+
+- New tools will be developed and your codebase will look outdated.
+- Developers will add ignore-static-check annotations when they're in a rush.
+- Developers in different parts of the codebase will have different opinions about code styles and you'll have different coding styles throughout the codebase. 
+- New business requirements will come in and perfect abstractions now have caveats for certain scenarios 
+- A trend of five years ago will have been created an integration in your codebase, and then have been removed, with artifacts left behind. 
+
+The point is - we should just accept that our codebase is going to look messy, and stop striving to get it into a perfect shape. 
+
+This isn't to say we accept a messy and difficult codebase and working environment. 
+
+Instead, we still use the same tools, techniques and conventions, but with a shift in perspective - instead of striving for a perfect codebase, we're aiming to contain and compartmentalise the mess.
+
+For example: 
+
+- A microservices pattern using OpenAPI specs as service boundaries means that individual services can be just replaced wholesale, so long as they adhere to the spec. 
+- Clear code ownership boundaries means that dysfunction or lack of experience in one team doesn't pollute the entire codebase. 
+- Tests that scoped at the appropriate levels means that refactors/rewrites can be made with confidence. 
+- Less tangibly, if an organisation has an engineering culture with technical expertise, and that knowledge is being well socialised, then when experienced developers leave that knowledge lives on. 
+
+
+   
+
+
+
+
+
+
+
+
+

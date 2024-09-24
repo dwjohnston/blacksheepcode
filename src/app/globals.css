@@ -96,10 +96,17 @@ body {
 
 
 .sheep-image-wrapper {
+  &.force-light {
+    background: unset;
+  }
+
+  &.force-dark{
+    background: radial-gradient(circle, black 60%, var(--color-background-paper) 68%, #ddffdd50 69%, var(--color-background-paper) 70%);
+
+  }
 
   @media (prefers-color-scheme: dark) {
       background: radial-gradient(circle, black 60%, var(--color-background-paper) 68%, #ddffdd50 69%, var(--color-background-paper) 70%);
-
       .light {
         display: none;
       }
@@ -293,6 +300,10 @@ a:hover {
 
 .game-of-life-cell.dead {
   background-color: grey;
+}
+
+img {
+  object-fit: contain;
 }
 
 .blog-image {

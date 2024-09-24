@@ -46,9 +46,7 @@ The solution is to do the conditional check on the client side. We display nothi
 
 This introduces a slight problem of having an image pop of the image suddenly appearing. To mitigate this I use a CSS animation to make it fade in over 100ms. 
 
-<Aside>
-    Call me old fashioned, but I think this is the correct use of animations -  to smooth out jankyness, or call attention to that something has changed. Animations for the sake of themselves are just distracting. 
-</Aside>
+I later removed this, I found the image fade in jarring. I opted for a simpler solution of displaying both images, and using a CSS media query on preferred theme to determine which one is displayed.
 
 ## Conditionally use stylesheets
 
