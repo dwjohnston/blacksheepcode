@@ -5,12 +5,12 @@ meta:
   dateCreated: 2022-11-28
   image: bridge
 ---
-
+import Image from "next/image";
 import bridge from "@/assets/bridge.jpeg"; 
 import hardToReach from "@/assets/hard_to_reach.png"; 
 
 
-<img src={bridge.src} className="blog-image" style={{maxHeight: 300}} alt="a bridge"/>
+<Image src={bridge} className="blog-image" style={{maxHeight: 300}} alt="a bridge"/>
 
 I think there's a tendency of software developers to think of ourselves like civil engineers building bridges, building these well designed perfect structures, like a bridge, that will stand the test of time.
 
@@ -38,7 +38,7 @@ There are a few reasons for this:
 
 Also, perhaps I'm viewing non-software engineers through a perfect lens, perhaps there plenty of frustrations in the non-software engineering space that I'm simply not privy to - what comes to mind is criticisms of car designers making the job of mechanics difficult, with difficult to reach bolts and the like.  
 
-<img src={hardToReach.src} className="blog-image" style={{maxHeight: 300}} alt="a hard to reach bolt in a car's engine bay"/>
+<Image src={hardToReach} className="blog-image" style={{maxHeight: 300}} alt="a hard to reach bolt in a car's engine bay"/>
 
 
 As software engineers we attempt to put guard rails in to move our codebase to 'the perfect solution', thinks like: 

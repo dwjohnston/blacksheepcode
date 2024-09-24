@@ -302,6 +302,10 @@ a:hover {
   background-color: grey;
 }
 
+img {
+  object-fit: contain;
+}
+
 .blog-image {
   max-width: 100%;
   display: block;
