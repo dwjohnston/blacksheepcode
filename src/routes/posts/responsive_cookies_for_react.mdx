@@ -1,0 +1,36 @@
+---
+meta:
+  title: How to create a responsive React hook to listen for changes to cookies
+  description: Your React components may wish to listen for changes to made to cookies, whether they were made by other React code, or HTTP requests or non-React JavaScript. The CookieStore API can help.
+  dateCreated: 2024-09-30
+---
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+
+
+I recently encountered a situation where I have some React code that needs to listen for changes to a cookie, but this cookie logic isn't controlled React. 
+
+Some searches reveal tutorial posts like [this one](https://seraj.me/blog/useCookie-hook) that implement a `useCookie` hook. 
+
+This works kind of nicely, we get a nice `useState` style hook, that also stores into cookies as a side effect, it's helpful for retainining state between sessions. 
+
+However, this solution is not responsive to cookie changes that may occur _outside_ of the React context. In fact, two components that were examining the same cookie would not have their updates be observed by the other. 
+
+The scenarios where cookies may be set outside of a React context are: 
+
+- Cookies being set by HTTP responses
+- Cookies being set with JavaScript in your state management layer
+
+We can use the [`CookieChangeEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent) to make a `useCookie` hook truely responsive. 
+
+<InfoPanel level="warning">
+<p>The [`CookieStore`](https://developer.mozilla.org/en-US/docs/Web/API/CookieStore) is not currently supported by Firefox or Safari, and so this technique may not be suitable for you</p>
+<p><span>Additionally, I couldn't a CookieStore polyfill. There is the [`cookie-store`](https://github.com/markcellus/cookie-store) project - but this has not implemented the CookieStore Monitoring Cookies feature. See this issue:</span> <GithubIssueLinkRsc issueLink="https://github.com/markcellus/cookie-store/issues/46" variant="inline"/></p>
+<p>My solution implements the polling solution described in [this Stack Overflow answer](https://stackoverflow.com/a/63952971/1068446)</p>
+</InfoPanel>
+
+
+The a polyfilled implementation of a responsive useCookie looks like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/cookies-and-react/blob/bdb11e2edd944c0b67c64e63a674a6a1e73a89ca/src/hooks/useCookieWithListenerPolyfilled.ts#L12-L133"/>
+
