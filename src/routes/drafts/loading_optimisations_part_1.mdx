@@ -1,0 +1,286 @@
+---
+meta:
+  title: Let's talk about the behaviour of browser as it pertains to loading static assets - images, css and scripts. 
+  description: I am the description
+  dateCreated: 2022-11-28
+---
+
+This is the first post in a series about optimising JavaScript application load times. 
+
+
+## Part 1 - Images 
+
+First let's take a very simple application with images only. 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+<body id="body">
+    IMAGES ONLY
+
+    <img src="https://place-hold.it/300?image-1"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-2"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-3"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-4" loading="lazy"/>
+
+
+</body>
+</html>
+```
+
+A link to actual code for this is here. ADD LINK 
+
+I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
+
+Let's examine the behaviour of this application. 
+
+Open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. 
+
+Refresh the page, and here's the network waterfall we see: 
+
+(loading_ss_1)
+
+Note that the images start loading _before the page has finished streaming in_. The browser will stream the HTML response and parse it as it recieves it. As it encounters the image tags, it starts downloading the images in parallell.
+
+### HTTP/1 Simulatenous request limits
+
+What happens if we have something like this? 
+
+CODE BLOCK
+
+Our waterfall now looks like this: 
+
+(loading_ss_2)
+
+The later images now have a good amount of stalled time. 
+
+This is because Live Server is using the HTTP/1 protocol - which limits the number of simultaneous connections per server at at time. See [this Stack Overflow answer for a summary.](https://stackoverflow.com/a/985704/1068446) 
+
+Also, [see this discussion for the difference between 'stalled' and 'queuing'](https://groups.google.com/g/google-chrome-developer-tools/c/YxYJdgoej18)
+
+
+### Lazy loading images 
+
+It's nice that the loading of images won't otherwise block the rendering of the page, but we're still unnecessarily fetching data that the user might not need, if they don't scroll down the page. 
+
+We can load the images only when the the image appears in the viewport by using the [`loading="lazy"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#loading) attribute. 
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+<body id="body">
+    IMAGES ONLY
+
+    <img src="https://place-hold.it/300?image-1" loading="lazy"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-2" loading="lazy"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-3" loading="lazy"/>
+
+    <div class="50kB-of-dom">
+      //snip - pretend there is 50kB of DOM content here
+    </div>
+
+    <img src="https://place-hold.it/300?image-4" loading="lazy"/>
+
+</body>
+</html>
+```
+
+LINK TO REPO 
+
+(loading_ss_4)
+
+Now only that first image loads when we refresh the page, the others will only load when we scroll down. 
+
+
+## CSS 
+
+Take this scenario: 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+     #main {
+        font-size: 2em;
+
+        color: black; 
+        border: black 2px dashed;
+        background-color: grey;
+     }
+      //50kB more css here
+    </style>
+</head>
+<body>
+
+    <p id="main">hello world!</p>
+
+    <div class="50kB-of-dom">
+      //snip
+    </div>
+
+    
+</body>
+</html>
+```
+
+Here the application behaves as we expect it might - the content streams in and because the CSS appears first, when the HTML content appears it is already styled. 
+
+If, on the other hand, we were to move that `<style>` tag to the bottom of the document: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+<body>
+
+    <p id="main">hello world!</p>
+
+    <div class="50kB-of-dom">
+      //snip
+    </div>
+
+        <style>
+
+     #main {
+        font-size: 2em;
+
+        color: black; 
+        border: black 2px dashed;
+        background-color: grey;
+     }
+      //50kB more css here
+    </style>
+
+    
+</body>
+</html>
+```
+
+Then what we'll see the content stream in, initially unstyled, and when it reaches the CSS then the style pops in. 
+
+### Accessing style via `<link>` tag 
+
+[LINK]
+
+What happens in this scenario? 
+
+I had thought, that the `<link>` tags would behave similarly to images here - that they would load in parallell while the rest of the content is displayed. 
+
+This is the not the case - they do indeed load in paralell, but the [stylesheets are render blocking](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path#css_object_model:~:text=CSS%20is%20render,identifying%20valid%20tokens). 
+
+See [my Stack Overflow question here](https://stackoverflow.com/questions/79021080/has-stylesheet-loading-always-been-render-blocking) and [this related question](https://stackoverflow.com/questions/50619239/render-blocking-and-css). 
+
+Note that on the face of it, we've actually worsened the loading performance of our application - the extra 'waiting for server response' means that the content will take longer to display than if we'd inlined the styles into the document head. 
+
+So why don't we do this? 
+
+Caching. By having two seperate files, each can be cached independantly. Chances are, the user has already downloaded the CSS, because they've visited the website before, or because they've just visited a different page. The HTML is likely to change more often than the CSS, and we don't want to invalidate any CSS caching everytime the HTML changes. 
+
+
+## Scripts 
+
+Our starting point:
+
+CODE BLOCK
+
+Here we just have HTML, and bit of inline CSS to color the blocks. What we see is the streaming behaviour of HTML, and each block pops in one at a time as it streams in. 
+
+Now, let's add some JavaScript that will change the background color. 
+
+To start, we'll make this an inline script. 
+
+CODE BLOCK
+
+
+IMAGE
+
+The behaviour here is what we might expect - the script is parsed first and it executes, and the remaining HTML is parsed and displayed one at a time. 
+
+If we move this inline script the middle of the document:
+
+CODE BLOCK
+
+IMAGE
+
+We now see the first two blocks appear, the background changes color, and then the remaining blocks appear. 
+
+## Classic scripts
+
+Now let's change this classic script (a `<script>` tag without `async`, `defer` or `type="module"` attributes):
+
+The behaviour is basically the same - but note that now the JavaScript file is streamed simultaneously. Here we'll get all of the advantages of caching. 
+
+The document still continues to be streamed, _but parsing is blocked until the JavaScript file finishes streaming and is executed_. 
+
+## Defer scripts 
+
+Defer scripts are the easiest to understand, so let's start there. If we add the `defer` attribute to our script tag: 
+
+CODE BLOCK
+
+Now, the browser streams the JavaScript file as soon as it enounters the tag, but waits until all of the document has finished loading before it executes it. 
+
+## Async scripts 
+
+Async don't block parsing while they are downloading. This means that they'll behave in a non-deterministic manner - if they interact with the document, it depends on how much of the document is loaded by the time the script has finished downloading as to what they'll have access to. 
+
+A better example of the three script types might demonstrated here: 
+
+CODE BLOCK
+
+Here, we have three different scripts, and each of them just log all of the images they can find on the page. 
+
+The classic script always finds no images, because the parsing hasn't occured yet. 
+
+The defer script always finds all twenty images, because it always waits until the document has finished streaming to execute. 
+
+The async script finds a different number everytime. 
+
+
