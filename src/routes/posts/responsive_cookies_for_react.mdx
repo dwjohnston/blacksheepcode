@@ -2,10 +2,14 @@
 meta:
   title: How to create a responsive React hook to listen for changes to cookies
   description: Your React components may wish to listen for changes to made to cookies, whether they were made by other React code, or HTTP requests or non-React JavaScript. The CookieStore API can help.
-  dateCreated: 2024-09-30
+  dateCreated: 2024-10-02
 ---
 import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+import {UserProfile1} from "@/demos/responsive_cookies/components/UserProfile1"
+import {UserProfile2} from "@/demos/responsive_cookies/components/UserProfile2"
+
+import {DemoFrame} from "@/components/DemoFrame/DemoFrame";
 
 
 I recently encountered a situation where I have some React code that needs to listen for changes to a cookie, but this cookie logic isn't controlled React. 
@@ -16,6 +20,19 @@ This works kind of nicely, we get a nice `useState` style hook, that also stores
 
 However, this solution is not responsive to cookie changes that may occur _outside_ of the React context. In fact, two components that were examining the same cookie would not have their updates be observed by the other. 
 
+<DemoFrame
+  description={
+    <>
+    <p>Click the 'Update User' button and observe the value changes.</p>
+    <p>Open your browser dev tools.</p>
+    <p>Observe that when you click 'Update User' a `user-1` cookie is set in the Applications tab.</p>
+    <p>Observe that when you click 'Server Fetch' an API call is made, and that Response contains a cookie. However our application will not respond to this cookie.</p>
+    </>
+  }
+>
+  <UserProfile1/>
+</DemoFrame>
+
 The scenarios where cookies may be set outside of a React context are: 
 
 - Cookies being set by HTTP responses
@@ -24,9 +41,10 @@ The scenarios where cookies may be set outside of a React context are:
 We can use the [`CookieChangeEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CookieChangeEvent) to make a `useCookie` hook truely responsive. 
 
 <InfoPanel level="warning">
-<p>The [`CookieStore`](https://developer.mozilla.org/en-US/docs/Web/API/CookieStore) is not currently supported by Firefox or Safari, and so this technique may not be suitable for you</p>
-<p><span>Additionally, I couldn't a CookieStore polyfill. There is the [`cookie-store`](https://github.com/markcellus/cookie-store) project - but this has not implemented the CookieStore Monitoring Cookies feature. See this issue:</span> <GithubIssueLinkRsc issueLink="https://github.com/markcellus/cookie-store/issues/46" variant="inline"/></p>
+<p>The [`CookieStore`](https://developer.mozilla.org/en-US/docs/Web/API/CookieStore) is not currently supported by Firefox or Safari.</p>
+<p><span>I couldn't a CookieStore polyfill. There is the [`cookie-store`](https://github.com/markcellus/cookie-store) project - but this has not implemented the CookieStore Monitoring Cookies feature. See this issue:</span> <GithubIssueLinkRsc issueLink="https://github.com/markcellus/cookie-store/issues/46" variant="inline"/></p>
 <p>My solution implements the polling solution described in [this Stack Overflow answer](https://stackoverflow.com/a/63952971/1068446)</p>
+<p>Note that on a page refresh the values in the demo are blank. This is to avoid hydration errors - this solution solves for cookies on the client-side only. The cookies are available to the server - a solution that avoids this flash will be the job of seperate post. </p>
 </InfoPanel>
 
 
@@ -34,3 +52,15 @@ The a polyfilled implementation of a responsive useCookie looks like this:
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/cookies-and-react/blob/bdb11e2edd944c0b67c64e63a674a6a1e73a89ca/src/hooks/useCookieWithListenerPolyfilled.ts#L12-L133"/>
 
+
+
+<DemoFrame
+  description={
+    <>
+    <p>Using Chrome observe that our component now responds to cookies set by the api response</p>
+    <p>Observe that this also works for Firefox. It appears sluggish - this is due the 1000ms poll rate. You can decrease the poll rate for snappier application, this will come at the cost of extra computation for the user.</p>
+    </>
+  }
+>
+  <UserProfile2/>
+</DemoFrame>
