@@ -94,6 +94,34 @@ body {
   }
 }
 
+.demo-frame {
+  background-color: var(--color-background-darken);
+  margin: 1em; 
+  padding: 1em; 
+  border-radius: 1em;
+
+  .demo-frame-title {
+    font-size: 0.8em;
+    border: solid 1px var(--color-foreground-darken);
+    border-radius: 1em;
+    display: inline-block;
+    padding: 0 1em;
+  }
+  .demo-frame-content {
+    background-color: var(--color-background-darken);
+    padding: 1em;
+    border-radius: 1em;
+
+  }
+
+  .demo-frame-description {
+      font-size: 0.75em;
+      margin: 0.5em 0;
+      padding: 0.25em 1em;
+      border-radius: 1em;
+
+  }
+}
 
 .sheep-image-wrapper {
   &.force-light {
