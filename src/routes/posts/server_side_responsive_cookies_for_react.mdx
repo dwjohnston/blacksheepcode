@@ -1,0 +1,52 @@
+---
+meta:
+  title: Using cookies in React Server Components to avoid a flash the incorrect content. 
+  description: We make use of NextJS's `cookies` function to access the cookies on the server side. 
+  dateCreated: 2024-10-02
+series: 
+  name: react_cookies
+  part: 2
+
+---
+import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+import {UserProfile2} from "@/demos/responsive_cookies/components/UserProfile2"
+import {UserProfileRsc} from "@/demos/responsive_cookies/components/UserProfileRsc"
+
+import {DemoFrame} from "@/components/DemoFrame/DemoFrame";
+
+In the [previous post](./responsive_cookies_for_react) about making responsive cookies for React,  I mention that the you'll see a flash of the default value, before the actual clientside cookie appears. 
+
+This is because my blog is server rendered using NextJS, and server doesn't have access to the clientside cookies, and so renders using the default value. When the page hits the browser, the clientside `useEffect` occurs and the value is replaced with the cookie. 
+
+However, the cookie _is_ available to the server, it's attached to the request for the page. 
+
+<DemoFrame
+  description={
+    <>
+    <p>Click 'Update User' to generate a random user'</p>
+    <p>Refresh the page, observe that this compoent briefly flashes the default user.</p>
+
+    </>
+  }
+>
+  <UserProfile2/>
+</DemoFrame>
+
+<DemoFrame
+  description={
+    <>
+    <p>Refresh the page, observe that this component starts with the correct user.</p>
+    </>
+  }
+>
+  <UserProfileRsc/>
+</DemoFrame>
+
+
+Attaching the cookie server side, in a React Server Component (RSC) is straight forward, we simply use the [`cookies()`](https://nextjs.org/docs/app/api-reference/functions/cookies) function. 
+
+We use this in a simple RSC, and then pass the values into our client component. 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/f33d4b9ce58453ce1c9a289a893db58b18593e9d/src/demos/responsive_cookies/components/UserProfileRsc.tsx#L11-L20"/>
+

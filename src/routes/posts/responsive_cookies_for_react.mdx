@@ -3,6 +3,11 @@ meta:
   title: How to create a responsive React hook to listen for changes to cookies
   description: Your React components may wish to listen for changes to made to cookies, whether they were made by other React code, or HTTP requests or non-React JavaScript. The CookieStore API can help.
   dateCreated: 2024-10-02
+series: 
+  name: react_cookies
+  part: 1
+  description: Using cookies in React applications
+
 ---
 import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
@@ -44,15 +49,13 @@ We can use the [`CookieChangeEvent`](https://developer.mozilla.org/en-US/docs/We
 <p>The [`CookieStore`](https://developer.mozilla.org/en-US/docs/Web/API/CookieStore) is not currently supported by Firefox or Safari.</p>
 <p><span>I couldn't a CookieStore polyfill. There is the [`cookie-store`](https://github.com/markcellus/cookie-store) project - but this has not implemented the CookieStore Monitoring Cookies feature. See this issue:</span> <GithubIssueLinkRsc issueLink="https://github.com/markcellus/cookie-store/issues/46" variant="inline"/></p>
 <p>My solution implements the polling solution described in [this Stack Overflow answer](https://stackoverflow.com/a/63952971/1068446)</p>
-<p>Note that on a page refresh the values in the demo are blank and then they pop-in. This is to avoid hydration errors - this solution solves for cookies on the client-side only. The cookies are available to the server - a solution that avoids this flash will be the job for a seperate post. </p>
+<p>Note that on a page refresh the values initially show as 'John Doe' and then cookie value pops in. This is because this blog is has server rendering, and this these solutions access the client cookies.  Cookies are available to the server - a solution that avoids this flash [is available in this post here](./server_side_responsive_cookies_for_react). </p>
 </InfoPanel>
 
 
 The a polyfilled implementation of a responsive useCookie looks like this: 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/755c91364f8673ccec472ec8fb2c883f1d324f71/src/demos/responsive_cookies/hooks/useCookieWithListenerPolyfilled.ts#L1-L131"/>
-
-
 
 <DemoFrame
   description={
