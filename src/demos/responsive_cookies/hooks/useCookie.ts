@@ -12,7 +12,7 @@ type UseCookieReturn<T> = [
 
 
 export default function useCookie<T>(name: string, defaultValue: T): UseCookieReturn<T> {
-  const [value, setValue] = useState<T | null>(null)
+  const [value, setValue] = useState<T | null>(defaultValue)
 
   useEffect(() => {
     const cookie = Cookies.get(name)
