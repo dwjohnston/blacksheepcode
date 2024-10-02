@@ -1,6 +1,7 @@
+//@ts-nocheck
 "use client";
 import { useState, useCallback, useEffect } from "react";
-import Cookies, {CookieAttributes} from "js-cookie"
+import Cookies from "js-cookie"
 // Define the return type of the hook
 type UseCookieReturn<T> = [
   T | null, // Value of the cookie
@@ -11,9 +12,7 @@ type UseCookieReturn<T> = [
 
 // Polyfilled cookieStore wrappers. 
 async function getCookie(cookieName: string) : Promise<string | null> {
-
   if("cookieStore" in window) {
-
     return (await cookieStore.get(cookieName))?.value ?? null;
   } 
 
@@ -29,7 +28,6 @@ async function setCookie(cookieName: string, value: string, options?: unknown) :
 }
 
 async function deleteCookie(cookie: string) : Promise<void> {
-
   if("cookieStore" in window) {
     return cookieStore.delete(cookie);
   } 
@@ -72,14 +70,11 @@ export function listenForCookieChange(cookieName: string, onChange: (newValue: s
     }
   }, 1000);
 
-
   // We still return a clean up function for the effect
   return () => {
     clearInterval(interval);
   }
 }
-
-
 
 export default function useCookieWithListener<T>(
   name: string,

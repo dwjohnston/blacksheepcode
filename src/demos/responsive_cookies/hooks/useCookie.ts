@@ -1,12 +1,12 @@
 "use client";
 import { useState, useCallback, useEffect } from 'react'
-import Cookies, { CookieAttributes } from 'js-cookie'
+import Cookies from 'js-cookie'
 
 
 // Define the return type of the hook
 type UseCookieReturn<T> = [
   T | null, // Value of the cookie
-  (newValue: T, options?: CookieAttributes) => void, // Function to update the cookie
+  (newValue: T, options?: typeof Cookies.attributes) => void, // Function to update the cookie
   () => void // Function to delete the cookie
 ]
 
@@ -38,7 +38,7 @@ export default function useCookie<T>(name: string, defaultValue: T): UseCookieRe
 
 
   const updateCookie = useCallback(
-    (newValue: T, options?: CookieAttributes) => {
+    (newValue: T, options?: typeof Cookies.attributes) => {
       // Stringify the value before storing it
       Cookies.set(name, JSON.stringify(newValue), options)
       setValue(newValue)
