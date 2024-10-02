@@ -44,7 +44,7 @@ We can use the [`CookieChangeEvent`](https://developer.mozilla.org/en-US/docs/We
 <p>The [`CookieStore`](https://developer.mozilla.org/en-US/docs/Web/API/CookieStore) is not currently supported by Firefox or Safari.</p>
 <p><span>I couldn't a CookieStore polyfill. There is the [`cookie-store`](https://github.com/markcellus/cookie-store) project - but this has not implemented the CookieStore Monitoring Cookies feature. See this issue:</span> <GithubIssueLinkRsc issueLink="https://github.com/markcellus/cookie-store/issues/46" variant="inline"/></p>
 <p>My solution implements the polling solution described in [this Stack Overflow answer](https://stackoverflow.com/a/63952971/1068446)</p>
-<p>Note that on a page refresh the values in the demo are blank. This is to avoid hydration errors - this solution solves for cookies on the client-side only. The cookies are available to the server - a solution that avoids this flash will be the job of seperate post. </p>
+<p>Note that on a page refresh the values in the demo are blank and then they pop-in. This is to avoid hydration errors - this solution solves for cookies on the client-side only. The cookies are available to the server - a solution that avoids this flash will be the job for a seperate post. </p>
 </InfoPanel>
 
 
