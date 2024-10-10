@@ -1,4 +1,4 @@
-import { getAllPostFrontmatter, mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
+import { getAllPostFrontmatter } from "@/utils/blogPosts";
 import { ListOfArticles } from "@/components/ListOfArticles/ListOfArticles";
 import { notFound } from "next/navigation";
 

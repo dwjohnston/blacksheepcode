@@ -114,7 +114,7 @@ export function getImageTags(imageName?: string): {
 
 
 
-export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlusSlug["frontmatter"]["meta"]> | null): Metadata {
+export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlusSlug["frontmatter"]["meta"]> | null, path?: string): Metadata {
 
     if (!meta) {
         return DEFAULT_METADATA;
@@ -129,7 +129,7 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
         openGraph: {
             title: meta?.title ?? DEFAULT_METADATA.title,
             description: meta?.description ?? DEFAULT_METADATA.description,
-            url: getDomainUrl(),
+            url: `${getDomainUrl()}${path ? path : ''}`,
             siteName: getSiteName(),
             type: "website",
             locale: "en_AU",
@@ -147,27 +147,28 @@ export function mergeFrontmatterAndDefaultMetadata(meta: Partial<FrontMatterPlus
     return data;
 }
 
-export async function getMetadata(slug: string): Promise<Metadata> {
+export async function getMetadata(path: string): Promise<Metadata> {
     try {
-        const metadata = await getFrontmatterFromSlug(slug);   
-        return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta);
+        const metadata = await getFrontmatterFromSlug(path);
+
+        return mergeFrontmatterAndDefaultMetadata(metadata.frontmatter.meta, path);
 
     }
-    catch(err){
+    catch (err) {
         return DEFAULT_METADATA;
     }
 }
 
 
 //@ts-ignore - something weird happening here, sometimes it shows an error, sometimes not
-export async function getBlogContent(slug: string, folder: BlogPostFolders = "posts") : Promise<React.ReactNode> {
+export async function getBlogContent(slug: string, folder: BlogPostFolders = "posts"): Promise<React.ReactNode> {
     try {
-        const data= await import(`../generated/mdx/${folder}/${slug}`)
+        const data = await import(`../generated/mdx/${folder}/${slug}`)
         return data.default();
-    } catch(err){
+    } catch (err) {
         notFound();
 
-   }
+    }
 }
 
 

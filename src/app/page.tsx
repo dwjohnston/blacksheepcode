@@ -2,7 +2,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import { ListOfArticles } from "@/components/ListOfArticles/ListOfArticles";
 import { SheepImage } from "@/components/SheepImage/SheepImage";
-import { getAllPostFrontmatter, mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
+import { getAllPostFrontmatter } from "@/utils/blogPosts";
 import { Metadata } from "next";
 
 async function getAllArticles() {
