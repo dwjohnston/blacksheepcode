@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "react-github-permalink/dist/github-permalink.css";
 import { mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
-import { Suspense } from "react";
 
 import {githubPermalinkRscConfig} from "react-github-permalink/dist/rsc";
 const inter = Inter({ subsets: ["latin"] });
