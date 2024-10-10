@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: {
     slug: string
 } }) {
-    return getMetadata(`/test/${params.slug}`, params.slug);
+    return getMetadata(`/test/${params.slug}`);
 }
 
 export default async function PageLayout(props: PropsWithChildren<{
