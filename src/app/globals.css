@@ -541,6 +541,11 @@ table td {
   clear: right;
 }
 
+.tooltip-container svg {
+
+  /* Todo - fix the library */
+  display: block !important;
+}
 
 .image-panel {
   display: flex; 
