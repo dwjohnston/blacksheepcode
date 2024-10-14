@@ -1,0 +1,220 @@
+---
+meta:
+  title: TypeScript - indexing into a mapped type
+  description: Indexing into a mapped type a powerful TypeScript technique to allow a collection of all different types, while retaining the type information. 
+  dateCreated: 2024-10-15 18:00:00
+
+  
+series: 
+  name: typescript_bits
+  part: 2
+  description: TypeScript bits
+---
+
+
+Let say we have some data representing rows in a table: 
+
+```js
+
+const rows = [
+  {
+    id: "1", 
+    name: "bob", 
+    address: "123 bobs way", 
+    favouriteNumber: 123,
+    favouriteColors: ["red", "green"], 
+  },
+  {
+    id: "1", 
+    name: "cindy", 
+    address: "123 cindy close", 
+    favouriteNumber: 999,
+    favouriteColors: ["purple"], 
+  }
+]
+
+```
+
+And then we have some column data that represent the row keys, and how the corresponding row values should be handled, 
+
+```
+const columns = [
+  {
+    key: "name", 
+    renderValue: (value) => { // 👈  Value should type 'string'
+
+    }
+  },
+  {
+    key: "favouriteNumber", 
+    renderValue: (value) => { // 👈  Value should type 'number'
+
+    }
+  },
+    {
+    key: "favouriteColors", 
+    renderValue: (value) => { // 👈  Value should type 'string[]'
+
+    }
+  }
+]
+
+```
+
+
+How can type this such that the typings of our `renderValue` functions have their types derived, from what is seen in the rows data? 
+
+## Step 1 - Declare a type for our rows. 
+
+```typescript
+type RowData = Record<string, unknown> & {key: string}; 
+```
+
+So far, so good. 
+
+
+## Step 2 - Declare a type for our columns 
+
+We want to derive our column data type from our row data. Using a generic here is appropriate. 
+
+To start, let's just get the keys of the row data.
+
+```typescript 
+type ColumnData<T extends RowData> = keyof T; // 👈  just the keys of T
+
+//type A = "foo" | "id"
+type A = ColumnData<{foo: number, id: string}>; 
+```
+
+Now, let's create an object type that has all the keys of the row data, mapped to just type 'unknown'. 
+
+
+Here we use a _mapped type_: 
+
+```typescript
+type ColumnData<T extends RowData> = { // 👈 it's an object type
+  [K in keyof T]: unknown;             // 👈 with every key of T, with value type 'unknown'
+}
+
+// type B = {
+//     foo: unknown;
+//     id: unknown;
+// }
+type B = ColumnData<{foo: number, id: string}>; 
+```
+
+
+Now, let's use the actual values of the row data. 
+
+```typescript 
+type ColumnData<T extends RowData> = { // 👈 it's an object type
+  [K in keyof T]: T[K]                 // 👈 with every key of T, with value type 'whatever every values can be accessed by K'
+}
+// type C = {
+//     foo: number;
+//     id: string;
+// }
+type C = ColumnData<{foo: number, id: string}>; 
+```
+
+We've effectively cloned the the row data type. 
+
+The `[K in keyof T]` effectively acts as a for loop, introducing a new generic type K, which we use to _index_ the original T type, to "get all values accessible by this type K". 
+
+So let's create those `key` and `renderValue` properties. 
+
+```typescript 
+type ColumnData<T extends RowData> = {// 👈 it's an object type
+  [K in keyof T]: {                       // 👈 for each key - declare an object type with... 
+    key: K;                               // 👈 property 'key'... 
+    renderValue: (value: T[K]) => void;   // 👈 and property 'renderValue'
+  }
+}
+// type D = {
+//     foo: {
+//         key: "foo";
+//         renderValue: (value: number) => void;
+//     };
+//     id: {
+//         key: "id";
+//         renderValue: (value: string) => void;
+//     };
+// }
+type D = ColumnData<{foo: number, id: string}>; 
+```
+
+This is looking good, but it's not _quite_ what we want. We don't want a full object, we're looking for just the types accessed by those "foo" and "id" keys. 
+
+This is where we use a second index type of the whole object itself: 
+
+
+```typescript 
+type ColumnData<T extends RowData> = { // 👈 it's an object type
+  [K in keyof T]: {                    // 👈 for each key in T...     
+    key: K;                               
+    renderValue: (value: T[K]) => void;   
+  }
+}[keyof T]                             // 👈 From the top level object type - what values can be accessed by the keys of T?
+
+// type E = {
+//     key: "id";
+//     renderValue: (value: string) => void;
+// } | {
+//     key: "foo";
+//     renderValue: (value: number) => void;
+// }
+type E = ColumnData<{foo: number, id: string}>; 
+```
+
+
+And there we have it!
+
+
+This gives us great type behaviour, we can do things like: 
+
+```
+function processColumn<T extends RowData>(rows: Array<T>, column: ColumnData<T>) {
+  rows.forEach((v) => {
+    const value = v[column.key];
+    column.renderValue(value);
+  })
+}
+
+const rows = [
+  { id: "1", x: 9, y: "hello" },
+  { id: "2", x: 10, y: "abc" },
+]
+
+// properly typed
+processColumn(rows,
+  {
+    key: "x",
+    renderValue: (value) => {
+      // number
+      value;
+    }
+})
+
+processColumn(rows,
+  {
+    // 👇 TypeScript knows the key doesn't exist
+    //Type '"z"' is not assignable to type '"id" | "x" | "y"'.(2322)
+    key: "z",
+    renderValue: (value) => {
+      // number
+      value;
+    }
+})
+
+processColumn(rows,
+  {
+    key: "x",
+    renderValue: (value) => {
+      // 👇 TypeScript knows what the value type is 
+      // Type 'number' is not assignable to type 'string'.(2322)
+      let value2: string = value; 
+    }
+})
+```
+
+For more information - see [this Stack Overflow answer.](https://stackoverflow.com/a/64753409/1068446) 
