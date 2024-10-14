@@ -1,0 +1,160 @@
+---
+meta:
+  title: TypeScript types are inferred in a forward direction
+  description: TypeScript's type inference is powerful, but it does have constraints. One constraint is that it can't retrospectively narrow types. 
+  dateCreated: 2024-10-14
+
+  
+series: 
+  name: typescript_bits
+  part: 1
+  description: TypeScript bits
+---
+
+If you're a fan of TypeScript, then one of the features you likely like is how it can sensibly infer and narrow types automatically, without relying on the developer to explicitly set the typings. 
+
+Here's an example use case, where we use a _discriminated union_ and _type guards_ which has TypeScript helpfully narrowing the type: 
+
+```typescript 
+
+
+type UserResult = {
+  isLoading: true; 
+  data: null; 
+} | {   // 👈 Discriminated Union
+  isLoading: false; 
+  data: {
+     username: string; 
+  }
+}
+
+function processUserResult(payload: UserResult) {
+
+  if(userResult.isLoading) { // 👈 Type Guard 
+    //(property) data: null
+    userResult.data; 
+  }
+  else{ // 👈 Type Guard 
+    // 👇 TypeScript knows that the data exists
+    //(property) username: string
+    userResult.data.username;
+  }
+}
+
+```
+
+However, one thing to note is that when encountering a type guard, TypeScript can't go back up the page to narrow the types. 
+
+For example, take this piece of code: 
+
+```typescript 
+type Types = "A" | "B"| "C"; 
+
+const valueMap  = {
+  "A": "alpha", 
+  "B": "bravo", 
+  "C": "charlie"
+} as const satisfies Record<Types, string>;
+
+
+function doThing(key: Types){
+
+  // "alpha" | "bravo" | "charlie"
+  const result = valueMap[key]; 
+
+  if(key === "A"){
+    // "alpha" | "bravo" | "charlie"      👈 No type narrowing here 
+    result; 
+  }
+
+}
+
+```
+
+Here, we can easily deduce that the the type of `result` should only be `"alpha"`. But because the generation of the type `result` occured _before_ the type guard, TypeScript can't 'go back in time' so to speak, to narrow the type. 
+
+If we were to change our code to: 
+
+```typescript 
+function doThing(key: Types){
+
+  if(key === "A"){
+      // "alpha"
+      const result = valueMap[key]; 
+  }
+  else if (key === "B"){
+       // "bravo"
+      const result = valueMap[key];  // But it's a bit annoying having to regenerate `result` in each block right? 
+  }
+}
+```
+
+Then the narrowing does occur, the `result` type is generated _after_ the type guard. 
+
+For more information - see [my Stack Overflow question here](https://stackoverflow.com/questions/79048935/can-i-make-a-typescript-type-guard-apply-against-the-result-of-a-function-overlo) with more details, including links to various TypeScript Github issues. 
+
+Continuing to use a discriminated union can be helpful. 
+
+
+```typescript
+
+// Here I've manually declared a discriminated union to create the association between keys and values. 
+type KeysAndValues = {
+  key: "A", 
+  value: "alpha"
+} | {
+  key: "B", 
+  value: "bravo", 
+} | {
+  key: "C", 
+  value: "charlie"
+}; 
+
+function getValueForKey(key: Types) : KeysAndValues  {
+  const value = valueMap[key]; 
+
+  return {key, value} as KeysAndValues
+}
+
+
+function doThing(key: Types){
+
+
+const result = getValueForKey(key);
+
+// Now, the type guard narrows the result type, which includes both the key and value. 
+  if(result.key === "A"){
+    // "alpha"
+    result.value
+  }
+
+}
+```
+
+Declaring that discriminated union is pain - is there a nicer way we can that? 
+
+Yes, we can _index into a mapped type_. 
+
+
+```typescript 
+// type KeysAndValues = {
+//     key: "A";
+//     value: "alpha";
+// } | {
+//     key: "B";
+//     value: "bravo";
+// } | {
+//     key: "C";
+//     value: "charlie";
+// }
+type KeysAndValues = {
+  [K in keyof ValueMap] : {
+    key: K, 
+    value: ValueMap[K]
+  }
+}[keyof  ValueMap]
+```
+
+I write about this technique in the next post. 
+
+
