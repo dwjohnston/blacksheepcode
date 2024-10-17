@@ -5,6 +5,8 @@ meta:
   dateCreated: 2022-11-28
 ---
 
+import {GithubPermalinkRsc} from "react-github-permalink/dist/rsc";
+
 This is the first post in a series about optimising JavaScript application load times. 
 
 
@@ -12,42 +14,10 @@ This is the first post in a series about optimising JavaScript application load 
 
 First let's take a very simple application with images only. 
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-</head>
-<body id="body">
-    IMAGES ONLY
-
-    <img src="https://place-hold.it/300?image-1"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-2"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-3"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-4" loading="lazy"/>
-
-
-</body>
-</html>
-```
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/bundle-size-investigation/blob/37f8511bb56a556b1abd2c87226847e2ef30e07f/scenario-1-images-only/index.html#L1-L31"
+  lineExclusions={[[13,13], [19,19], [25,25]]}
+  lineExclusionText="//50kB of DOM here"
+/>
 
 A link to actual code for this is here. ADD LINK 
 
