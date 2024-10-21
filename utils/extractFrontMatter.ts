@@ -2,7 +2,8 @@ import fm from "front-matter";
 import fs from 'fs';
 import fsAsync from "fs/promises"
 import path from 'path';
-import { frontMatterSchema } from "./frontmatterTypings";
+import { FrontMatter, frontMatterSchema } from "./frontmatterTypings";
+import { getFileGitTimestamps } from "./getFileGitTimestamps";
 
 
 export type WriteFileFn = typeof _writeFile; 
@@ -58,13 +59,26 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
 
   async function processFile(inputString: string) {
     const file = await fsAsync.readFile(inputString);
+
+    const timestamps = await getFileGitTimestamps(inputString);
+
+    console.log(inputString,timestamps)
     const fileText = file.toString();
     const [subPath, fileName] = getParts(inputString);
 
     const output = fm(fileText);
 
+
+    const fmContent = output.attributes as FrontMatter; 
+
+
+    // If a dateCreated exists, use it, otherwise use the one from git
+    if(!fmContent.meta.dateCreated){
+      fmContent.meta.dateCreated = timestamps.createdAt
+    }
+
     try {
-      frontMatterSchema.parse(output.attributes);
+      frontMatterSchema.parse(fmContent);
     }
     catch (e) {
       throw new Error(`
@@ -79,7 +93,7 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
 
 
 
-    await writeFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, output.attributes);
+    await writeFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, fmContent);
     await appendIndexFile(path.join(basePath, 'index.js'), fileName);
 
 }

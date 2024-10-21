@@ -1,8 +1,10 @@
 
-export function DatePublished(props: {date: string | Date}) {
+export function DatePublished(props: { date: string | Date, className?: string}) {
 
-    return <div>
-         <i className="date-published">Published: <time dateTime={new Date(props.date).toISOString()}>{new Date(props.date).toLocaleDateString(undefined, {day: 'numeric', month: 'long', year:'numeric'})}</time></i>
-     </div>
-  
+    const {className = '', date} = props;
+
+    return <div className={`date-published ${className}`}>
+        <i><span>Published:</span><time dateTime={new Date(date).toISOString()}>{new Date(date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}</time></i>
+    </div>
+
 }
