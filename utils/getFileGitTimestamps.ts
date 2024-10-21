@@ -11,7 +11,7 @@ import { exec } from 'child_process'
  * @param filePath 
  * @returns 
  */
-export async function getFileGitTimestamps(filePath: string)  : Promise<{createdAt: string, lastEditedAt: string}>{
+export async function getFileGitTimestamps(filePath: string)  : Promise<{createdAt: Date, lastEditedAt: Date}>{
     return new Promise((resolve, reject) => {
         exec(`git log --follow --format="%H %at" -- "${filePath}"`, (error, stdout, stderr) => {
             if (error) {
