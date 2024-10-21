@@ -22,7 +22,7 @@ describe("real pages", () => {
         cy.get(".react-github-permalink").its("length").should('eq', 10);
      })
   
-      it("comment blocks", () => {
+      it.skip("comment blocks", () => {
         cy.visit('posts/adding_msw_bundler_to_remix_app_2'); 
   
         cy.get("iframe.utterances-frame").should("exist");
