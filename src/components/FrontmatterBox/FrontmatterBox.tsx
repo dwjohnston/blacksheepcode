@@ -3,6 +3,7 @@ import React from "react";
 import { getFrontmatterFromSlug } from "@/utils/blogPosts";
 import type { EnrichedFrontMatterPlusSlug } from "../../../utils/frontmatterTypings";
 import Link from "next/link";
+import { DatePublished } from "../DatePublished/DatePublished";
 
 type FrontmatterBoxProps = {
     frontmatter: EnrichedFrontMatterPlusSlug | null;
@@ -72,22 +73,13 @@ export async function FrontmatterBox(props: PropsWithChildren<{
         return <>{props.children}</>;
     }
 
-    const formatter = new Intl.DateTimeFormat(["en-GB", 'en-US'], {
-        day: "numeric",
-        month: "long", 
-        year: "numeric",
-        "timeZone": "UTC"
-    })
-
-    const dateString = formatter.format(new Date(frontmatter.frontmatter.meta.dateCreated))
-
     return <>
         <div>
             <SeriesBox frontmatter={frontmatter} />
         </div>
         <div>
             <h1>{frontmatter.frontmatter.meta.title}</h1>
-            <p className="date-published">{dateString}</p>
+            <DatePublished date={frontmatter.frontmatter.meta.dateCreated}/>
         </div>
         {props.children}
 

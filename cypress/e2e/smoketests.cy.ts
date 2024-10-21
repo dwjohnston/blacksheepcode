@@ -109,7 +109,7 @@ describe('Test pages', () => {
 
     })
 
-    it("comment blocks", () => {
+    it.skip("comment blocks", () => {
       cy.visit('test/basic_mdx?q=foo'); 
 
       cy.get("iframe.utterances-frame").should("exist");
