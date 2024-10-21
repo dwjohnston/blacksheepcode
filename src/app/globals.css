@@ -182,6 +182,20 @@ body {
 }
 
 
+h1 {
+  margin-bottom: 0;
+}
+
+h1 + .date-published {
+  margin-top:0;
+  margin-bottom: 3em;
+  margin-left: 1em;
+
+  color: var(--color-foreground-secondary)
+}
+
+
+
 
 .error-page h1 {
   text-align: center;
