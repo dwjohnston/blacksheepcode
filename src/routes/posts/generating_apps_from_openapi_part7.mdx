@@ -1,6 +1,6 @@
 ---
 meta:
-  title: Black box contract testing - third party API mocking using Mockbin
+  title: Black box contract testing - third party API mocking
   description: We have an API that makes calls out to a third party - how do we test it? We can use .HAR files to configure a tool like Mockbin to act as the third party service.
   dateCreated: 2023-08-14
 
@@ -10,9 +10,6 @@ series:
 ---
 import { GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
-
-
-# Black box contract testing - third party API mocking 
 
 What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albeit with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
 
