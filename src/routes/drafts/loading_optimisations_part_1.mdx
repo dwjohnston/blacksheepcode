@@ -2,24 +2,60 @@
 meta:
   title: Let's talk about the behaviour of browser as it pertains to loading static assets - images, css and scripts. 
   description: I am the description
-  dateCreated: 2022-11-28
 ---
-
-import {GithubPermalinkRsc} from "react-github-permalink/dist/rsc";
 
 This is the first post in a series about optimising JavaScript application load times. 
 
+## Part 1 - HTML Streams in 
 
-## Part 1 - Images 
+Let's take an application that looks like this: 
 
-First let's take a very simple application with images only. 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/bundle-size-investigation/blob/37f8511bb56a556b1abd2c87226847e2ef30e07f/scenario-1-images-only/index.html#L1-L31"
-  lineExclusions={[[13,13], [19,19], [25,25]]}
-  lineExclusionText="//50kB of DOM here"
-/>
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-A link to actual code for this is here. ADD LINK 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+</body>
+</html>
+```
+
+Just plain HTML, and a little bit of CSS for purpose of demonstration. 
 
 I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
 
@@ -27,17 +63,97 @@ Let's examine the behaviour of this application.
 
 Open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. 
 
-Refresh the page, and here's the network waterfall we see: 
+Refresh the page. 
 
-(loading_ss_1)
+Note that we see the individual blocks pop in one at a time - as the network response streams in. 
 
-Note that the images start loading _before the page has finished streaming in_. The browser will stream the HTML response and parse it as it recieves it. As it encounters the image tags, it starts downloading the images in parallell.
+This is important, and useful. HTML documents _parse as they stream_ - we don't need to wait for the entire document to have loaded before we display it. 
+
+## Part 2 - Images 
+
+Now, let's add some images to our application: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+</head>
+<body id="body">
+    <img src="https://place-hold.it/300?image-1"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <img src="https://place-hold.it/300?image-2"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <img src="https://place-hold.it/300?image-3"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <img src="https://place-hold.it/300?image-4"/>
+
+</body>
+</html>
+```
+
+
+We get similar behaviour, but observe the images start streaming as soon the DOM element has been encountered. 
 
 ### HTTP/1 Simulatenous request limits
 
 What happens if we have something like this? 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 
-CODE BLOCK
+</head>
+<body id="body">
+    <img src="https://place-hold.it/300?image-1"/>
+    <img src="https://place-hold.it/300?image-2"/>
+    <img src="https://place-hold.it/300?image-3"/>
+    <img src="https://place-hold.it/300?image-4"/>
+    <img src="https://place-hold.it/300?image-5"/>
+    <img src="https://place-hold.it/300?image-6"/>
+    <img src="https://place-hold.it/300?image-7"/>
+    <img src="https://place-hold.it/300?image-8"/>
+    <img src="https://place-hold.it/300?image-9"/>
+    <img src="https://place-hold.it/300?image-10"/>
+    <img src="https://place-hold.it/300?image-11"/>
+    <img src="https://place-hold.it/300?image-12"/>
+    <img src="https://place-hold.it/300?image-13"/>
+    <img src="https://place-hold.it/300?image-14"/>
+    <img src="https://place-hold.it/300?image-15"/>
+    <img src="https://place-hold.it/300?image-16"/>
+    <img src="https://place-hold.it/300?image-17"/>
+    <img src="https://place-hold.it/300?image-18"/>
+    <img src="https://place-hold.it/300?image-19"/>
+
+</body>
+</html>
+```
 
 Our waterfall now looks like this: 
 
@@ -49,13 +165,21 @@ This is because Live Server is using the HTTP/1 protocol - which limits the numb
 
 Also, [see this discussion for the difference between 'stalled' and 'queuing'](https://groups.google.com/g/google-chrome-developer-tools/c/YxYJdgoej18)
 
-
 ### Lazy loading images 
 
 It's nice that the loading of images won't otherwise block the rendering of the page, but we're still unnecessarily fetching data that the user might not need, if they don't scroll down the page. 
 
 We can load the images only when the the image appears in the viewport by using the [`loading="lazy"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#loading) attribute. 
 
+### Summarising where we are at 
+
+Browsers are sensibly designed. They'll display HTML and images as they receive it. 
+
+There is a bottleneck with http/1.1 - it's browser specific but for Chrome it's six connections per server simulateneously.
+
+## Part 2 - CSS 
+
+Let's add some CSS to the head of our document:
 
 ```html
 <!DOCTYPE html>
@@ -63,81 +187,40 @@ We can load the images only when the the image appears in the viewport by using 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-</head>
-<body id="body">
-    IMAGES ONLY
-
-    <img src="https://place-hold.it/300?image-1" loading="lazy"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-2" loading="lazy"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-3" loading="lazy"/>
-
-    <div class="50kB-of-dom">
-      //snip - pretend there is 50kB of DOM content here
-    </div>
-
-    <img src="https://place-hold.it/300?image-4" loading="lazy"/>
-
-</body>
-</html>
-```
-
-LINK TO REPO 
-
-(loading_ss_4)
-
-Now only that first image loads when we refresh the page, the others will only load when we scroll down. 
-
-
-## CSS 
-
-Take this scenario: 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
     <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
 
-     #main {
-        font-size: 2em;
-
-        color: black; 
-        border: black 2px dashed;
-        background-color: grey;
-     }
-      //50kB more css here
+        // 👉  👈
+        // 50 kB of CSS here
     </style>
 </head>
-<body>
-
-    <p id="main">hello world!</p>
-
-    <div class="50kB-of-dom">
-      //snip
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
     </div>
 
-    
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 </body>
 </html>
 ```
+
 
 Here the application behaves as we expect it might - the content streams in and because the CSS appears first, when the HTML content appears it is already styled. 
 
-If, on the other hand, we were to move that `<style>` tag to the bottom of the document: 
+If, on the other hand, we were to move that CSS to the bottom of the document: 
 
 ```html
 <!DOCTYPE html>
@@ -145,47 +228,90 @@ If, on the other hand, we were to move that `<style>` tag to the bottom of the d
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
 
+    </style>
 </head>
-<body>
-
-    <p id="main">hello world!</p>
-
-    <div class="50kB-of-dom">
-      //snip
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
     </div>
 
-        <style>
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-     #main {
-        font-size: 2em;
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-        color: black; 
-        border: black 2px dashed;
-        background-color: grey;
-     }
-      //50kB more css here
+    <style>
+        // 👉  👈
+        // 50 kB of CSS here
     </style>
-
-    
 </body>
 </html>
 ```
 
-Then what we'll see the content stream in, initially unstyled, and when it reaches the CSS then the style pops in. 
+Then what we'll see the content stream in, initially unstyled, and when it reaches the CSS then the style pops in. This behaviour is known as a ["flash of unstyled content" (FOUC).](https://en.wikipedia.org/wiki/Flash_of_unstyled_content) 
 
 ### Accessing style via `<link>` tag 
 
-[LINK]
+Now, let's access the CSS via a `<link>` tag.
 
-What happens in this scenario? 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
 
-I had thought, that the `<link>` tags would behave similarly to images here - that they would load in parallell while the rest of the content is displayed. 
+    </style>
+    
+    // 👇 50kB CSS
+    <link href="./index.css" rel="stylesheet"/> 
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-This is the not the case - they do indeed load in paralell, but the [stylesheets are render blocking](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path#css_object_model:~:text=CSS%20is%20render,identifying%20valid%20tokens). 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+
+We might think that the `<link>` tag will behave similar to our images - it'll load in parallel, the HTML will continue to stream in, and when it's complete the styles will apply. 
+
+This is the not the case! - They do indeed load in paralell, but the [stylesheets are render blocking](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path#css_object_model:~:text=CSS%20is%20render,identifying%20valid%20tokens). 
 
 See [my Stack Overflow question here](https://stackoverflow.com/questions/79021080/has-stylesheet-loading-always-been-render-blocking) and [this related question](https://stackoverflow.com/questions/50619239/render-blocking-and-css). 
+
+The reason that stylesheets are render blocking - is to prevent these FOUCs. 
 
 Note that on the face of it, we've actually worsened the loading performance of our application - the extra 'waiting for server response' means that the content will take longer to display than if we'd inlined the styles into the document head. 
 
@@ -194,63 +320,479 @@ So why don't we do this?
 Caching. By having two seperate files, each can be cached independantly. Chances are, the user has already downloaded the CSS, because they've visited the website before, or because they've just visited a different page. The HTML is likely to change more often than the CSS, and we don't want to invalidate any CSS caching everytime the HTML changes. 
 
 
-## Scripts 
-
-Our starting point:
-
-CODE BLOCK
-
-Here we just have HTML, and bit of inline CSS to color the blocks. What we see is the streaming behaviour of HTML, and each block pops in one at a time as it streams in. 
-
-Now, let's add some JavaScript that will change the background color. 
-
-To start, we'll make this an inline script. 
-
-CODE BLOCK
+## Part 3 - Scripts
 
 
-IMAGE
+### Classic Scripts - inline
 
-The behaviour here is what we might expect - the script is parsed first and it executes, and the remaining HTML is parsed and displayed one at a time. 
+Let's leave behind CSS, and we'll introduce some JavaScript. 
 
-If we move this inline script the middle of the document:
+Say we have this: 
 
-CODE BLOCK
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
 
-IMAGE
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-We now see the first two blocks appear, the background changes color, and then the remaining blocks appear. 
+    <script>
 
-## Classic scripts
+      // change text to maroon
+      const styleTag1a = document.createElement("style"); 
+      styleTag1a.textContent=`body {color: maroon;}`
+      document.head.appendChild(styleTag1a)
 
-Now let's change this classic script (a `<script>` tag without `async`, `defer` or `type="module"` attributes):
+      // 50kB of filler
 
-The behaviour is basically the same - but note that now the JavaScript file is streamed simultaneously. Here we'll get all of the advantages of caching. 
+      // Change background to pink
+      const styleTag1 = document.createElement("style"); 
+      styleTag1.textContent=`body {background-color: pink;}`
+      document.head.appendChild(styleTag1)
+    </script>
 
-The document still continues to be streamed, _but parsing is blocked until the JavaScript file finishes streaming and is executed_. 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-## Defer scripts 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-Defer scripts are the easiest to understand, so let's start there. If we add the `defer` attribute to our script tag: 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-CODE BLOCK
+    <script>
 
-Now, the browser streams the JavaScript file as soon as it enounters the tag, but waits until all of the document has finished loading before it executes it. 
+      // Change text to green
+      const styleTag2a = document.createElement("style"); 
+      styleTag2a.textContent=`body {color: green;}`
+      document.head.appendChild(styleTag2a)
 
-## Async scripts 
+      // 50kB of filler
+      
+      // Change background to violet
+      const styleTag2b = document.createElement("style"); 
+      styleTag2b.textContent=`body {background-color: violet;}`
+      document.head.appendChild(styleTag2b)
+    </script>
 
-Async don't block parsing while they are downloading. This means that they'll behave in a non-deterministic manner - if they interact with the document, it depends on how much of the document is loaded by the time the script has finished downloading as to what they'll have access to. 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-A better example of the three script types might demonstrated here: 
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-CODE BLOCK
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
 
-Here, we have three different scripts, and each of them just log all of the images they can find on the page. 
+    <script>
+      //Change text to brown
+      const styleTag3a = document.createElement("style"); 
+      styleTag3a.textContent=`body {color: brown;}`
+      document.head.appendChild(styleTag3a)
+      // 50kB of filler
+      
+      // Change background to orange
+      const styleTag3b = document.createElement("style"); 
+      styleTag3b.textContent=`body {background-color: orange;}`
+      document.head.appendChild(styleTag3b)
+    </script>
 
-The classic script always finds no images, because the parsing hasn't occured yet. 
+</body>
+</html>
 
-The defer script always finds all twenty images, because it always waits until the document has finished streaming to execute. 
+We have our 50kB DOM blocks, and in between them we have 50kB inline JavaScript scripts:
 
-The async script finds a different number everytime. 
+```html
+    <script>
 
+      // change text to maroon
+      const styleTag1a = document.createElement("style"); 
+      styleTag1a.textContent=`body {color: maroon;}`
+      document.head.appendChild(styleTag1a)
+
+      // 50kB of filler
+
+      // Change background to pink
+      const styleTag1 = document.createElement("style"); 
+      styleTag1.textContent=`body {background-color: pink;}`
+      document.head.appendChild(styleTag1)
+    </script>
+```
+
+These scripts will first change the color of the text, then there's 50kB of non-functional filler, and then the background color will change. 
+
+What we observe is that the blocks will stream in, and then nothing will happen while the script is streaming in, then the script will be evaluated all at once, and then the blocks will stream in. 
+
+This demonstrates an important difference between JavaScript and HTML - JavaScript does must wait until the entire scripts is loaded before it can be evaluated. 
+
+If we split our scripts into three: 
+
+```html
+    <script>
+      // change text to maroon
+      const styleTag1a = document.createElement("style"); 
+      styleTag1a.textContent=`body {color: maroon;}`
+      document.head.appendChild(styleTag1a)
+    </script>
+
+    <script>
+      // 50kB of filler
+    </script>
+    x
+    <script>
+      // Change background to pink
+      const styleTag1 = document.createElement("style"); 
+      styleTag1.textContent=`body {background-color: pink;}`
+      document.head.appendChild(styleTag1)
+    </script>
+```
+
+Then we will see the text color change and the background color change occur independendantly. 
+
+Moral of the story: Small scripts mean changes can occur sooner. 
+
+
+### Classic scripts - sourced
+
+Let's ignore splitting the text change and the background color change, and we'll we'll now move our scripts into `.js` files and include them in our document with the `src` attribute. 
+
+```html
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+
+    // 👇
+    <script src="./script1.js"></script>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+
+    // 👇
+    <script src="./script2.js"></script>
+
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    // 👇
+    <script src="./script3.js"></script>
+
+
+</body>
+</html>
+
+```
+We're also going to add this little bit to each script: 
+
+```js
+function appendBlockCount1(){
+    const div1 = document.createElement("div");
+    const numBlocks = document.querySelectorAll(".dom-50kB").length;
+    div1.textContent=`Script 1: Number of blocks: ${numBlocks}`;
+    const body = document.querySelector("body");
+    body.appendChild(div1);
+    
+}
+appendBlockCount1();
+```
+
+The purpose of this part is to have our script tell us how many blocks it sees at the time it evaluates. 
+
+When we run this we observe three things: 
+
+1. When the script tag is enountered, the JavaScript script starts downloading and the HTML also continues downloading. 
+2. When the script evaluates we see the color change, and we also immediately see 2-3 blocks appear
+3. The `Number of blocks:` value is consistent, it is always the number we can see directly above the script. 
+
+The important principle here is that that classic scripts are _parse blocking_. That is - while the document can continue stream, it won't continue to put elements into the DOM until the script has evaluated. 
+
+We do get an efficiency here - the JavaScript and the HTML document can be streamed at the same time, and that's why we see 2-3 blocks appears immediately, the browser has already downloaded them. 
+
+### Classic scripts - in serial 
+
+Let's take a document that looks like this
+```html
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+    </style>
+
+
+    // Change background color to pink
+    <script src="./script1.js"></script>
+    // Change background color to pink
+    <script src="./script1.js"></script>
+    // Change background color to orange
+    <script src="./script3.js"></script>
+
+</head>
+<body id="body">
+
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+
+In this scenario, we might expect that we'll see the scripts load in serial. The scripts are parse blocking after all - the browser shouldn't evaluate the next script tag until the first one has finished loading. 
+
+Turns out this is not the case - browser have done some amount of optimisation allowing the parsing to continue precisely for this scenario - allowing all of the scripts to to load in parallel. [See this Stack Overflow answer](https://stackoverflow.com/a/37759508/1068446). This functionality is known as _preload scanning_.  
+
+Note that just inserting divs between the scripts is not enough to prevent this behaviour. ie. 
+
+
+```html 
+<body>
+    
+    // Change background color to pink
+    <script src="./script1.js"></script>
+    <div>1</div>
+    // Change background color to pink
+    <script src="./script1.js"></script>
+    <div>2</div>
+    // Change background color to orange
+    <script src="./script3.js"></script>
+</body>
+```
+
+Will have the scripts still load in parallel - though their execution is still parse blocking. 
+
+### Classic scripts - defer 
+
+Defer scripts are the easiest to understand, so let's start there. If we add the `defer` attribute to our script tag, then the browser streams the JavaScript file as soon as it enounters the tag, but waits until all of the document has finished loading before it executes it. 
+
+This has the advantage that we can put the script tag at the top of the document so it starts downloading early, have it be ready to evaluate by the time the document has finished streaming. 
+
+
+Consider three scenarios: 
+
+- Scenario 1 - a script in the head of the document, without a defer tag
+- Scenario 2 - a script at the end of the document, without a defer tag
+- Scenario 3 - a script in the head of the document with a defer tag
+
+For these scenarios let's assume that the important thing the script is doing is counting the number of blocks. 
+
+```html
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+
+    // 👇 Scenario 1 - script in the head with no defer tag
+    <script src="./script1.js"></script>
+
+    // 👇 Scenario 2 - script in the head with a defer tag
+    <script src="./script1.js" defer></script>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+
+    // 👇 Scenario 2 - script at the bottom
+    <script src="./script1.js"></script>
+
+
+</body>
+</html>
+```
+
+In scenario 1 the script is evaluated before any of the other elements exist in the document - it will actually error out - because no body tag exists yet. 
+
+In scenario 2 - the count will be correct, but the script didn't start downloading until the document was almost complete parsing. 
+
+Scenario 3 - using the `defer` attribute provides us the the best of both worlds - we start streaming the script early, but we wait until the document is complete to use it. 
+
+
+### Async scripts 
+
+Like defer scripts, scripts with the `async` attribute don't block parsing while they are downloading. This means that they'll behave in a non-deterministic manner - if they interact with the document, it depends on how much of the document is loaded by the time the script has finished downloading as to what they'll have access to. 
+
+This example demonstrates the difference between the three types: 
+
+
+```html
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+
+    <script src="./script1.js"></script>
+    <script src="./script2.js" async></script>
+    <script src="./script3.js" defer></script>
+
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+
+In this example: 
+
+- Script 1 errors out - because no body tag exists
+- Script 2 evaluates when usually around four of the blocks are loaded, but this number is indeterminate. 
+- Script 3 always evaluates at the end. 
+
+## Summarising 
+
+- HTML documents are parsed as they stream, take advantage of this. 
+- Stylesheets will block rendering until all stylesheets are loaded. Maybe you will want to have some default themeing inlined in your head, so the user doesn't see a white screen initially. 
+- JavaScript scripts will not be evaluated until they are completely loaded. Breaking your scripts up means that they can act sooner. 
+- Non defer/async scripts will block parsing, however this will not cause scripts to be loaded in serial - due to preload scanning. 
+- Be aware of the HTTP/1.1 connections bottleneck - consider using a server that uses HTTP/2.
 
