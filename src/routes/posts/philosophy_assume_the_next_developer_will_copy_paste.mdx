@@ -1,0 +1,68 @@
+---
+meta:
+  title: "Assume the next developer will copy paste what they see you do. (That next developer might be you.)"
+  description: aaa
+  dateCreated: 2024-09-09
+---
+
+A core principle I keep in mind when creating a pull request is that I assume that the next developer to come along is going to continue doing what they already see here. 
+
+
+## Example 1 - Switch like statements
+
+For example, say I've written some code that looks like this: 
+
+
+```tsx
+type Product = {
+    productType: "movie" | "book";
+}
+
+function ProductSuggestion(product: Product) {
+    if(product.productType ==="movie") {
+        return <div> 
+            <img src="/movie-icon.svg"/> Enjoy a visual spectacle with... 
+        </div>;
+    }
+
+    if(product.productType === "book") {
+        return <div> 
+            <img src="/book-icon.svg"> Jump into a great read with... 
+        </div>
+    }
+}
+```
+
+Then we can assume that the next PR will look like this: 
+
+```diff
+type Product = {
+-    productType: "movie" | "book";
++    productType: "movie" | "book" | "album";
+}
+
+function ProductSuggestion(product: Product) {
+    if(product.productType ==="movie") {
+        return <div> 
+            <img src="/movie-icon.svg"/> Enjoy a visual spectacle with... 
+        </div>;
+    }
+
+    if(product.productType === "book") {
+        return <div> 
+            <img src="/book-icon.svg"> Jump into a great read with... 
+        </div>
+    }
+
++    if(product.productType === "album") {
++        return <div> 
++            <img src="/album-icon.svg"> Rock out with... 
++        </div>
+    }
+}
+
+```
+
+## Example 2 - Tests 
+
+13

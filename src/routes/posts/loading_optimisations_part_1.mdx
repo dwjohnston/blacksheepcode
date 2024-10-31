@@ -1,0 +1,516 @@
+---
+meta:
+  title: The behaviour of browsers and loading resources - HTML, images, and CSS
+  description: Browsers do not need to wait for an entire HTML document to be loaded before it can display it. CSS is render blocking. Images will start streaming as soon as the tag is encountered.
+  dateCreated: 2024-10-31 12:00:00
+
+series: 
+  name: loading_optimisations
+  part: 1
+  description: Optimising frontend applications
+---
+
+import {CodeExampleLink} from "@/components/CodeExampleLink/CodeExampleLink";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+import loading_ss_1 from "@/assets/loading_ss_1.png";
+
+
+<InfoPanel level="instruction">
+    The code examples in this post are hosted in [this repository](https://github.com/dwjohnston/bundle-size-investigation).
+
+    Each code example contains a link the specific specific example, so you can run these yourself.
+
+    I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
+
+    While accessing the application with your web browser - open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. This allows us to see with more detail what's happening with browsers network requests. 
+</InfoPanel>
+## HTML
+Let's take an application that looks like this: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        // Just some styling so we can see the blocks individually
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+</body>
+</html>
+```
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/1.1-html" text="1.1-html"/>
+
+
+Just plain HTML, and a little bit of CSS for purpose of demonstration. 
+
+Note that we see the individual blocks pop in one at a time - as the network response streams in. 
+
+This is important, and useful. HTML documents _parse as they stream_ - we don't need to wait for the entire document to have loaded before we display it. 
+
+## Images 
+
+Now, let's add some images to our application: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+</head>
+<body id="body">
+    <img src="https://place-hold.it/300?image-1"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+    
+    <img src="https://place-hold.it/300?image-2"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <img src="https://place-hold.it/300?image-3"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <img src="https://place-hold.it/300?image-4"/>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/2.1-images-only" text="2.1-images-only"/>
+
+We get similar behaviour, but observe the images start streaming as soon the DOM element has been encountered. 
+
+### HTTP/1 Simulatenous request limits
+
+What happens if we have something like this? 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+<body id="body">
+    <img src="https://place-hold.it/300?image-1"/>
+    <img src="https://place-hold.it/300?image-2"/>
+    <img src="https://place-hold.it/300?image-3"/>
+    <img src="https://place-hold.it/300?image-4"/>
+    <img src="https://place-hold.it/300?image-5"/>
+    <img src="https://place-hold.it/300?image-6"/>
+    <img src="https://place-hold.it/300?image-7"/>
+    <img src="https://place-hold.it/300?image-8"/>
+    <img src="https://place-hold.it/300?image-9"/>
+    <img src="https://place-hold.it/300?image-10"/>
+    <img src="https://place-hold.it/300?image-11"/>
+    <img src="https://place-hold.it/300?image-12"/>
+    <img src="https://place-hold.it/300?image-13"/>
+    <img src="https://place-hold.it/300?image-14"/>
+    <img src="https://place-hold.it/300?image-15"/>
+    <img src="https://place-hold.it/300?image-16"/>
+    <img src="https://place-hold.it/300?image-17"/>
+    <img src="https://place-hold.it/300?image-18"/>
+    <img src="https://place-hold.it/300?image-19"/>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/2.2-only-lot-of-images" text="2.2-lots-of-images"/>
+
+Our waterfall now looks like this: 
+
+<img src ={loading_ss_1.src} alt="A dev tools loading waterfall demonstrating a lot of stalled time for multiple images" className="blog-image" style={{height: 400, display: "block", margin: "40px auto"}}/>
+
+The later images now have a good amount of stalled time. 
+
+This is because Live Server is using the HTTP/1 protocol - which limits the number of simultaneous connections per server at at time. See [this Stack Overflow answer for a summary.](https://stackoverflow.com/a/985704/1068446) 
+
+Also, [see this discussion for the difference between 'stalled' and 'queuing'](https://groups.google.com/g/google-chrome-developer-tools/c/YxYJdgoej18)
+
+### Lazy loading images 
+
+It's nice that the loading of images won't otherwise block the rendering of the page, but we're still unnecessarily fetching data that the user might not need, if they don't scroll down the page. 
+
+We can load the images only when the the image appears in the viewport by using the [`loading="lazy"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#loading) attribute. 
+
+### Summarising where we are at 
+
+Browsers are sensibly designed. They'll display HTML and images as they receive it. 
+
+There is a bottleneck with http/1.1 - it's browser specific but for Chrome it's six connections per server simultaneously.
+
+## CSS 
+
+Let's add some CSS to the head of our document:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+        // 👇
+        // 50 kB of CSS here
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.1-css-inline-in-head" text="3.1-css-inline-in-head"/>
+
+Here the application behaves as we expect it might - the content streams in and because the CSS appears first, when the HTML content appears it is already styled. 
+
+If, on the other hand, we were to move that CSS to the bottom of the document: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+    </style>
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <style>
+        // 👇
+        // 50 kB of CSS here
+    </style>
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.2-css-inline-at-bottom" text="3.2-css-inline-at-bottom"/>
+
+
+
+Then what we'll see the content stream in, initially unstyled, and when it reaches the CSS then the style pops in. This behaviour is known as a ["flash of unstyled content" (FOUC).](https://en.wikipedia.org/wiki/Flash_of_unstyled_content) 
+
+### Accessing style via `<link>` tag 
+
+Let's access the CSS via a `<link>` tag.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+    </style>
+    
+    <!-- 👇 50kB CSS -->
+    <link href="./index.css" rel="stylesheet"/> 
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.3-css-link" text="3.3-css-link"/>
+
+We might think that the `<link>` tag will behave similar to our images - it'll load in parallel, the HTML will continue to stream in, and when it's complete the styles will apply. 
+
+This is the not the case! - They do indeed load in parallel, but the [stylesheets are render blocking](https://developer.mozilla.org/en-US/docs/Web/Performance/Critical_rendering_path#css_object_model:~:text=CSS%20is%20render,identifying%20valid%20tokens). 
+
+See [my Stack Overflow question here](https://stackoverflow.com/questions/79021080/has-stylesheet-loading-always-been-render-blocking) and [this related question](https://stackoverflow.com/questions/50619239/render-blocking-and-css). 
+
+The reason that stylesheets are render blocking - is to prevent these FOUCs. 
+
+Note that the HTML document will continue to stream, it just won't be displayed until the stylesheet is loaded. 
+
+Note depending on the size of our document and the size of our CSS, that we've potentially worsened the loading performance of our application - the extra 'waiting for server response' means that the content could take longer to display than if we'd inlined the styles into the document head. 
+
+So why don't we do this? 
+
+Caching. By having two separate files, each can be cached independently. Chances are, the user has already downloaded the CSS, because they've visited the website before, or because they've just visited a different page. The HTML is likely to change more often than the CSS, and we don't want to invalidate any CSS caching every time the HTML changes. 
+
+### Render blocking, not parse blocking 
+
+If we take the previous example, and add some images to start of our document
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+
+    </style>
+    
+    <!-- 👇 50kB CSS -->
+    <link href="./index.css" rel="stylesheet"/> 
+</head>
+<body id="body">
+    <!-- 👇 images -->
+    <img src="https://place-hold.it/300?image-1"/>
+    <img src="https://place-hold.it/300?image-2"/>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.3.5-css-link-not-parse-blocking" text="3.3-css-link"/>
+
+Note that although nothing will be displayed until the stylesheet has completed loading, the image will still start downloading immediately. 
+
+This is because the browser continues _parsing_ the the document, it just doesn't _render_ the document. 
+
+This example highlights the difference between three concepts: 
+
+- **Streaming** - The loading of a HTTP response's response body. Nothing interrupts streaming, but HTTP/1.1 requests have a simultaneous requests limit. 
+- **Parsing** - The browser evaluation of an HTML string, determining what elements exist, and whether new resources need to be streamed.  
+- **Rendering** - The actual displaying of the HTML elements on the page. 
+
+This [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/Performance/How_browsers_work) is a helpful overview. 
+
+### Accessing style via `<link>` tag  at the end of the document
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+    
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <!-- 👇 50kB CSS -->
+    <link href="./index.css" rel="stylesheet"/> 
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.4-css-link-in-middle" text="3.4-css-link-in-middle"/>
+
+In this example we put the `<link>` tag in the middle of the document to demonstrate that the HTML will stream in up until it reaches the link tag, and which point the rendering will be blocked until the stylesheet is loaded. 
+
+So if we don't care about FOUCs and we want to prioritise showing the the user the content as soon as possible, we can put our `<link>` tags at the end of the document. 
+
+The problem with this approach is that it's not until the end of the document that the stylesheet start loading, meaning that the use will be delayed in seeing the final result of the page.
+
+### Preloading a stylesheet with `<link rel="preload">`
+
+The above problem can be mitigated by [preloading](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload) our stylesheet. 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 👇 preload the stylesheet -->
+    <link href="./index.css" rel="preload" as="style"/> 
+
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>    
+
+</head>
+<body id="body">
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <!-- 👇 50kB CSS -->
+    <link href="./index.css" rel="stylesheet"/> 
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
+
+</body>
+</html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.5-css-link-in-middle-with-preload" text="3.5-css-link-in-middle-with-preload"/>
+
+The resource will start loading as soon as the `<link rel="preload"/>` tag is encountered - but won't be render blocking until the `<link rel="stylesheet">` tag is encountered.
+
+## Summarising 
+
+- HTML documents are parsed as they stream, take advantage of this. 
+- Stylesheets will block rendering until all stylesheets are loaded. Maybe you will want to have some default theming inlined in your head, so the user doesn't see a white screen initially. 
+- Be aware of the HTTP/1.1 connections bottleneck - consider using a server that uses HTTP/2.
+- Note the difference between streaming, parsing and rendering.
+- Generally we can trust that a browser will start loading a resource as soon as it parses the tag. Though in future posts we'll note that there's some nuance to this.
+- We can use `rel="preload"` to greedily get resources we need. 

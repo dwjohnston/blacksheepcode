@@ -25,21 +25,30 @@ body {
   --color-background-impact: #222;
 
 
+  --color-instruction-primary: #ff9900;
+  --color-instruction-darken: #c27400;
+  --color-instruction-secondary: #907f12;
+
 
   --color-warn-primary: #ff8400;
   --color-warn-contrast: black;
   --color-warn-secondary: #fffcd3;
 
 
-  --color-foreground-darken: #00000010;
+  --color-info-primary: #40c4ff;
+  --color-info-contrast: black;
+  --color-info-secondary: #b3e5fc;
+
+  --color-action-primary: #3629c2;
+  --color-action-darken: #1a117d;
+
+
+  --color-foreground-darken: #362b97;
   --color-background-darken: #00000015;
 
   --color-background-lighten: #ffffff08;
 
 
-  --color-info-primary: #40c4ff;
-  --color-info-contrast: black;
-  --color-info-secondary: #b3e5fc;
 
 
   color: var(--color-foreground-paper);
@@ -50,6 +59,9 @@ body {
 
 @media (prefers-color-scheme: dark) {
   body {
+
+
+    
       --color-foreground-paper: white;
       --color-foreground-secondary: #ccc; 
 
@@ -73,14 +85,20 @@ body {
       --color-background-deep: black;
       --color-background-impact: #black;
 
+      --color-instruction-primary: #e2c715;
+      --color-instruction-darken: #aa9719;
+      --color-instruction-secondary: #907f12;
+
       --color-warn-primary: #d88f41;
       --color-warn-contrast: rgb(235, 201, 122);
       --color-warn-secondary: #3c2301;
-    
-    
+        
       --color-info-primary: #00a8f5;
       --color-info-contrast: rgb(253, 253, 253);
       --color-info-secondary: #033248;
+
+      --color-action-primary: #9966ff;
+      --color-action-darken: #a29ce1;
   }
 
 }
@@ -121,6 +139,24 @@ body {
       border-radius: 1em;
 
   }
+}
+
+.code-example-link {
+
+  font-size: 0.9em;
+  &, &:visited {
+    font-weight: bold;
+    margin-left: 1em;
+    margin-bottom: 2em;
+    display: block;
+    
+  }
+
+  &:hover {
+
+  }
+
+
 }
 
 .sheep-image-wrapper {
@@ -420,6 +456,16 @@ table td {
   font-size: 0.8em;
 
 
+}
+
+.infopanel-instruction {
+  background-color: var(--color-background-darken);
+  border-color: var(--color-instruction-secondary);
+  margin: 0 1em;
+
+  .icon {
+    color: var(--color-instruction-primary);
+  }
 }
 
 .infopanel-warning {
