@@ -1,9 +1,28 @@
-## Part 3 - Scripts
+---
+meta:
+  title: The behaviour of browsers and loading resources - Scripts
+  description: JavaScript scripts can not evaluated until they have been completely loaded. By default they are parse blocking. 
+series: 
+  name: loading_optimisations
+  part: 1
+---
 
+import {CodeExampleLink} from "@/components/CodeExampleLink/CodeExampleLink";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
 
-### Classic Scripts - inline
+<InfoPanel level="instruction">
+    The code examples in this post are hosted in [this repository](https://github.com/dwjohnston/bundle-size-investigation).
 
-Let's leave behind CSS, and we'll introduce some JavaScript. 
+    Each code example contains a link the specific specific example, so you can run these yourself.
+
+    I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
+
+    While accessing the application with your web browser - open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. This allows us to see with more detail what's happening with browsers network requests. 
+</InfoPanel>
+
+Let's leave CSS behind, and talk about JavaScript scripts.
+
+## Inline Scripts
 
 Say we have this: 
 
@@ -31,7 +50,6 @@ Say we have this:
     </div>
 
     <script>
-
       // change text to maroon
       const styleTag1a = document.createElement("style"); 
       styleTag1a.textContent=`body {color: maroon;}`
@@ -48,17 +66,14 @@ Say we have this:
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
 
     <script>
-
       // Change text to green
       const styleTag2a = document.createElement("style"); 
       styleTag2a.textContent=`body {color: green;}`
@@ -75,11 +90,9 @@ Say we have this:
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
@@ -99,12 +112,14 @@ Say we have this:
 
 </body>
 </html>
+```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.1-inline-scripts-between-blocks" text="4.1-inline-scripts-between-blocks"/>
 
-We have our 50kB DOM blocks, and in between them we have 50kB inline JavaScript scripts:
+
+We have our 50kB DOM blocks, and in between them we have these 50kB inline JavaScript scripts:
 
 ```html
     <script>
-
       // change text to maroon
       const styleTag1a = document.createElement("style"); 
       styleTag1a.textContent=`body {color: maroon;}`
@@ -123,7 +138,7 @@ These scripts will first change the color of the text, then there's 50kB of non-
 
 What we observe is that the blocks will stream in, and then nothing will happen while the script is streaming in, then the script will be evaluated all at once, and then the blocks will stream in. 
 
-This demonstrates an important difference between JavaScript and HTML - JavaScript does must wait until the entire scripts is loaded before it can be evaluated. 
+This demonstrates an important difference between JavaScript and HTML - _JavaScript must wait until the entire scripts is loaded before it can be evaluated_. 
 
 If we split our scripts into three: 
 
@@ -147,14 +162,17 @@ If we split our scripts into three:
     </script>
 ```
 
-Then we will see the text color change and the background color change occur independendantly. 
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.2-inline-scripts-between-blocks-split" text="4.2-inline-scripts-between-blocks-split"/>
+
+
+Then we will see the text color change and the background color change occur independently. 
 
 Moral of the story: Small scripts mean changes can occur sooner. 
 
 
-### Classic scripts - sourced
+## Sourced scripts
 
-Let's ignore splitting the text change and the background color change, and we'll we'll now move our scripts into `.js` files and include them in our document with the `src` attribute. 
+Let's ignore splitting the scripts, and we'll we'll now move our scripts into `.js` files and include them in our document with the `src` attribute. 
 
 ```html
 <html lang="en">
@@ -179,39 +197,35 @@ Let's ignore splitting the text change and the background color change, and we'l
     </div>
 
 
-    // 👇
+    <!-- 👇 50kB JS -->
     <script src="./script1.js"></script>
 
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
 
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
 
-
-    // 👇
+    <!-- 👇 50kB JS -->
     <script src="./script2.js"></script>
 
 
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
 
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    // 👇
+    <!-- 👇 50kB JS -->
     <script src="./script3.js"></script>
 
 
@@ -219,6 +233,8 @@ Let's ignore splitting the text change and the background color change, and we'l
 </html>
 
 ```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.3-src-scripts-between-blocks" text="4.3-src-scripts-between-blocks"/>
+
 We're also going to add this little bit to each script: 
 
 ```js
@@ -237,7 +253,7 @@ The purpose of this part is to have our script tell us how many blocks it sees a
 
 When we run this we observe three things: 
 
-1. When the script tag is enountered, the JavaScript script starts downloading and the HTML also continues downloading. 
+1. When the script tag is encountered, the JavaScript script starts downloading and the HTML also continues downloading. 
 2. When the script evaluates we see the color change, and we also immediately see 2-3 blocks appear
 3. The `Number of blocks:` value is consistent, it is always the number we can see directly above the script. 
 
@@ -245,7 +261,7 @@ The important principle here is that that classic scripts are _parse blocking_. 
 
 We do get an efficiency here - the JavaScript and the HTML document can be streamed at the same time, and that's why we see 2-3 blocks appears immediately, the browser has already downloaded them. 
 
-### Classic scripts - in serial 
+## Sourced scripts - in serial 
 
 Let's take a document that looks like this
 ```html
@@ -280,11 +296,9 @@ Let's take a document that looks like this
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
@@ -293,17 +307,17 @@ Let's take a document that looks like this
 </html>
 ```
 
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.4-src-scripts-in-serial" text="4.4-src-scripts-in-serial"/>
+
 In this scenario, we might expect that we'll see the scripts load in serial. The scripts are parse blocking after all - the browser shouldn't evaluate the next script tag until the first one has finished loading. 
 
 Turns out this is not the case - browser have done some amount of optimisation allowing the parsing to continue precisely for this scenario - allowing all of the scripts to to load in parallel. [See this Stack Overflow answer](https://stackoverflow.com/a/37759508/1068446). This functionality is known as _preload scanning_.  
 
-Note that just inserting divs between the scripts is not enough to prevent this behaviour. ie. 
-
+Note that just inserting divs between the scripts is not enough to prevent this behaviour, for example: 
 
 ```html 
 <body>
-    
-    // Change background color to pink
+     // Change background color to pink
     <script src="./script1.js"></script>
     <div>1</div>
     // Change background color to pink
@@ -314,14 +328,15 @@ Note that just inserting divs between the scripts is not enough to prevent this 
 </body>
 ```
 
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.5-src-scripts-in-serial-with-divs-between" text="4.5-src-scripts-in-serial-with-divs-between"/>
+
 Will have the scripts still load in parallel - though their execution is still parse blocking. 
 
-### Classic scripts - defer 
+## Defer scripts
 
-Defer scripts are the easiest to understand, so let's start there. If we add the `defer` attribute to our script tag, then the browser streams the JavaScript file as soon as it enounters the tag, but waits until all of the document has finished loading before it executes it. 
+Defer scripts are the easiest to understand, so let's start there. If we add the `defer` attribute to our script tag, then the browser streams the JavaScript file as soon as it encounters the tag, but waits until all of the document has finished loading before it executes it. 
 
 This has the advantage that we can put the script tag at the top of the document so it starts downloading early, have it be ready to evaluate by the time the document has finished streaming. 
-
 
 Consider three scenarios: 
 
@@ -347,49 +362,34 @@ For these scenarios let's assume that the important thing the script is doing is
         }
     </style>
 
-    // 👇 Scenario 1 - script in the head with no defer tag
+    <!-- 👇 Scenario 1 - script in the head with no defer tag --> 
     <script src="./script1.js"></script>
 
-    // 👇 Scenario 2 - script in the head with a defer tag
+    <!-- 👇 Scenario 2 - script in the head with a defer tag -->
     <script src="./script1.js" defer></script>
 </head>
 <body id="body">
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
-
+    <div class="dom-50kB">
+        // 50kB of dom elements here
+    </div>
     <div class="dom-50kB">
         // 50kB of dom elements here
     </div>
 
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
+    <!-- snip -->
 
 
-    // 👇 Scenario 2 - script at the bottom
+    <!-- 👇 Scenario 2 - script at the bottom -->
     <script src="./script1.js"></script>
 
 
 </body>
 </html>
 ```
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.6-src-scripts-defer-in-head" text="4.6-src-scripts-defer-in-head"/>
 
 In scenario 1 the script is evaluated before any of the other elements exist in the document - it will actually error out - because no body tag exists yet. 
 
@@ -398,7 +398,7 @@ In scenario 2 - the count will be correct, but the script didn't start downloadi
 Scenario 3 - using the `defer` attribute provides us the the best of both worlds - we start streaming the script early, but we wait until the document is complete to use it. 
 
 
-### Async scripts 
+## Async scripts 
 
 Like defer scripts, scripts with the `async` attribute don't block parsing while they are downloading. This means that they'll behave in a non-deterministic manner - if they interact with the document, it depends on how much of the document is loaded by the time the script has finished downloading as to what they'll have access to. 
 
@@ -440,25 +440,14 @@ This example demonstrates the difference between the three types:
         // 50kB of dom elements here
     </div>
 
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
-
-    <div class="dom-50kB">
-        // 50kB of dom elements here
-    </div>
+    <!-- snip -->
 
 </body>
 </html>
 ```
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/4.7-src-scripts-async-defer-none" text="4.7-src-scripts-async-defer-none"/>
+
 
 In this example: 
 
