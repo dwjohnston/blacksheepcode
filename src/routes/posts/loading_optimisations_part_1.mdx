@@ -5,21 +5,24 @@ meta:
 series: 
   name: loading_optimisations
   part: 1
+  description: Optimising frontend applications
 ---
 
-import {CodeExampleLink} from "../../components/CodeExampleLink/CodeExampleLink";
-import loading_ss_1 from "../../assets/loading_ss_1.png";
+import {CodeExampleLink} from "@/components/CodeExampleLink/CodeExampleLink";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+import loading_ss_1 from "@/assets/loading_ss_1.png";
 
-The code examples in this post are hosted in [this repository](https://github.com/dwjohnston/bundle-size-investigation).
 
-Each code example contains a link the specific specific example, so you can run these yourself.
+<InfoPanel level="instruction">
+    The code examples in this post are hosted in [this repository](https://github.com/dwjohnston/bundle-size-investigation).
 
-I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
+    Each code example contains a link the specific specific example, so you can run these yourself.
 
-While accessing the application with your web browser - open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. This allows us to see with more detail what's happening with browsers network requests. 
+    I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
 
-## HTML - HTML Streams in 
-
+    While accessing the application with your web browser - open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. This allows us to see with more detail what's happening with browsers network requests. 
+</InfoPanel>
+## HTML
 Let's take an application that looks like this: 
 
 ```html
@@ -266,7 +269,7 @@ Then what we'll see the content stream in, initially unstyled, and when it reach
 
 ### Accessing style via `<link>` tag 
 
-Now, let's access the CSS via a `<link>` tag.
+Let's access the CSS via a `<link>` tag.
 
 ```html
 <!DOCTYPE html>
@@ -317,7 +320,7 @@ The reason that stylesheets are render blocking - is to prevent these FOUCs.
 
 Note that the HTML document will continue to stream, it just won't be displayed until the stylesheet is loaded. 
 
-Note that we've potentially worsened the loading performance of our application - the extra 'waiting for server response' means that the content will take longer to display than if we'd inlined the styles into the document head. 
+Note depending on the size of our document and the size of our CSS, that we've potentially worsened the loading performance of our application - the extra 'waiting for server response' means that the content could take longer to display than if we'd inlined the styles into the document head. 
 
 So why don't we do this? 
 
@@ -380,6 +383,8 @@ This example highlights the difference between three concepts:
 - **Parsing** - The browser evaluation of an HTML string, determining what elements exist, and whether new resources need to be streamed.  
 - **Rendering** - The actual displaying of the HTML elements on the page. 
 
+This [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/Performance/How_browsers_work) is a helpful overview. 
+
 ### Accessing style via `<link>` tag  at the end of the document
 
 ```html
@@ -397,10 +402,8 @@ This example highlights the difference between three concepts:
             margin: 1em;
             border: dashed 1px black;
         }
-
     </style>
     
-
 </head>
 <body id="body">
     <div class="dom-50kB">
@@ -439,11 +442,11 @@ In this example we put the `<link>` tag in the middle of the document to demonst
 
 So if we don't care about FOUCs and we want to prioritise showing the the user the content as soon as possible, we can put our `<link>` tags at the end of the document. 
 
-The problem with this approach is that it's not until the end of the document that the stylesheet will be loaded. 
+The problem with this approach is that it's not until the end of the document that the stylesheet start loading, meaning that the use will be delayed in seeing the final result of the page.
 
 ### Preloading a stylesheet with `<link rel="preload">`
 
-The above problem can be solved by [preloading](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload) our stylesheet. 
+The above problem can be mitigated by [preloading](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/preload) our stylesheet. 
 
 ```html
 <!DOCTYPE html>
@@ -463,9 +466,7 @@ The above problem can be solved by [preloading](https://developer.mozilla.org/en
             margin: 1em;
             border: dashed 1px black;
         }
-
-    </style>
-    
+    </style>    
 
 </head>
 <body id="body">
@@ -501,7 +502,7 @@ The above problem can be solved by [preloading](https://developer.mozilla.org/en
 ```
 <CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/3.5-css-link-in-middle-with-preload" text="3.5-css-link-in-middle-with-preload"/>
 
-The resource will start loading as soon as the `<link rel="preload"/>` tag is encountered - but won't be render blocking until the `<link rel="stylesheet">` tag is encountered. Hopefully by then the resource has already loaded.
+The resource will start loading as soon as the `<link rel="preload"/>` tag is encountered - but won't be render blocking until the `<link rel="stylesheet">` tag is encountered.
 
 ## Summarising 
 
