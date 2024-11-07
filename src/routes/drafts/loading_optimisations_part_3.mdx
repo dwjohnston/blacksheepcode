@@ -1,188 +1,78 @@
 ---
 meta:
-  title: Let's talk about the behaviour of browser as it pertains to loading static assets - images, css and scripts. 
-  description: I am the description
-  dateCreated: 2022-11-28 12:00:00
+  title: Two caching strategies
+  description: There are generally two strategies for caching, 'cache, but require validation' and 'trust what you've already got without caching'. The former is well suited for caching static assets.
+  dateCreated: 2024-11-01 12:00:00
 
 ---
-
-Let's turn to the behaviour of modules, and we talk 
-
-## Module Scripts
-
-
-### Imports resolving in serial 
-
-Module scripts are a relatively new feature (supported by all major browsers since May 2018 according to [caniuse](https://caniuse.com/es6-module)). 
-
-They allow us to write our code in maintainable seperate files. 
-
-One of the motivations of _bundling_ (compiling our seperate files into one big file) is because we simply didn't have modules. 
-
-Let's take this example: 
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .dom-50kB {
-            width: 200px;
-            height: 200px; 
-            overflow: hidden;
-            display: inline-block;
-            margin: 1em;
-            border: dashed 1px black;
-        }
-    </style>
-
-<script src="./script.js" type="module" ></script>
-
-
-
-</head>
-<body id="body">
-
-
-</body>
-</html>
-```
-
-```js
-//script.js 
-
-import {a} from "a.js"; 
-
-a(): 
-
-// 50kb filler
-```
-
-```js
-//a.js 
-import { b } from "./b.js";
-export function a(){
-
-    const div = document.createElement('div');; 
-    div.textContent="I am A block";
-    document.body.appendChild(div);
-
-    b();
-}
-
-// 50kb filler
-```
-
-```js
-//b.js
-
-import {c} from './c.js';
-
-export function b(){
-
-    const div = document.createElement('div');; 
-    div.textContent="I am B block";
-    document.body.appendChild(div);
-
-    c()
-}
-
-// 50kb filler
-
-```
-
-And so on for `c.js` and `d.js`
-
-Let's observe the behaviour here. 
-
-Note that the files load in serial until all the files are loaded, and _only then_ is the script evaluated. 
-
-This makes sense - a JavaScript script can't be evaluated until the entire script is there, and then once it's there the first thing it encounters is an import statement, so evaluation pauses until that script is ready, but that script won't be ready until it evaluates its imports, and so forth. 
-
-
-
-### A bundling exmaple 
-
-Note that the majority of the time was spent on the 'waiting for server response' portion of the waterfall. If we could reduce that to just one script download with all the content we need then we avoid that overhead. 
-
-```js
-
-//script.js
-
-
-a();
-
-export function a(){
-
-    const div = document.createElement('div');; 
-    div.textContent="I am A block";
-    document.body.appendChild(div);
-
-    b()
-}
-
-export function b(){
-
-    const div = document.createElement('div');; 
-    div.textContent="I am B block";
-    document.body.appendChild(div);
-
-    c()
-}
-
-export function c(){
-    const div = document.createElement('div');; 
-
-    div.textContent="I am C block";
-    document.body.appendChild(div);
-
-    d()
-}
-
-export function d(){
-
-    const div = document.createElement('div');; 
-    div.textContent="I am D block";
-    document.body.appendChild(div);
-}
-
-// 4 * 50kB filler
-
-```
-
-In this scenario we still get essentially the same behaviour, we still have to download all of the JavaScript, and only then does our application execute.  The saving we made is that we don't have to wait for server response for each module. 
-
-
-### But don't forget about caching!
-
-The loading waterfalls are only really a problem if we need to return to the server to request the module. 
-
-If the module is in the browser cache, _and_ the browser can trust that it's up to date, then the problems of having to return to the server are negated. 
-
-Of course, for users hitting the website for the first time, they will still have that loading waterfall. This can be negated with preloading the modules. 
-
-#### Two kinds of caching approach 
-
-There are generally two approach cached resources have: 
-
-##### 1. Cache the response body, but check with the server if it's still correct
-
-The common way this occurs is that the first response will come with an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) header, and cache headers directing the cache to revalidate with the server (eg. the `no-cache` directive) and then when the client needs the resource again, it sends the request to the the server, along with the Etag, and the server inspects the Etag and can return an HTTP 304 status code saying 'The response body you have is still up to date'. 
-
-This approach is more appropriate for caching _data_ rather than static assets. 
-
-This approach can also we coupled with caching directives like `stale-while-revalidate` - where the browser can continue to use the stale value while revalidation occurs. eg. For the image of a product listing, we continue to display the image until the new image arrives. 
-
-##### 2. Cache the response body, and don't check with the server
-
-This is a common strategy for static assets like JavaScript. The common strategy is to append the file name with a _hash_ of the files contents, eg. `script-abcdef123.js` and use an `immutable` cache directive, which will tell the browser cache 'this content will _never_ change'. Because the file hash enforces uniqueness we don't need to worry about getting stale data, if the file content had changed, so would the file name. 
-
-<hr/>
-
-One of the problems with bundling the all of our scripts into one file, is that if one of the modules changes, _the entire file's hash_ changes, meaning that when a user rerequests the page, they have to redownload the entire bundle, not just the part that changed. 
-
-
-
-
+import { RequestRequiresValidation } from "@/demos/cache/components/RequestRequiresValidation"
+
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+
+There are two general approaches to caching. 
+
+## Approach 1 - require server revalidation 
+
+In this approach the cache will will store the data, but go back to the server for revalidation. If the data is still valid, then the server will either return fresh data, or respond with a 304 header, indicating that the stored data can be used. 
+
+A common mechanism for checking if the data is still valid, is the use of [Etag headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag). When the server first responds with the data, an ETag header is attached. The client, when re-requesting the data will attach the Etag as request header (browsers do this automatically), and the server can compare the Etag with a local in memory store to check if it's the most recent Etag for that resource.
+
+This approach has two optimisations over no cache at all: 
+
+1. The server typically does not need to go all the way to database to return data/check for its freshness. Some kind of local store can be used. 
+2. The response body does not need to be streamed again. 
+
+
+<DemoFrame
+  description={
+    <>
+    <ol>
+    <li>Open dev tools to network tab, make sure 'disable cache' is off.</li>
+    <li>Click 'Click Me!' and see you get a 200 response with some random data.
+    <ul>
+        <li>if you have already done the exercise, then you can click 'Force Fresh Response' for a new 200 response.</li>
+        <li>Note the `Cache-Control` response header.</li>
+        <li>Note the `ETag` response header.</li>
+    </ul>
+    </li>
+    <li>Click 'Click Me!' again, and note that you get a 304.
+       <ul>
+        <li>Note the `If-None-Match` request header</li>
+        </ul>
+ </li>
+    </ol>
+    </>
+
+  }
+>
+  <RequestRequiresValidation endpoint="requires-validation"/>
+</DemoFrame>
+
+
+## Approach 2 - Trust the data you have
+
+In this approach, the 
+
+
+<DemoFrame
+  description={
+    <>
+    <ol>
+    <li>Open dev tools to network tab, make sure 'disable cache' is off.</li>
+    <li>Click 'Click Me!' and see you get a 200 response with some random data.
+    <ul>
+        <li>if you have already done the exercise, then you can click 'Force Fresh Response' for a new 200 response.</li>
+        <li>Note the `Cache-Control: public, max-age=604800, immutable` response header.</li>
+        <li>Note no `ETag` header
+
+    </ul>
+    </li>
+    <li>Click 'Click Me!' again, and note that you get a greyed-out 200 (disk cache) response.
+   </li>
+    </ol>
+    </>
+
+  }
+>
+  <RequestRequiresValidation endpoint="immutable"/>
+</DemoFrame>
