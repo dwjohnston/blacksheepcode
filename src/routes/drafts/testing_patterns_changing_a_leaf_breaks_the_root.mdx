@@ -1,0 +1,308 @@
+Here's a common scenario I encounter with React applications, where making changes becomes more difficult that we'd like it to be. 
+
+
+We have a `Header` component, that display a navigation menu, the user avatar etc. 
+
+```tsx
+// Header.tsx
+export function Header() {
+
+    // Whatever state management tool we are using to make an API call for us
+    const user = useSelf(); 
+
+    return <div> 
+        {/* Other stuff here*/}
+
+        <UserAvatar user={user}/>
+    </div>
+} 
+```
+
+And let's we have tests for this, we're taking the recommended ([Redux](https://redux.js.org/usage/writing-tests#integration-testing-connected-components-and-redux-logic), [Tanstack Query](https://tanstack.com/query/v4/docs/framework/react/guides/testing#testing-network-calls)) approach of including our state management logic in impliciitly in our test, and mocking the API calls using a tool like MSW. 
+
+```tsx
+//Header.test.tsx
+
+// MSW boilerplate here
+
+const handlers = [
+  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  http.get('/self', () => {
+    return HttpResponse.json({
+      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+      firstName: 'John',
+      lastName: 'Maverick',
+      avatarSrc: "/image.png"
+    })
+  }),
+]
+
+const server = setupServer(...handlers)
+
+
+describe(Header, () => {
+    it("Has a user avatar", async () => {
+        // Assert existence of UserAvatar here.
+    })
+})
+```
+
+So far, so good, this is a nice simple test. 
+
+Let's also assume that our header is included in a root level `App` component. 
+
+```tsx
+// App.tsx
+
+export function App() {
+
+    return <div>
+        <Header/>
+
+        {/* Other content here*/}
+    </div>
+}
+
+```
+
+Now note that for a test for this, we'll also need to define that that MSW behaviour - otherwise when we render this that `Header` component will error out. 
+
+```tsx
+//App.test.tsx
+
+// MSW boilerplate here
+
+// The exact same MSW config
+const handlers = [
+  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  http.get('/self', () => {
+    return HttpResponse.json({
+      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+      firstName: 'John',
+      lastName: 'Maverick',
+      avatarSrc: "/image.png"
+    })
+  }),
+]
+
+const server = setupServer(...handlers)
+
+
+describe(App, () => {
+    it("Whatever logic we want to assert about App", async () => {
+       // Assertions here
+    })
+})
+```
+
+Now at this point, alarm bells might be going off in your head, this feels like a code smell, but let's contine to make the point. 
+
+## Making a change 
+
+So assuming our codebase looks like what we've got above, let's now make a change. 
+
+We're going to add functionalility to that `Header` component - this time adding a notifications indicator. 
+
+```diff
+// Header.tsx
+export function Header() {
+
+    // Whatever state management tool we are using to make an API call for us
+    const user = useSelf(); 
++    const notifications = useNotifications(); 
+
+    return <div> 
+        {/* Other stuff here*/}
++        <Notifications notifications={notifications}/>
+        <UserAvatar user={user}/>
+    </div>
+} 
+```
+
+And our test: 
+
+```diff
+//Header.test.tsx
+
+// MSW boilerplate here
+
+const handlers = [
+  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  http.get('/self', () => {
+    return HttpResponse.json({
+      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+      firstName: 'John',
+      lastName: 'Maverick',
+      avatarSrc: "/image.png"
+    })
+  }),
++  http.get("/notifications", () => {
++        return HttpResponse.json([
++            {
++                id: "1234", 
++                eventType: "ticket-status-changed", 
++                ticketId: "abcd", 
++                newStatus: "closed"
++            }
++        ])
++  })
+]
+
+const server = setupServer(...handlers)
+
+
+describe(Header, () => {
+-    it("Has a user avatar", async () => {
++    it("Has a user avatar, notifications", async () => {
+        // Assert existence of UserAvatar here.
+
++        // Assert about notifications here 
+    })
+})
+```
+
+So far, so good, this is a nice clean change here. 
+
+BUT: the problem is we also need to make a corresponding change to the `App` test as well - it's otherwise going to error when the `/notifications` endpoint isn't defined. 
+
+I consider this a code smell - where a code change we make breaks tests outside of the scope of what we're working on, and we have to make a series 'just fix the tests' style changes that aren't actually related to what we're working on. 
+
+Note that in this example I've indicated just one test breaking, but it's possible, if this component was used in multiple other places, that we'd making this change is multiple places. 
+
+## Solutions to this problem 
+
+### 1. Consider the kind of change we made above a breaking change - change our implementation to make the new functionality opt in. 
+
+The argument here is that because our implementation will break consumers (tests that indirectly consume the component) of the component, we shouldn't make a change like this, without a major version bump style warning. 
+
+Certainly - if this was a published package, being consumed by people outside of our organisation, this would be the right way to go. 
+
+The change would end up looking like this: 
+
+
+```diff
+// Header.tsx
+
++ function Notifications() {
++    const notifications = useNotifications(); 
++    return <>{/*implementation here*/} <>
++ }
+
+-export function Header() {
++export function Header(props?: {showNotifications?: boolean}) {
+
+    // Whatever state management tool we are using to make an API call for us
+    const user = useSelf(); 
+
+    return <div> 
+        {/* Other stuff here*/}
++       {props?.showNotifications && <Notifications/>}
+        <UserAvatar user={user}/>
+    </div>
+} 
+```
+
+Now, we can opt-in to this change as we need. 
+
+We won't break `App` until we make this change: 
+
+```diff
+// App.tsx
+
+export function App() {
+
+    return <div>
+-        <Header/>
++        <Header showNotifications/>
+        {/* Other content here*/}
+    </div>
+}
+
+```
+
+But here's the problem. When we _do_ make this change, then we need to make that same MSW configuration change to the `App` test. 
+
+While this 'opt-in' solution is certainly less disruptive - we can take our time in transitioning to the new functionality - we still have to make these changes to all of the tests that are indirect consumers of the component. 
+
+### 2. Maintain a list default MSW handlers. 
+
+In this strategy we have a list of default behaviour that all tests will use. 
+
+For example it might look like this initially: 
+
+```js
+//msw-defaults.js
+export const defaultHandlers = [
+  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  http.get('/self', () => {
+    return HttpResponse.json({
+      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+      firstName: 'John',
+      lastName: 'Maverick',
+      avatarSrc: "/image.png"
+    })
+  })
+]
+```
+
+```tsx
+//App.test.tsx
+
+const specificHandlers = []; 
+const server = setupServer(...defaultHandlers, ...specificHandlers)
+
+```
+
+Now, when we make the change adding notifications to the application, we also update the list of default handlers: 
+
+
+```diff
+//msw-defaults.js
+export const defaultHandlers = [
+  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  http.get('/self', () => {
+    return HttpResponse.json({
+      id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
+      firstName: 'John',
+      lastName: 'Maverick',
+      avatarSrc: "/image.png"
+    })
+  }),
++  http.get("/notifications", () => {
++    return HttpResponse.json([
++       // default is an empty array
++    ])
+  })
+]
+```
+
+The problem with this approach is that this lists may become brittle and difficult to maintain. 
+
+For example, might be likely that there are a lot of components that want to have a different set of default handlers, - ones that represent when the session is not authenticated. So now we have two sets, and then, what about a set of handlers for when the user is an admin? Now we have three sets.
+
+Still, this may be a sensible approach for a base level of functionality, eg. representing the set of requests when a user first logs in. 
+
+### 3. Wrap error boundaries around components
+
+In this approach we simply allow the components further down the tree to error - if we don't care about them. 
+
+```tsx
+export function App() {
+
+    return <div>
+    <ComponentBoundary data-testid="header">
+        <Header/>
+    </ComponentBoundary>
+        {/* Other content here*/}
+    </div>
+}
+```
+
+The suggestion here is that `ComponentBoundary` is both a [Suspense](https://react.dev/reference/react/Suspense) boundary and an [ErrorBoundary](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). 
+
+This way, we can just allow the `Header` component to error out if we don't care about what it's doing. 
+
+If we do want it to display, then we still need to opt in by configuring the right API behaviour. 
+
+
+
