@@ -1,14 +1,14 @@
 ---
 meta:
   title: "Assume the next developer will copy paste what they see you do. (That next developer might be you.)"
-  description: aaa
-  dateCreated: 2024-09-09
+  description: It's not a criticism of developers to suggest that they'll copy paste what they already see in a codebase. Programming is complex and we'll use whatever hueristic we can to reduce what we need to think about. 
+  dateCreated: 2024-11-18
 ---
 
 A core principle I keep in mind when creating a pull request is that I assume that the next developer to come along is going to continue doing what they already see here. 
 
 
-## Example 1 - Switch like statements
+## Switch like statements
 
 For example, say I've written some code that looks like this: 
 
@@ -63,6 +63,93 @@ function ProductSuggestion(product: Product) {
 
 ```
 
-## Example 2 - Tests 
+Whereas if our code look liked this: 
 
-13
+```typescript
+type Product = {
+    productType: "movie" | "book";
+}
+
+const productToContentMap : Record<Product['productType'], {
+    image: string, 
+    description: string
+}> = {
+    'movie': {
+        image: "/movie-icon.svg", 
+        description: "Enjoy a visual spectacle with..."
+    }, 
+    "book": {
+        image: "/book-icon.svg", 
+        description: "Jump into a great read with... "
+    }
+}
+
+function ProductSuggestion(product: Product) {
+
+    const content = productToContentMap[product.type];
+        return <div> 
+            <img src={content.image}/> {content.description}
+        </div>;
+}
+
+```
+
+then we we can expect that the next PR will look like: 
+
+```diff
+const productToContentMap : Record<Product['productType'], {
+    image: string, 
+    description: string
+}> = {
+    'movie': {
+        image: "/movie-icon.svg", 
+        description: "Enjoy a visual spectacle with..."
+    }, 
+    "book": {
+        image: "/book-icon.svg", 
+        description: "Jump into a great read with... "
+    }
++    "album": {
++        image: "/album-icon.svg", 
++        description: "Rock out with... "
++    }
+}
+```
+
+This isn't to say that, in this case, one style is better than the other, but it demonstrates that we can predict to some extent how a codebase is going to evolve given what we write now. 
+
+## Tests
+
+In the above scenario, this is quite a simple component, it might be tempting to skip the test. 
+
+If we do, that bit of friction in setting up the test boilerplate might also have the next developer also not writing a test. 
+
+Whereas if we write a single test: 
+
+```tsx 
+
+describe(ProductSuggestion, () => {
+    it("renders the product suggestion for movies", () => {
+        render(<ProductSuggestion product={{productType:"movie"}}/>); 
+
+        expect(screen.getByText("Enjoy a visual spectacle with...")).toBeInTheDocument();
+    })
+})
+
+```
+
+Then this will make it that bit easier for the next developer to write a test. 
+
+This suggests a corollary: 
+
+> At least write one test. 
+
+This is a pragmatic kind of compromise, that doesn't require us to comprehensively test every line of code, but if the need arises, we are well placed to write a test. 
+
+This can be easier said than done! For example if our component has hooks into state management, then in order to just render the component, we also need to provide the state management. [I write more about this problem here.](./the_problem_of_testability_in_react). Writing one test then, actually serves a very useful purpose - it may sound like a low bar, but it's actually a _very important one_ - if we can't clear that bar - then we might want to rethink things. 
+
+
+
+
+
+
