@@ -1,0 +1,53 @@
+---
+meta:
+  title: Examples of tooling that do not play nicely with ESM
+  description: EcmaScript Modules (ESM) are well established - leading some to argue that we no longer need to provide CJS packages. However, is that really the case?
+  dateCreated: 2024-11-19
+---
+
+ESM is well supported these days - so there's a question of whether we still need to be transforming our code into CJS, or whether we can leave it as nice ESM and trust that it will play nicely.
+
+The following is a list of scenarios I have enountered where ESM packages do not play nicely out of the box. 
+
+## 1. Jest 
+
+Jest does not yet fully support ESM, [see this documentation](https://jestjs.io/docs/ecmascript-modules).
+
+By default, the way Jest works is: 
+
+1. It uses Babel to transpile your code to CJS. As I understand it, it then uses these CJS modules to work its module mocking behaviour. 
+2. By default, it doesn't transform the code in your node_modules - I believe this is just an optimisation. 
+
+This means that if you have a package in your node_modules that is ESM only, when your tests run you will see an error like this: 
+
+```
+    /Users/davidjohnston/localstorage-repro/node_modules/use-local-storage-state/index.js:1
+    ({"Object.<anonymous>":function(module,exports,require,__dirname,__filename,jest){import useLocalStorageState from './src/useLocalStorageState.js';
+                                                                                      ^^^^^^
+
+    SyntaxError: Cannot use import statement outside a module
+
+      3 |
+      4 | import {hri} from "human-readable-ids";
+    > 5 | import useLocalStorageState from "use-local-storage-state";
+        | ^
+```
+
+[(Example codebase here.)](https://github.com/dwjohnston/localstorage-repro)
+
+### The work around
+
+Add to your `jest.config.js` this line: 
+
+```
+  transformIgnorePatterns: ['node_modules\\/(?!use-local-storage-state\\/)'],
+```
+
+to selectively opt some of your node_modules in for transformation. 
+
+See also this [StackOverflow question](https://stackoverflow.com/questions/68520619/jest-typescript-with-es-module-in-node-modules-error-must-use-import-to-load-e).
+
+
+
+
+
