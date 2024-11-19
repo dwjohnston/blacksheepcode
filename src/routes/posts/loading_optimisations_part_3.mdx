@@ -2,8 +2,10 @@
 meta:
   title: Two caching strategies
   description: There are generally two strategies for caching, 'cache, but require validation' and 'trust what you've already got without caching'. The former is well suited for caching static assets.
-  dateCreated: 2024-11-01 12:00:00
-
+  dateCreated: 2024-11-19
+series: 
+  name: loading_optimisations
+  part: 3
 ---
 import { RequestRequiresValidation } from "@/demos/cache/components/RequestRequiresValidation"
 
@@ -11,7 +13,7 @@ import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
 There are two general approaches to caching. 
 
-## Approach 1 - require server revalidation 
+## Approach 1 - Require server revalidation 
 
 In this approach the cache will will store the data, but go back to the server for revalidation. If the data is still valid, then the server will either return fresh data, or respond with a 304 header, indicating that the stored data can be used. 
 
@@ -51,8 +53,13 @@ This approach has two optimisations over no cache at all:
 
 ## Approach 2 - Trust the data you have
 
-In this approach, the 
+In this approach, the cache will use the data it already has, without requiring server validation. 
 
+A common scenario where this strategy is is appropriate is for static resources like bundled and minified javascript files. 
+
+When the file is created, the tooling will usually include a hash of the file content as part of the file name. Eg. `index.js` becomes `index-ac23a1.js`. Because the hash is a deterministic result of the content, we can safely assume that if the file name hasn't changed, then neither has the content. 
+
+In this scenario we can use the [`immutable`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#:~:text=the%20response%20contents.-,immutable,-The%20immutable%20response) cache directive. 
 
 <DemoFrame
   description={
@@ -61,9 +68,9 @@ In this approach, the
     <li>Open dev tools to network tab, make sure 'disable cache' is off.</li>
     <li>Click 'Click Me!' and see you get a 200 response with some random data.
     <ul>
-        <li>if you have already done the exercise, then you can click 'Force Fresh Response' for a new 200 response.</li>
+        <li>If you have already done the exercise, then you can click 'Force Fresh Response' for a new 200 response.</li>
         <li>Note the `Cache-Control: public, max-age=604800, immutable` response header.</li>
-        <li>Note no `ETag` header
+        <li>Note no `ETag` header</li>
 
     </ul>
     </li>
