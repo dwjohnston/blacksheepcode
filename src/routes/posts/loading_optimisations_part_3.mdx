@@ -55,7 +55,7 @@ This approach has two optimisations over no cache at all:
 
 In this approach, the cache will use the data it already has, without requiring server validation. 
 
-A common scenario where this strategy is is appropriate is for static resources like bundled and minified javascript files. 
+A common scenario where this strategy is appropriate is for static resources like bundled and minified javascript files. 
 
 When the file is created, the tooling will usually include a hash of the file content as part of the file name. Eg. `index.js` becomes `index-ac23a1.js`. Because the hash is a deterministic result of the content, we can safely assume that if the file name hasn't changed, then neither has the content. 
 
