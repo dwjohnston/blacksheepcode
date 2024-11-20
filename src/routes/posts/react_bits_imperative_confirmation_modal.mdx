@@ -1,8 +1,8 @@
 ---
 meta:
-  title: How to create a responsive React hook to listen for changes to cookies
+  title: How to create an imperative useConfirmationModal hook
   description: Your React components may wish to listen for changes to made to cookies, whether they were made by other React code, or HTTP requests or non-React JavaScript. The CookieStore API can help.
-  dateCreated: 2024-10-02 18:00:00
+  dateCreated: 2024-11-20
 series: 
   name: react_bits
   part: 1
@@ -11,21 +11,18 @@ series:
 ---
 
 import {DemoFrame} from "@/components/DemoFrame/DemoFrame";
-import {MyForm} from "@/components/demos/imperative_confirmation_modal/components/MyForm";
+import {MyForm} from "@/demos/imperative_confirmation_modal/components/MyForm";
 
-import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
+import {GithubPermalinkRsc} from "react-github-permalink/dist/rsc";
 
 Ever find your self writing code like this? 
 
 ```jsx
 export function MyComponent() {
-
     const [modalIsOpen, setModalIsOpen] = useState(false); 
     const [formData, setFormData] = useState<null | FormData>(null);
 
-
     return <>
-
         <form 
             onSubmit={(e) => {
                 e.preventDefault(); 
@@ -52,14 +49,16 @@ export function MyComponent() {
 }
 ```
 
-This is kind of gross right? 
+This is kind of gross right? We end up including a bunch of logic up in our component for displaying a simple confirmation modal, that messys up and distracts from what we're actually trying to do. 
 
 This is where a pattern of encapsulating the open/closed state in a hook, and exposing just the needed parts to the calling components. 
 
 Our form with confirmation required can now look like this: 
 
 ```jsx
-    const [content, showConfirmation ] = useConfirmationModal({
+export function MyComponent() {
+
+    const [confirmationModal, showConfirmation ] = useConfirmationModal({
         title: "Are you sure?", 
         body: "Some kind of custom text here", 
         cancelButton: "I am the customised cancel button", 
@@ -68,7 +67,7 @@ Our form with confirmation required can now look like this:
 
 
     return <>
-        {content}
+        {confirmationModal}
         <form 
             onSubmit={(e) => {
                 e.preventDefault(); 
@@ -81,20 +80,23 @@ Our form with confirmation required can now look like this:
                 })
             }}
             >
-             <button onClick ={() => setModalIsOpen(true)} type="submit">Submit</form> 
+                <button onClick ={() => setModalIsOpen(true)} type="submit">Submit</form> 
         </form>
         
-        </>
+    </>
+}
 ```
 
 This is nice right? 
 
 Here's how we can implement such a hook: 
 
-<>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/816e270f9be05c31d987fc8d436d703c7d1a194a/src/demos/imperative_confirmation_modal/hooks/useConfirmationModal.tsx#L6-L66"/>
 
 <DemoFrame description={<>
     <p>Click the button to see the modal</p>
 </>}>
       <MyForm/>
 </DemoFrame>
+
+Find this helpful? Disagree with this approach? Let me know in the comments? 
