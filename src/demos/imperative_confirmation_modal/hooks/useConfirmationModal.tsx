@@ -13,8 +13,8 @@ export function useConfirmationModal(options: {
     title?: ReactNode;
     body?: ReactNode;
 
-    // The idea here is that we want to allow the user to provide their own component if they want
-    // But we need to make it a renderProp, not just a ReactNode, as we need a way to pass in the click handler
+    /* The idea here is that we want to allow the user to provide their own component if they want
+     But we need to make it a renderProp, not just a ReactNode, as we need a way to pass in the click handler*/
     cancelButton?: string | ((onClick: () => void) => ReactNode);
     confirmButton?: string | ((onClick: () => void) => ReactNode);
 } = emptyObject): [content: ReactNode, openModal: (onConfirmHandler: () => void) => void] {
@@ -48,8 +48,7 @@ export function useConfirmationModal(options: {
 
         {typeof cancelButton === "function" ? cancelButton(onCancel) : <button onClick={onCancel}>
             {cancelButton}</button>}
-
-        {typeof confirmButton === "function" ? confirmButton(onConfirm) : <button onClick={onCancel}>
+        {typeof confirmButton === "function" ? confirmButton(onConfirm) : <button onClick={onConfirm}>
             {confirmButton}</button>}
     </dialog>;
 
