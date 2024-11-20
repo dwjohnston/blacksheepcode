@@ -1,0 +1,102 @@
+---
+meta:
+  title: How to create an imperative useConfirmationModal hook
+  description: Your React components may wish to listen for changes to made to cookies, whether they were made by other React code, or HTTP requests or non-React JavaScript. The CookieStore API can help.
+  dateCreated: 2024-11-20
+series: 
+  name: react_bits
+  part: 1
+  description: React bits
+
+---
+
+import {DemoFrame} from "@/components/DemoFrame/DemoFrame";
+import {MyForm} from "@/demos/imperative_confirmation_modal/components/MyForm";
+
+import {GithubPermalinkRsc} from "react-github-permalink/dist/rsc";
+
+Ever find your self writing code like this? 
+
+```jsx
+export function MyComponent() {
+    const [modalIsOpen, setModalIsOpen] = useState(false); 
+    const [formData, setFormData] = useState<null | FormData>(null);
+
+    return <>
+        <form 
+            onSubmit={(e) => {
+                e.preventDefault(); 
+                setModalIsOpen(true); 
+                setFormData(new FormData(e.currentTarget));
+            }}
+            >
+             <button onClick ={() => setModalIsOpen(true)} type="submit">Submit</form> 
+        </form>
+        
+        </>
+        <Modal isOpen={modalIsOpen} onClose={setModalIsOpen(false)}>
+
+                <button onClick={() => {
+                    setFormData(null); 
+                    setModalIsOpen(false);
+                }}>Cancel</button>
+                <button onClick={() => {
+                    setModalIsOpen(false);
+                    // Do whatever with the form data
+                }}>Confirm</button>
+        </Modal>
+    </>
+}
+```
+
+This is kind of gross right? We end up including a bunch of logic up in our component for displaying a simple confirmation modal, that messys up and distracts from what we're actually trying to do. 
+
+This is where a pattern of encapsulating the open/closed state in a hook, and exposing just the needed parts to the calling components. 
+
+Our form with confirmation required can now look like this: 
+
+```jsx
+export function MyComponent() {
+
+    const [confirmationModal, showConfirmation ] = useConfirmationModal({
+        title: "Are you sure?", 
+        body: "Some kind of custom text here", 
+        cancelButton: "I am the customised cancel button", 
+        confirmButton: "I am the confirm button",
+    });
+
+
+    return <>
+        {confirmationModal}
+        <form 
+            onSubmit={(e) => {
+                e.preventDefault(); 
+                
+                // Calling the `showConfirmation` function will display the modal. 
+                // If the modal is confirmed, then we trigger the callback passed in.
+                showConfirmation(() => {
+                    const formData = (e.currentTarget); 
+                    //do whatever with the formData; 
+                })
+            }}
+            >
+                <button onClick ={() => setModalIsOpen(true)} type="submit">Submit</form> 
+        </form>
+        
+    </>
+}
+```
+
+This is nice right? 
+
+Here's how we can implement such a hook: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/0f6abb3ffdb642759702ecbd5ad3823bb935ca88/src/demos/imperative_confirmation_modal/hooks/useConfirmationModal.tsx#L1-L65"/>
+
+<DemoFrame description={<>
+    <p>Click the button to see the modal</p>
+</>}>
+      <MyForm/>
+</DemoFrame>
+
+Find this helpful? Disagree with this approach? Let me know in the comments!
