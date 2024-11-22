@@ -2,7 +2,11 @@
 meta:
   title: Let's talk about the behaviour of browser as it pertains to loading static assets - images, css and scripts. 
   description: I am the description
-  dateCreated: 2022-11-28 12:00:00
+  dateCreated: 2024-11-19 12:00:00
+
+series: 
+  name: loading_optimisations
+  part: 4
 
 ---
 
@@ -11,13 +15,13 @@ Let's turn to the behaviour of modules, and we talk
 ## Module Scripts
 
 
-### Imports resolving in serial 
+### Imports resolve in serial 
 
 Module scripts are a relatively new feature (supported by all major browsers since May 2018 according to [caniuse](https://caniuse.com/es6-module)). 
 
-They allow us to write our code in maintainable seperate files. 
+They allow us to write our code in maintainable separate files. 
 
-One of the motivations of _bundling_ (compiling our seperate files into one big file) is because we simply didn't have modules. 
+One of the motivations of _bundling_ (compiling our separate files into one big file) is because we simply didn't have modules. 
 
 Let's take this example: 
 
@@ -101,11 +105,11 @@ Note that the files load in serial until all the files are loaded, and _only the
 
 This makes sense - a JavaScript script can't be evaluated until the entire script is there, and then once it's there the first thing it encounters is an import statement, so evaluation pauses until that script is ready, but that script won't be ready until it evaluates its imports, and so forth. 
 
+### A bundling example 
 
+Note that the majority of the time was spent on the 'waiting for server response' portion of the waterfall. If we could reduce that to just one script download with all the content we need then we avoid that overhead.
 
-### A bundling exmaple 
-
-Note that the majority of the time was spent on the 'waiting for server response' portion of the waterfall. If we could reduce that to just one script download with all the content we need then we avoid that overhead. 
+This shows the second motivation for bundling - reducing the overhead of multiple server roundtrips. 
 
 ```js
 
@@ -163,26 +167,52 @@ If the module is in the browser cache, _and_ the browser can trust that it's up 
 
 Of course, for users hitting the website for the first time, they will still have that loading waterfall. This can be negated with preloading the modules. 
 
-#### Two kinds of caching approach 
+### Preloading modules 
 
-There are generally two approach cached resources have: 
+We can preload our modules in similar fashion as the `rel="preload"` method mentioned in part 1. 
 
-##### 1. Cache the response body, but check with the server if it's still correct
-
-The common way this occurs is that the first response will come with an [Etag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag) header, and cache headers directing the cache to revalidate with the server (eg. the `no-cache` directive) and then when the client needs the resource again, it sends the request to the the server, along with the Etag, and the server inspects the Etag and can return an HTTP 304 status code saying 'The response body you have is still up to date'. 
-
-This approach is more appropriate for caching _data_ rather than static assets. 
-
-This approach can also we coupled with caching directives like `stale-while-revalidate` - where the browser can continue to use the stale value while revalidation occurs. eg. For the image of a product listing, we continue to display the image until the new image arrives. 
-
-##### 2. Cache the response body, and don't check with the server
-
-This is a common strategy for static assets like JavaScript. The common strategy is to append the file name with a _hash_ of the files contents, eg. `script-abcdef123.js` and use an `immutable` cache directive, which will tell the browser cache 'this content will _never_ change'. Because the file hash enforces uniqueness we don't need to worry about getting stale data, if the file content had changed, so would the file name. 
-
-<hr/>
-
-One of the problems with bundling the all of our scripts into one file, is that if one of the modules changes, _the entire file's hash_ changes, meaning that when a user rerequests the page, they have to redownload the entire bundle, not just the part that changed. 
+For modules we need to use [`rel="modulepreload"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/modulepreload) which has support across major browsers since September 2023 according to [caniuse](https://caniuse.com/?search=modulepreload). 
 
 
 
+### Cache invalidation cascades 
+
+Let's say we have an application that looks like this: 
+
+```
+root.js -> a.js -> b.js -> c.js 
+```
+
+But we're using some kind of build tooling that adds file hashes to the file names, and we immutably cache the data assets. So our files really look like: 
+
+```
+root-1.js
+a-1.js
+b-1.js
+c-1.js
+d-1.js 
+```
+
+Now if we change some of the content of `root.js`, then our files will look like this: 
+
+```diff
+-root-1.js
++root-2.js
+a-1.js
+b-1.js
+c-1.js
+d-1.js 
+```
+
+Great, users that have already gone to our application only need to download the new `root-2.js`. 
+
+But what if we change the content of `d.js`? The problem is that in default behaviour - the compiled file for `c.js` will need to update its import like:
+
+```diff
+
+-import {d} from "d-1.js"; 
++import {d} from "d-2.js"; 
+```
+
+and so its file hash will change, and then b will need to change its import, and so forth. An update of `d.js` will cause all of the files further up the dependency chain to also be invalidated. 
 
