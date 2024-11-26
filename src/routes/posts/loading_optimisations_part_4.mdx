@@ -1,0 +1,354 @@
+---
+meta:
+  title: Module behaviour in browsers - loading waterfalls, module preloading, cache invalidation cascades and import maps. 
+  description: "Browsers now support ESM modules natively - meaning that we no longer need to bundle our modular code. However be aware that naive use of ESM modules may lead to unperformant loading waterfalls. Our options: bundle, use dynamic imports, or preload our modules."  
+  dateCreated: 2024-11-26
+
+series: 
+  name: loading_optimisations
+  part: 4
+
+---
+
+import {CodeExampleLink} from "@/components/CodeExampleLink/CodeExampleLink";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+
+<InfoPanel level="instruction">
+    The code examples in this post are hosted in [this repository](https://github.com/dwjohnston/bundle-size-investigation).
+
+    Each code example contains a link the specific specific example, so you can run these yourself.
+
+    I run this code using the [Live Sever VSCode plugin](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer). 
+
+    While accessing the application with your web browser - open your dev tools, navigate to the network tab, click 'disable cache' and set throttling to 3G. This allows us to see with more detail what's happening with browsers network requests. 
+</InfoPanel>
+
+Module scripts are a relatively new feature (supported by all major browsers since May 2018 according to [caniuse](https://caniuse.com/es6-module)). 
+
+They allow us to write our code in maintainable separate files. 
+
+One of the motivations of _bundling_ (compiling our separate files into one big file) is because we simply didn't have modules.  
+
+Browser support for ESM means that we can write `import {x} from "./x.js"` type imports with no need for transpilation.
+
+### Modules resolving in serial
+
+Let's take this example: 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .dom-50kB {
+            width: 200px;
+            height: 200px; 
+            overflow: hidden;
+            display: inline-block;
+            margin: 1em;
+            border: dashed 1px black;
+        }
+    </style>
+
+<script src="./script.js" type="module" ></script>
+</head>
+<body id="body">
+
+
+</body>
+</html>
+```
+
+```js
+//script.js 
+
+import {a} from "a.js"; 
+
+a(): 
+
+// 50kb filler
+```
+
+```js
+//a.js 
+import { b } from "./b.js";
+export function a(){
+
+    const div = document.createElement('div');; 
+    div.textContent="I am A block";
+    document.body.appendChild(div);
+
+    b();
+}
+
+// 50kb filler
+```
+
+```js
+//b.js
+
+import {c} from './c.js';
+
+export function b(){
+
+    const div = document.createElement('div');; 
+    div.textContent="I am B block";
+    document.body.appendChild(div);
+
+    c()
+}
+
+// 50kb filler
+
+```
+
+And so on for `c.js` and `d.js`
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/5.1-script-module" text="5.1-script-module"/>
+
+Let's observe the behaviour here. 
+
+Note that the files load in serial until all the files are loaded, and _only then_ is the script evaluated. 
+
+This makes sense - a JavaScript script can't be evaluated until the entire script is there, and then once it's there the first thing it encounters is an import statement, so evaluation pauses until that script is ready, but that script won't be ready until it evaluates its imports, and so forth. 
+
+To mitigate this problem, we have four options: 
+
+- Accept it and do nothing. 
+- Use dynamic/async imports. 
+- Bundle the application. 
+- Preload our modules. 
+
+
+#### Parallel imports 
+
+Note there is one nice optimisation - [regular import statements are hoisted](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#import_declarations_are_hoisted).
+
+If we have a module that declares multiple imports like this: 
+
+```js
+//script.js
+import {a} from "./a.js";
+import {b} from "./b.js";
+import {c} from "./c.js"
+import {d} from "./d.js";
+
+a();
+b();
+c();
+d();
+```
+
+Or even this: 
+
+```js
+//script.js
+import {a} from "./a.js";
+a();
+import {b} from "./b.js";
+b()
+import {c} from "./c.js"
+c()
+import {d} from "./d.js";
+d();
+```
+
+Then the imports will resolve in parallel - the import of a `a.js` does not need to complete and be evaluated before `b.js` starts downloading. 
+
+Importantly, in case you're doing it - any side effects in the imported modules will also occur before any of the other statements are evaluated. 
+
+### Dynamic Imports
+
+A simple solution we can use is to change our imports to [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import), like so: 
+
+```js
+export async function a(){  // 👈 note it's an async function 
+    const div = document.createElement('div');; 
+    div.textContent="I am A block";
+    document.body.appendChild(div);
+
+    const {b} = await import("./b.js"); // 👈 note the import here
+    b()
+}
+```
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/5.1-script-module-with-dynamic-imports" text="5.1-script-module-with-dynamic-imports"/>
+
+
+Note that this doesn't remove the loading waterfall - the end state of the application will still occur at approximately the same time.
+
+What it will do is allow the updates occur while the downstream dependencies are loading. Note that the individual blocks pop in one at a time.
+
+
+### Bundling 
+
+Note that in our first and second examples, a lot of the time was spent on the 'waiting for server response' portion of the waterfall. If we could reduce that to just one script download with all the content we need then we avoid that overhead.
+
+This shows the second motivation for bundling - reducing the overhead of multiple server roundtrips. 
+
+Here we have just one script:
+
+```js
+//script.js
+a();
+
+export function a(){
+
+    const div = document.createElement('div');; 
+    div.textContent="I am A block";
+    document.body.appendChild(div);
+
+    b()
+}
+
+export function b(){
+
+    const div = document.createElement('div');; 
+    div.textContent="I am B block";
+    document.body.appendChild(div);
+
+    c()
+}
+
+export function c(){
+    const div = document.createElement('div');; 
+
+    div.textContent="I am C block";
+    document.body.appendChild(div);
+
+    d()
+}
+
+export function d(){
+
+    const div = document.createElement('div');; 
+    div.textContent="I am D block";
+    document.body.appendChild(div);
+}
+
+// 4 * 50kB filler
+
+```
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/5.3-script-module-bundled" text="5.3-script-module-bundled"/>
+
+In this scenario we still get essentially the same behaviour, we still have to download all of the JavaScript, and only then does our application execute.  The saving we made is that we don't have to wait for server response for each module. 
+
+### But don't forget about caching!
+
+The loading waterfalls are only really a problem if we need to return to the server to request the module. 
+
+If the module is in the browser cache, _and_ the browser can trust that it's up to date, then the problems of having to return to the server are negated. 
+
+Of course, for users hitting the website for the first time, they will still have that loading waterfall. This can be negated with preloading the modules. 
+
+### Preloading modules 
+
+We can preload our modules in similar fashion as the `rel="preload"` method mentioned in part 1. 
+
+For modules we need to use [`rel="modulepreload"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/rel/modulepreload) which has support across major browsers since September 2023 according to [caniuse](https://caniuse.com/?search=modulepreload). 
+
+```html
+<link rel="modulepreload" href="./a.js" as="script" />
+<link rel="modulepreload" href="./b.js" as="script" />
+<link rel="modulepreload" href="./c.js" as="script" />
+<link rel="modulepreload" href="./d.js" as="script" />
+
+<script src="./script.js" type="module" ></script>
+```
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/5.4-script-module-with-preload" text="5.4-script-module-with-preload"/>
+
+### Cache invalidation cascades 
+
+Let's say we have an application that looks like this: 
+
+```text
+root.js -> a.js -> b.js -> c.js 
+```
+
+We're using some kind of build tooling that adds file hashes to the file names, and we immutably cache the data assets. So our files really look like: 
+
+```text
+root-1.js
+a-1.js
+b-1.js
+c-1.js
+d-1.js 
+```
+
+Now if we change some of the content of `root.js`, then our files will look like this: 
+
+```diff
+-root-1.js
++root-2.js
+a-1.js
+b-1.js
+c-1.js
+d-1.js 
+```
+
+Great, users that have already gone to our application only need to download the new `root-2.js`. 
+
+But what if we change the content of `d.js`? The problem is that in default behaviour - the compiled file for `c.js` will need to update its import like:
+
+```diff
+
+-import {d} from "d-1.js"; 
++import {d} from "d-2.js"; 
+```
+
+and so its file hash will change, and then b will need to change its import, and so forth. An update of `d.js` will cause all of the files further up the dependency chain to also be invalidated. 
+
+### Module maps
+
+The above problem can be negated with [import maps](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). These have baseline support since 2023 according to [caniuse](https://caniuse.com/import-maps). 
+
+The idea here is, instead of referencing a specific file in our import: 
+
+```js
+import {d} from "d-2.js"; 
+```
+
+We instead import from a module alias: 
+
+```js
+import {d} from "i-can-be-named-anything"; 
+```
+
+In our document head we provide the import map:
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "i-can-be-named-anything": "./d2-.js"
+    }
+  }
+</script>
+```
+
+This way - we a dependency down the dependency chain changes, we just need to update the import map - we don't need to change all of the import statements themselves. 
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/5.5-script-module-with-preload-and-import-map" text="5.5-script-module-with-preload-and-import-map"/>
+
+This works, however in practise we would not manage our import maps and ourselves - we would rely on our tooling to do this for us. 
+
+
+## Conclusions 
+
+Modules are now browser supported and resemble how as developers we like to write our code. 
+
+In their naive usage, synchronous and non-preloaded, they can cause loading waterfalls. 
+
+Dynamic imports partially mitigates the problem by allowing the code to execute while the next dependency is loading. 
+
+However the real solution is to either preload modules, and or bundle them into reasonable sized chunks. Import maps will help solve cache invalidation chains the are caused when dependencies change. 
+
+In the next post we will discuss how well modern bundling tools are making use of module preloading and import maps. 
+
+
+
+
