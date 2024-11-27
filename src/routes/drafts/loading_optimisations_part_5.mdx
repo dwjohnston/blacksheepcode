@@ -1,0 +1,81 @@
+---
+meta:
+  title: The behaviour of browsers and loading resources - HTML, images, and CSS
+  description: Browsers do not need to wait for an entire HTML document to be loaded before it can display it. CSS is render blocking. Images will start streaming as soon as the tag is encountered.
+  dateCreated: 2024-10-31 12:00:00
+
+series: 
+  name: loading_optimisations
+  part: 5
+  description: Optimising frontend applications
+---
+
+import {CodeExampleLink} from "@/components/CodeExampleLink/CodeExampleLink";
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+
+
+We'll now turn to the behaviour of bundlers and build tools. 
+
+It's important to note that there's two distinct things we care about: 
+
+- **The production artifacts** - ie. the contents of our bundle chunks. 
+- **The development experience** - What we assets we recieve via the dev server when developing our application, and dev servers behaviour as it relates to caching, hot module replacement etc. 
+
+It might be tempting to suggest that the dev server doesn't warrant consideration - that optimisation for development bundles doesn't really matter because end users aren't going to see it. 
+
+
+## An exmaple of an application that has an optimised production build, but an unoptimised developer build
+
+Here is a simple example:
+
+<CodeExampleLink link="https://github.com/dwjohnston/bundle-size-investigation/tree/main/8.0-webpack-unoptimized" text="8.0-webpack-unoptimized"/>
+
+This is a plain, no custom configuration,  Next 14 application using the app router. 
+
+We have have a series of functions with this structure: 
+
+```
+services/
+   a/ 
+      a1.js
+      a2.js
+      //... 
+      a50.js 
+      index.js // 👈 barrel file
+  b/ 
+     b1.js
+     b2.js
+     //snip 
+     b50.js
+     index.js
+  //snip
+  i/ 
+    i1.js
+    i2.js
+    //snip
+    i50.js
+    index.js
+```
+
+In our application, we have root component that will call `a1`, and `a1` will in turn call `b1` and so forth. 
+
+We we run our dev server using webpack (not turbopack), this what our loading waterfall looks like - note no throttling: 
+
+SCREENSHOT
+
+We have a 8.1MB page.js bundle that takes ~500ms to download. 
+
+If we make subsequent updates without reloading the page, those updates occur via hot module replacment and are small and fast. 
+
+SCREEN SHOT
+
+If we use turbopack then we get a waterfall like this: 
+
+SCREEN SHOT
+
+On the otherhand, our production build is tiny: 
+
+Now, you might point out that the issue here is that we're using barrel files, and you'd be right, but the point is, it is possible to configure/architect our application in such a away that the dev experience is slow and this is something we want to keep in mind. 
+
+
+
