@@ -112,6 +112,11 @@ body {
   }
 }
 
+code {
+  background-color: var(--color-background-lighten);
+  
+}
+
 .demo-frame {
   background-color: var(--color-background-darken);
   margin: 1em; 
