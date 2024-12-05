@@ -42,6 +42,7 @@ const server = setupServer(...handlers)
 
 describe(Header, () => {
     it("Has a user avatar", async () => {
+        render(<Header/>)
         // Assert existence of UserAvatar here.
     })
 })
@@ -90,6 +91,7 @@ const server = setupServer(...handlers)
 
 describe(App, () => {
     it("Whatever logic we want to assert about App", async () => {
+       render(<App/>);
        // Assertions here
     })
 })
@@ -154,6 +156,7 @@ const server = setupServer(...handlers)
 describe(Header, () => {
 -    it("Has a user avatar", async () => {
 +    it("Has a user avatar, notifications", async () => {
+        render(<Header/>)
         // Assert existence of UserAvatar here.
 
 +        // Assert about notifications here 
@@ -303,6 +306,120 @@ The suggestion here is that `ComponentBoundary` is both a [Suspense](https://rea
 This way, we can just allow the `Header` component to error out if we don't care about what it's doing. 
 
 If we do want it to display, then we still need to opt in by configuring the right API behaviour. 
+
+
+### 4. Component composition 
+
+In this approach, we don't let the `Header` component make a data call, instead we rely on the its parent to pass in the Notifications component, like such: 
+
+```diff
+-export function Header() {
++export function Header(props?: {notificationsSlot?: React.ReactNode}) {
+
+    // Whatever state management tool we are using to make an API call for us
+    const user = useSelf(); 
+
+    return <div> 
+        {/* Other stuff here*/}
++       {props?.notificationsSlot && props.notificationsSlot}
+        <UserAvatar user={user}/>
+    </div>
+} 
+```
+
+Now, what we write for our `Header` tests doesn't really matter, we'll just be asserting on the existence of whatever we passed in. 
+
+describe(Header, () => {
+-    it("Has a user avatar", async () => {
++    it("Has a user avatar, notifications", async () => {
+        render(<Header notificationsSlot={<div>I am the notifications<div>/>)
+        // Assert existence of UserAvatar here.
+
++        // Assert existence of "I am the notifications" text here
+    })
+})
+
+This is a similar 'opt in' approach as #1, and it has the same problems - when we do opt in our `App` component like: 
+
+```diff
+// App.tsx
+
+export function App() {
+
+    return <div>
+-        <Header/>
++        <Header notificationsSlot={<Notifications/>}/>
+        {/* Other content here*/}
+    </div>
+}
+```
+
+Our `App` test we will now need to provide the MSW mocking behaviour necessary in order for the `Notifications` component to work. 
+
+Another thing I don't like about the component composition approach is that it's difficult to type such that only certain components are valid as children. See [this Stack Overflow question](https://stackoverflow.com/questions/57627929/only-allow-specific-components-as-children-in-react-and-typescript) noting that the accepted answer does not actually work. 
+
+
+### 5. Not really a solution - pass the notifications data in as a prop 
+
+It might be tempting to suggest that we should do something like this: 
+
+```diff
+-export function Header() {
++export function Header(props?: {notificationsData?: Array<{message: string}>}) {
+
+    // Whatever state management tool we are using to make an API call for us
+    const user = useSelf(); 
+
+    return <div> 
+        {/* Other stuff here*/}
++       {props?.notificationsData && <Notifications data={props.notificationsData}/>}
+        <UserAvatar user={user}/>
+    </div>
+} 
+```
+
+That way we don't need to do any new MSW mocking when we test our Header component. 
+
+But note that the MSW mocking on the `Header` component test wasn't the problem! That's the scenario where the mocking makes sense. 
+
+It's the requiring the `App` tests to know about all of the API calls down its render tree that is the problem, and we don't avoid this problem here. Our change to opt in to the notifications functionality would look something like this: 
+
+```diff
+// App.tsx
+
+export function App() {
++    const notifications = useNotifications(); 
+
+    return <div>
+-        <Header/>
++        <Header notificationsData={notifications}/>
+        {/* Other content here*/}
+    </div>
+}
+```
+
+And now we would require new MSW mocking in the `App` component. 
+
+Perhaps though - that's OK, after all, it's the `App` component that is making the call in state management. 
+
+However, the caution I would give is that this approach of only doing calls into the state management at the top levels, means that you end up having 'God objects' at the top of your render tree, with _lots_ of API calls and this can make them difficult to maintain. 
+
+
+## Conclusions 
+
+Solutions that allow an 'opt in' to new functionality are less disruptive, but are not a panacea, ulimately if opting in requires making changes in every affected test, then it will still be a difficult task. 
+
+The problem with having state management calls at lower levels of your render tree is that components higher up the tree now need to be implicitly aware of what these API calls are. This can be mitigated by simply allowing those components to error out, though this might pose its own set of issues. 
+
+Component composition is effective way to reduce prop drilling. 
+
+Ultimately there is a tension between avoiding  having implicit state management further down your tree, vs avoiding having God objects at the top of your tree. 
+
+I think the happy medium is that split a given page into sensible logical groupings, and have these be wrapped in both and error boundary and a Suspense boundary. This fits very well with the React Server Components model.
+
+That way, at a top level the page is simply responsible for basic layout, and the logical groups can contain some complex logic, but are hopefully small enough that the logic is understandable. 
+
+The sensible logical groupings could in turn, also contain some of their own sensible logical groupings that are wrapped in error and Suspense boundaries. 
 
 
 
