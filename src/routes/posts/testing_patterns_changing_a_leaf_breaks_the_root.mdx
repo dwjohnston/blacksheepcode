@@ -1,3 +1,10 @@
+---
+meta:
+  title: "React testing patterns: When making a change to a leaf component breaks tests further up the tree"
+  description: A common pain point in testing React applications is when we make a change to a component that exists down the component tree, and this change causes breaks in multiple components that directly or indirectly consume this component. Here we outline some strategies for mitigating this problem.
+  dateCreated: 2024-12-13
+---
+
 Here's a common scenario I encounter with React applications, where making changes becomes more difficult that we'd like it to be. 
 
 
@@ -103,7 +110,7 @@ Now at this point, this copy pasting might be setting off alarm bells in your he
 
 So assuming our codebase looks like what we've got above, let's now make a change. 
 
-We're going to add functionalility to that `Header` component - this time adding a notifications indicator. 
+We're going to add functionality to that `Header` component - this time adding a notifications indicator. 
 
 ```diff
 // Header.tsx
@@ -168,9 +175,9 @@ So far, so good, this is a nice clean change here.
 
 BUT: the problem is we also need to make a corresponding change to the `App` test as well - it's otherwise going to error when the `/notifications` endpoint isn't defined. 
 
-I consider this a code smell - where a code change we make breaks tests outside of the scope of what we're working on, and we have to make a series 'just fix the tests' style changes that aren't actually related to what we're working on. 
+I consider this a code smell - where a code change we make breaks tests outside of the scope of what we're working on, and we have to make a series of 'just fix the tests' style changes that aren't actually related to what we're working on. 
 
-Note that in this example I've indicated just one test breaking, but it's possible, if this component was used in multiple other places, that we'd making this change is multiple places. 
+Note that in this example I've indicated just one test breaking, but it's possible, if this component was used in multiple other places, that we'd making this change in multiple places. 
 
 ## Solutions to this problem 
 
@@ -180,7 +187,7 @@ The argument here is that because our implementation will break consumers (tests
 
 Certainly - if this was a published package, being consumed by people outside of our organisation, this would be the right way to go. 
 
-The change would end up looking like this: 
+We could make an 'opt in' style of change looking like this:
 
 
 ```diff
@@ -279,7 +286,7 @@ export const defaultHandlers = [
 ]
 ```
 
-The problem with this approach is that this lists may become brittle and difficult to maintain. 
+The problem with this approach is that these lists may become brittle and difficult to maintain. 
 
 For example, might be likely that there are a lot of components that want to have a different set of default handlers, - ones that represent when the session is not authenticated. So now we have two sets, and then, what about a set of handlers for when the user is an admin? Now we have three sets.
 
@@ -329,6 +336,8 @@ In this approach, we don't let the `Header` component make a data call, instead 
 
 Now, what we write for our `Header` tests doesn't really matter, we'll just be asserting on the existence of whatever we passed in. 
 
+
+```diff
 describe(Header, () => {
 -    it("Has a user avatar", async () => {
 +    it("Has a user avatar, notifications", async () => {
@@ -338,6 +347,7 @@ describe(Header, () => {
 +        // Assert existence of "I am the notifications" text here
     })
 })
+```
 
 This is a similar 'opt in' approach as #1, and it has the same problems - when we do opt in our `App` component like: 
 
