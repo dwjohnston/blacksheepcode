@@ -34,3 +34,6 @@ jobs:
 
       - name: Run Types Check
         run: npm run types
+
+      - name: Unit Tests
+        run: npm test

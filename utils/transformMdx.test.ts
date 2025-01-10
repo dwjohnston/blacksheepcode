@@ -31,8 +31,9 @@ describe(compileMDXFiles, () => {
             const writeFile = vitest.fn();
 
             const result = await compileMDXFiles(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"), 'generated', writeFile);
-            expect(result).toBe(true);
+            expect(result).toHaveLength(1);
 
+            // But write file is still called for all files
             expect(writeFile).toHaveBeenCalledTimes(4);
 
 
