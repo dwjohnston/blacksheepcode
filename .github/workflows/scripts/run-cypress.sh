@@ -1,8 +1,5 @@
 #!/bin/bash
-
-set -e 
-output=$(node .github/workflows/scripts/wait-for-netlify-deploy.js 2>&1)
-echo $output
+output=$(node .github/workflows/scripts/wait-for-netlify-deploy.js)
 exit_code=$?
 
 # Check if the process exited with a non-zero status
