@@ -6,6 +6,5 @@
   publish = ".next"
 
 
-
 [context.deploy-preview.environment]
   SHOW_TEST_PAGES = "true"
