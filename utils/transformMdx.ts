@@ -22,12 +22,10 @@ function extractFrontmatter(str: string) {
 export type WriteFileFn = (path: string, data: string) => Promise<void>;
 
 const defaultWriteFileFn: WriteFileFn = async (path: string, data: string) => {
-    return fs.writeFile(path, data);
+    fs.writeFile(path, data);
 }
 
-export async function compileMDXFiles(inputPath: string, outputPath: string, writeFileFn = defaultWriteFileFn) {
-
-    console.log(writeFileFn)
+export async function compileMDXFiles(inputPath: string, outputPath: string, writeFileFn = defaultWriteFileFn) : Promise<boolean> {
     const { compile } = await import("@mdx-js/mdx");
     const entries = await fs.readdir(inputPath, { withFileTypes: true });
 
@@ -40,8 +38,11 @@ export async function compileMDXFiles(inputPath: string, outputPath: string, wri
         const outputFilePath = path.join(outputPath, entry.name.replace('.mdx', '.mjs'));
 
         if (entry.isDirectory()) {
-            await compileMDXFiles(inputFilePath, path.join(outputPath, entry.name), writeFileFn);
+            const result = await compileMDXFiles(inputFilePath, path.join(outputPath, entry.name), writeFileFn);
+            hasErrors = hasErrors ?? result;
         } else if (entry.isFile() && entry.name.endsWith('.mdx')) {
+
+        
             const mdxContent = await fs.readFile(inputFilePath, 'utf-8');
 
             const compiledJS = await compile(mdxContent, {
@@ -50,15 +51,16 @@ export async function compileMDXFiles(inputPath: string, outputPath: string, wri
             });
 
             await writeFileFn(outputFilePath, String(compiledJS));
-            console.log(`Compiled: ${inputFilePath} -> ${outputFilePath}`);
             const frontMatterString = extractFrontmatter(String(compiledJS));
 
             try {
                 frontMatterSchema.parse(JSON.parse(frontMatterString ?? 'null'));
-                console.log(`${outputFilePath} passes Zod validation`)
+                console.log(`✅ ${outputFilePath}`)
             } catch (err) {
 
                 hasErrors = true;
+                console.log(`${outputFilePath} ❌`)
+
                 console.error(`
                 Error parsing file : '${inputFilePath}'. 
                 Failed Zod validation with: ${err instanceof Error && err.message}
@@ -72,9 +74,9 @@ export async function compileMDXFiles(inputPath: string, outputPath: string, wri
         }
     }
 
-    if (hasErrors) {
-        throw new Error("A Zod validation error was encountered - scan the logs above to find it ")
-    }
+
+    return hasErrors;
+
 }
 
 
