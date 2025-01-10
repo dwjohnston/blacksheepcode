@@ -15,6 +15,9 @@ async function _writeFile(filePath:string, slug: string, output: unknown) {
     slug, 
     frontmatter: output
   }, null, 2));
+
+  console.log(`📝${filePath}`)
+
 }
 
 async function _appendIndexFile(filePath:string, fileName: string) {
@@ -22,7 +25,7 @@ async function _appendIndexFile(filePath:string, fileName: string) {
 }
 
 async function _generateSubfolder(subPath: string) : Promise<string> {
-  const basePath = path.join(process.cwd(), "src", "generated", "frontmatter", subPath);
+  const basePath = path.join("src", "generated", "frontmatter", subPath);
   await fsAsync.mkdir(basePath, { recursive: true }); 
   return basePath; 
 }
@@ -61,8 +64,6 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
     const file = await fsAsync.readFile(inputString);
 
     const timestamps = await getFileGitTimestamps(inputString);
-
-    console.log(inputString,timestamps)
     const fileText = file.toString();
     const [subPath, fileName] = getParts(inputString);
 
@@ -94,6 +95,8 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
 
 
     await writeFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, fmContent);
+
+
     await appendIndexFile(path.join(basePath, 'index.js'), fileName);
 
 }

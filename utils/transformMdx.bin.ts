@@ -4,5 +4,18 @@ const inputDir = path.join('src', 'routes');
 const outputDir = path.join('src', 'generated', 'mdx');
 
 compileMDXFiles(inputDir, outputDir)
-    .then(() => console.log('All MDX files compiled successfully!'))
-    .catch(error => console.error('Error compiling MDX files:', error));
+    .then((v) => {
+        if(v.length ===0){
+            console.log(`
+All MDX files compiled successfully!
+
+`)
+        }
+        else {
+            console.error("Compiling MDX enountered errors. Scan logs above for details.")
+            v.forEach((w)=> {
+                console.error(`❌ ${w.file}`);
+            })
+            process.exit(1); 
+        }
+    })

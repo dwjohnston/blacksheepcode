@@ -26,15 +26,15 @@ describe(compileMDXFiles, () => {
         })
     });
 
-    describe.only("Scenario 2 - Validation Failures", () => {
+    describe("Scenario 2 - Validation Failures", () => {
         it('Throws an error if expected front matter does not exist', async () => {
             const writeFile = vitest.fn();
 
-            await expect(async () => {
-                await compileMDXFiles(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"), 'generated', writeFile);
-            }).rejects.toThrowError(/A Zod validation error was encountered/);
+            const result = await compileMDXFiles(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"), 'generated', writeFile);
+            expect(result).toHaveLength(1);
 
-            expect(writeFile).toHaveBeenCalledTimes(2);
+            // But write file is still called for all files
+            expect(writeFile).toHaveBeenCalledTimes(4);
 
 
         })

@@ -18,11 +18,11 @@ For an application that involves SSR and RSCs, it's not quite this simple - as s
 
 The solution I've opted to investigate is using the tool [mitmproxy](https://mitmproxy.org/), we proxy our requests through mitmproxy and and use that to record a HAR file. 
 
-## Sample application 
+## There are four kinds of requests we need to handle
 
 I have a sample application set up at [this repository here](https://github.com/dwjohnston/nextjs-proxying), I'm request data in various forms from the [jsonplaceholder API.](https://jsonplaceholder.typicode.com/) 
 
-I have four kinds of requests: 
+There are four kinds of requests we need to handle.
 
 ### Straight client side requests 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/src/components/ComponentFetch.tsx#L1-L15"/>
@@ -38,7 +38,7 @@ In this scenario we request the data via a relative path, and we configure NextJ
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/next.config.mjs#L7-L16"/>
 
-In this case the requests _won't_ be directed to our proxy, as our browser proxy configuration doesn't proxy the localhost requests. 
+In this case the browser proxy configuration is not able to proxy these requests - as the requests are made to application server which is doing the requests on the browsers behalf.
 
 ### Server side requests - with native fetch
 
