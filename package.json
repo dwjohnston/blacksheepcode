@@ -6,6 +6,7 @@
     "build": "npm run generate:all && npm run build:base",
     "dev": "SHOW_TEST_PAGES=true next dev",
     "start": "netlify serve",
+    "next:start": "next start",
     "lint": "eslint .",
     "types": "tsc && tsc -p cypress/tsconfig.json",
     "test:cypress": "cypress open",

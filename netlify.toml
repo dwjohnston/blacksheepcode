@@ -5,6 +5,10 @@
   command = "npm run build"
   publish = ".next"
 
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [context.deploy-preview.environment]
   SHOW_TEST_PAGES = "true"
