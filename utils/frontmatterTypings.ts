@@ -3,7 +3,7 @@ import {z} from "zod";
 const metaSchema = z.object({
     title: z.string(),
     description: z.string(), 
-    dateCreated: z.date().or(z.string()).optional(),
+    dateCreated: z.date().or(z.string()),
     image: z.string().optional(),
   }); 
 
