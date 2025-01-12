@@ -2,15 +2,16 @@
 meta:
   title: If I were building a start up from scratch, these are the things I would include (or have a plan to include).
   description: The easiest time to include something in your application is at the start. On the other hand, you're likely time-poor and there's no point on burning all your runway on a gold-plated hello world! application.
-  dateCreated: 2024-11-22 
+  dateCreated: 2025-01-13
 ---
 
 import {GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
 
 
-Particularly as it relates to testing, it's much easier to include some tests when you're writing something new, than it is to add tests later on. 
 
 The problem any codebase can face is that they make really good headway early on, and then after a year or two everything runs into the mud, and that's when greater effort on adding said tests or tooling. 
+
+Particularly as it relates to testing, it is much easier to include some tests when you're writing something new, than it is to add tests later on. 
 
 But assuming this is a start up context, or there's otherwise some kind of deadline (perhaps this is a simple proof of concept that we need to whip up and not spend a year building), we can't spend all our time creating a gold-plated application that does very little. 
 
@@ -21,11 +22,13 @@ I would argue that there's a middle ground - some toolings we can add right from
 
 ### OpenAPI specs
 
-OpenAPI has a wealth of associated tooling, code generators, documentation generators and the like. If we take a 'spec first' strategy to building our application firstly we're going to 
+OpenAPI has a wealth of associated tooling, code generators, documentation generators and the like. If we take a 'spec first' strategy to building our application this is likely going to save us a lot of time building our first MVP. 
 
 ### Storybook and Storybook Testing 
 
-I don't see Storybook, or tests as 'extra work'. They're actually a _faster_ way of working as components can be created in isolation, without having to navigate to them with the application dev server.
+I don't see creating Storybook stories as 'extra work'.  They're actually a _faster_ way of working as components can be created in isolation, without having to navigate to them with the application dev server.
+
+Comprehensive tests can be extra work - but my philosophy here is 'at least write one test' - that is, if we can show one test working for a given component, then later it is going to be a lot easier to write more. Often the difficulty of writing tests isn't the actual business logic being tested - but the scaffolding the dependencies to get the unit of code into a runnable state.
 
 ### Documentation generators
 
@@ -93,12 +96,23 @@ We can use a tool like [k6.io](https://k6.io/) to conduct load tests on our appl
 
 I would use a tool like [changesets](https://github.com/changesets/changesets) for release management.
 
-We want a formalised release process that will 
+We want a formalised release process that: 
 
+1. Avoids us making breaking changes as much as possible. (ie. follow a deprecation and clean up strategy)
+2. _Defines_ what a breaking change is. Is changing a class name on an HTML element a breaking change? 
+3. Gives a process for making breaking changes/major version bumps that isn't immediately disruptive. 
 
 ### Observability
 
-## Tooling I would add if we're hiring more people 
+My experience has been that observability has been a 'thrown over the fence' type type concern, either rightwards to SRE/Infrastructure types (eg. performance and load monitoring) or from the left from product owner types (eg. Real User Monitoring).
+
+If we can instil the observability tooling as a core part of developer's technical toolkit, then developers will have more ownership of the metrics and make it work for them. For example, say a developer notices an minor algorithm that looks inefficient. The developer could: 
+
+1. Spend time optimising it, without knowing what the value of the optimisation is. 
+2. Wait for someone else in the business to complain about it and then fix it. 
+3. Put in an observability experiment to determine how often this algorithm is being encountered and what its impact is. 
+
+## Tooling I would add as/before we're hiring more people 
 
 Expanding team size can be risky, albeit necessary, manoeuvrer - a dilution of technical culture can occur, where a previously cohesive technical direction is subjected to people's different experiences and understandings.
 
@@ -112,10 +126,6 @@ A [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys
 
 I'm a fan of clear code ownership - in order to avoid [diffusion of responsibility](https://en.wikipedia.org/wiki/Diffusion_of_responsibility) ('responsibility shared is no responsibility at all'). Clear code ownership puts the right incentives on developers to maintain a tidy codebase. 
 
-### Increase static checks 
-
-At the time we're expanding the team, I would put greater focus on improving static checks.
-
 ## We're building a quality product 
 
 ### Release Artifacts - Docker Images
@@ -126,7 +136,7 @@ The idea here is, if our product provides programmatic access via a REST API, th
 
 If our application contains frontend components, then it can be helpful to provide a series of helper functions to will assist in interacting with the the components in test contexts. 
 
-For example, say we our product is some kind of credit card payment form that others will integrate in our website. 
+For example, say we our product provides some kind of credit card payment form that others will integrate in our website. 
 
 Rather than having our users write their tests like: 
 
@@ -135,9 +145,7 @@ Rather than having our users write their tests like:
 cy.findByRole("textbox", {name: "credit-card-number"}).type("5555555555554444");
 cy.findByRole("textbox", {name: "credit-card-name"}).type("Test User");
 // etc
-
 ```
-
 
 We might want to expose a function like such:
 
@@ -150,9 +158,9 @@ cy.fillCreditCardForm({
 })
 ```
 
-Much more convenient. 
+Very convenient.
 
 
+## Have I missed anything? 
 
-
-
+Let me know if you think I'm either overcooking it, or there is something blindingly obvious that should be included in some new codebase.
