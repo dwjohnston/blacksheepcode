@@ -1,7 +1,7 @@
 ---
 meta:
-  title: The tool I want to exist
-  description: I want some kind of API mocking tool that can monitor real world API usage to produce its mocks
+  title: The tool I want to exist - an API mocking tool that generates mock data by observing real world usage. 
+  description: Mocking API calls, particularly multiple interlinked calls can be cumbersome. I want a tool to do it for me. 
   dateCreated: 2025-02-04
 ---
 
@@ -11,7 +11,7 @@ For example, Tanstack Query [recommends nock in its docs](https://tanstack.com/q
 
 ## Configuring mock behaviour is cumbersome 
 
-I like API mocking tools, I think the approach of 'including your state management as an implicit part of the test' works, and that's not the part that makes testing difficult. (Unless the state management layer contains a lot of convoluted business logic - in which case [see this post](https://blacksheepcode.com/posts/dependency_injecting_when_using_redux).)
+I like API mocking tools, I think the approach of 'including your state management as an implicit part of the test' works, it's not the part that makes testing difficult. (Unless the state management layer contains a lot of convoluted business logic - in which case [see this post](https://blacksheepcode.com/posts/dependency_injecting_when_using_redux).)
 
 But defining the sets API configuration data is often cumbersome and adds a lot of friction to writing tests. 
 
@@ -169,9 +169,7 @@ The idea here is, our tests will run repeatedly, maybe 1000 times, and it genera
 
 The test reporter can then tell you - 'it looks like you're not handling this scenario, which occurs 2% of the time in the real world'. 
 
-## Do you know of an existing tool? 
-
-I don't know of any such tools. 
+## Existing tools I know of
 
 OpenAPI spec driven tools, a neat such tool I've used is [msw-auto-mock](https://github.com/zoubingwu/msw-auto-mock) which generates MSW mocks from an OpenAPI spec, including using referenced values in specs [`examples`](https://swagger.io/docs/specification/v3_0/adding-examples/) property, see [my write up here](./generating_apps_from_openapi_part3), are good because they give us a standardised way of doing things, and tool interoperability. 
 
@@ -324,3 +322,7 @@ const spec = {
 }
 
 ```
+
+## Do you know of any such tools? 
+
+If you do, please get in touch and let me know. 
