@@ -115,25 +115,44 @@ export function TodosPage() {
 
 Now there are multiple outcomes each of these API calls could have: 
 
-- useUser could encounter a 500
-- useUser could encounter a 403
-- useUser could be successful and return an admin user
-- useUser could be successful and return a non-admin users
-
-
-
-- useTodos could encounter a 500
-- useTodos could encounter a 403
-- useTodos could return an empty list
-- useTodos could return a single page of todos
-- useTodos could return the first page of many pages
-
-
-
-- useUpdateTodosMutation could encounter a 500
-- useUpdateTodosMutation could encounter a 403
-- useUpdateTodosMutation could encounter a 400
-- useUpdateTodosMutation return successful
+<table>
+    <tbody>
+        <tr>
+           <td>useUser</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could be successful and return an admin user</li>
+                <li>could be successful and return a non-admin users</li>
+              </ul>
+           </td>
+        </tr>
+        <tr>
+           <td>useTodos</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could return an empty list</li>
+                <li>could return an single page</li>
+                <li>could return page one of many pages</li>
+              </ul>
+           </td>
+        </tr>
+        <tr>
+           <td>useUpdateTodosMutation</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could encouter a 400</li>
+                <li>could return successful</li>
+              </ul>
+           </td>
+        </tr>
+    </tbody>
+</table>
 
 Chances are we are not testing 4\*5\*4=80 permutations of our test, and pragmatically speaking - we probably shouldn't be. 
 
