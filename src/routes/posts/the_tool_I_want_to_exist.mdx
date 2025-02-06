@@ -1,0 +1,351 @@
+---
+meta:
+  title: The tool I want to exist - an API mocking tool that generates mock data by observing real world usage. 
+  description: Mocking API calls, particularly multiple interlinked calls can be cumbersome. I want a tool to do it for me. 
+  dateCreated: 2025-02-04
+---
+
+There is a wealth of API mocking tools - and often web frameworks recommend using them as part of you testing strategy. 
+
+For example, Tanstack Query [recommends nock in its docs](https://tanstack.com/query/latest/docs/framework/react/guides/testing#testing-network-calls) and Redux [recommends using MSW](https://redux.js.org/usage/writing-tests#ui-and-network-testing-tools).
+
+## Configuring mock behaviour is cumbersome 
+
+I like API mocking tools, I think the approach of 'including your state management as an implicit part of the test' works, it's not the part that makes testing difficult. (Unless the state management layer contains a lot of convoluted business logic - in which case [see this post](https://blacksheepcode.com/posts/dependency_injecting_when_using_redux).)
+
+But defining the sets API configuration data is often cumbersome and adds a lot of friction to writing tests. 
+
+These are the common scenarios I find containing a lot of friction: 
+
+### 1. There's a lot of interlinked data
+
+Let's say I've got an untested page component that looks like this: 
+
+```tsx
+export function FooPage() {
+
+    const user = useUser(); 
+    const todos = useTodos({forUser: user.data.id}); 
+    const projects = useProjects({forTodoTypes: todos.data.map(v => v.todoType)}); 
+    const organisation = useOrganisation({forProjects: projects.data.map(v => v.id)}); 
+    const preferences = usePreferences(); 
+
+    return <>
+            // The component
+    </>
+}
+```
+
+Setting up the mock data for this kind of scenario can be difficult and be prone to copy-paste style errors where IDs don't match etc. 
+
+### 2. Where data needs to update 
+
+For example say I have a todo app:
+
+```tsx
+  export function TodosPage() {
+
+    const todos = useTodos(); 
+    const editTodo = useEditTodoMutation(); 
+
+    return <>
+            // The component
+    </>
+}  
+
+```
+
+Say I'm rendering this component in Storybook, then it's usually not enough for me to just mock a response for when the 'update todo' action occurs. 
+
+I likely want this scenerio to happen: 
+
+1. I fetch the todos
+2. I update a todo
+3. I fetch all the todos again, and expect to see the updated todo reflected in the list. 
+
+We _can_ go down the path of implementing full MSW mocks for every endpoint that would have some amount of smarts to allow for this, storing the todos in an in memory object for example. 
+
+However, at this point we're basically just reimplementing our backend for the purpose of testing. 
+
+### 3. Variations of responses and error states 
+
+Say we did do a comprehensive, bespoke MSW implementation that reflects our API. What about when we need to test error scenarios, or scenarios where the user is an admin vs a non-admin? 
+
+For example: 
+
+1. I fetch the todos
+2. I update a todo, but it errors
+3. I fetch all the todos, I expect the original list. 
+
+## What if we have an enterprise scale project that is badly tested? 
+
+Now it might be possible to create an internal framework and process that does allow us to define API mocks and define variants as our application evolves. 
+
+However, what if we don't have that, our tests are sparse and/or brittle and we really just want to a starting point? 
+
+## The Solution: Generate API mock behaviour by observing real API usage. 
+
+The idea here is, rather than reasoning our way through the code base and the API documentation - we just observe the application as it currently behaves, and then use that data to define our API behaviour. 
+
+I have experimented with the tool [mitmproxy](https://mitmproxy.org/) to do this - mitmproxy allows the recording of HTTP requests, and subsequent replay. You can see my post about [configuring a NextJS server to proxy its requests via tool like mitmproxy here](./how_to_proxy_nextjs). However what I found was the replay was not reliable for any variation in the application requests. 
+
+For example, say you were creating an ecommerce site - you might need to add the exact same items in the exact same order to the cart in order for the responses to make sense, and even that's not a given. 
+
+The way I want a tool to work is something like this: 
+
+1. You set the tool to record mode, and you start interacting with your application to gather a profile of the kind of test you're trying to generate. 
+2. You now switch the tool to replay mode 
+3. You can now use your application dev server to do your work, or it's generated a set of MSW mocks for you, or an API spec, there are multiple formats that produced artifact could take shape in.
+
+## Probabilistic testing 
+
+The next level of this has us writing tests for every permutation that our API responses could have. 
+
+For example, lets say we have a page: 
+
+```tsx
+export function TodosPage() {
+
+    const user = useUser(); 
+    const todos = useTodos(); 
+    const updateTodos = useUpdateTodosMutation(); 
+} 
+
+```
+
+Now there are multiple outcomes each of these API calls could have: 
+
+<table>
+    <tbody>
+        <tr>
+           <td>useUser</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could be successful and return an admin user</li>
+                <li>could be successful and return a non-admin users</li>
+              </ul>
+           </td>
+        </tr>
+        <tr>
+           <td>useTodos</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could return an empty list</li>
+                <li>could return an single page</li>
+                <li>could return page one of many pages</li>
+              </ul>
+           </td>
+        </tr>
+        <tr>
+           <td>useUpdateTodosMutation</td>
+           <td>
+              <ul>
+                <li>could encounter a 500 </li>
+                <li>could encounter a 403</li>
+                <li>could encouter a 400</li>
+                <li>could return successful</li>
+              </ul>
+           </td>
+        </tr>
+    </tbody>
+</table>
+
+Chances are we are not testing 4\*5\*4=80 permutations of our test, and pragmatically speaking - we probably shouldn't be. 
+
+The idea I have is that if we can generate test data by observing real world API use, then we can we also generate these permutations. 
+
+The thinking is, we'll write tests that look like this: 
+
+```tsx
+given(ourMagicallyGeneratedTestData)
+.setUp(() => {
+    render(<TodosPage/>)
+})
+.oneOfTheseScenariosOccurs([
+    it("An error page is displayed", () => {
+        expect(screen.getByText("Something went wrong")).toBeInTheDocument();
+    }), 
+    it("A list of todos is shown", () => {
+        expect(screen.getByText("todo title 1")).toBeInTheDocument();
+
+        userEvent.click(screen.getByRole("button", {name: "Delete"})); 
+
+        thenOneOfTheseThingsHappens([
+            it("The todo no longer exists", () => {
+                 expect(screen.queryByText("todo title 1")).not.toBeInTheDocument();
+            }); 
+            it("We see an error message", () => {
+                 expect(screen.getByText("An error occurred deleting the todo")).toBeInTheDocument();
+                 expect(screen.queryByText("todo title 1")).toBeInTheDocument();
+            }); 
+        ])
+    }), 
+])
+
+```
+
+The idea here is, our tests will run repeatedly, maybe 1000 times, and it generates different responses proportionally to actual real world observations. 
+
+The test reporter can then tell you - 'it looks like you're not handling this scenario, which occurs 2% of the time in the real world'. 
+
+## Existing tools I know of
+
+OpenAPI spec driven tools, a neat such tool I've used is [msw-auto-mock](https://github.com/zoubingwu/msw-auto-mock) which generates MSW mocks from an OpenAPI spec, including using referenced values in specs [`examples`](https://swagger.io/docs/specification/v3_0/adding-examples/) property, see [my write up here](./generating_apps_from_openapi_part3), are good because they give us a standardised way of doing things, and tool interoperability. 
+
+The problem is - the OpenAPI spec doesn't do anything to define the relationship between different endpoints, ('when I POST /todos then a new todo will appear on GET /todos'). 
+
+Defining such scenarios could be included in an OpenAPI spec though - [OpenAPI allows for extending the spec](https://swagger.io/docs/specification/v3_0/openapi-extensions/). So for example we include the concept of 'scenarios' like so: 
+
+```js
+const spec = {
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Todo API",
+    "description": "A simple API for managing todos",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/todos": {
+      "get": {
+        "summary": "Get all todos",
+        "operationId": "getTodos",
+        "responses": {
+          "200": {
+            "description": "A list of todos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Todo"
+                  }
+                },
+                "examples": {
+                  "example1": {
+                    "x-scenario-number": 1, // 👈 custom extension of the spec denoting a scenario grouping
+                    "x-scenario-step": 1,   // 👈 Step 1 - the initial state 
+                    "summary": "Example response",
+                    "value": [
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "title": "Buy groceries",
+                        "completed": false
+                      },
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174001",
+                        "title": "Walk the dog",
+                        "completed": true
+                      }
+                    ]
+                  },
+                "example2": {
+                    "x-scenario-number": 1, 
+                    "x-scenario-step": 3, // 👈 Step 3 - the new todo appears
+                    "summary": "Example response",
+                    "value": [
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "title": "Buy groceries",
+                        "completed": false
+                      },
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174001",
+                        "title": "Walk the dog",
+                        "completed": true
+                      },
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174002",
+                        "title": "Read a book",
+                        "completed": false
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new todo",
+        "operationId": "createTodo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTodo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created todo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Todo"
+                },
+                "examples": {
+                  "example1": {
+                    "x-scenario-number": 1, 
+                    "x-scenario-step": 2, // 👈 Step 2 - adding a new todo 
+                    "summary": "Example response",
+                    "value": {
+                      "id": "123e4567-e89b-12d3-a456-426614174002",
+                      "title": "Read a book",
+                      "completed": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Todo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the todo"
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the todo"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Whether the todo is completed"
+          }
+        }
+      },
+      "NewTodo": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "The title of the new todo"
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+## Do you know of any such tools? 
+
+If you do, please get in touch and let me know. 
