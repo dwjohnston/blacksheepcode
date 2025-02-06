@@ -120,18 +120,22 @@ Now there are multiple outcomes each of these API calls could have:
 - useUser could be successful and return an admin user
 - useUser could be successful and return a non-admin users
 
+
+
 - useTodos could encounter a 500
 - useTodos could encounter a 403
 - useTodos could return an empty list
 - useTodos could return a single page of todos
 - useTodos could return the first page of many pages
 
+
+
 - useUpdateTodosMutation could encounter a 500
 - useUpdateTodosMutation could encounter a 403
 - useUpdateTodosMutation could encounter a 400
 - useUpdateTodosMutation return successful
 
-Chances are we are not testing 4*5*4=80 permutations of our test, and pragmatically speaking - we probably shouldn't be. 
+Chances are we are not testing 4\*5\*4=80 permutations of our test, and pragmatically speaking - we probably shouldn't be. 
 
 The idea I have is that if we can generate test data by observing real world API use, then we can we also generate these permutations. 
 
