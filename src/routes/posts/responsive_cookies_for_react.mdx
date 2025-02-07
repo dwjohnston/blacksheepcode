@@ -9,12 +9,16 @@ series:
   description: Using cookies in React applications
 
 ---
-import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
-import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
-import {UserProfile1} from "@/demos/responsive_cookies/components/UserProfile1"
-import {UserProfile2} from "@/demos/responsive_cookies/components/UserProfile2"
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel";
+import { UserProfile1 } from "@/demos/responsive_cookies/components/UserProfile1"
+import { UserProfile2 } from "@/demos/responsive_cookies/components/UserProfile2"
 
-import {DemoFrame} from "@/components/DemoFrame/DemoFrame";
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+
+<InfoPanel level="info">
+  This hook now exists as a npm package. See: <a href="https://www.npmjs.com/package/@blacksheepcode/use-cookie-state">@blacksheepcode/use-cookie-state</a>
+</InfoPanel>
 
 
 I recently encountered a situation where I have some React code that needs to listen for changes to a cookie, but this cookie logic isn't controlled React. 
