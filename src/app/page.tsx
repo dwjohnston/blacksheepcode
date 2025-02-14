@@ -33,6 +33,8 @@ export default async function Home() {
         <h2>Open Source Projects</h2>
         <ul>
           <li> <a href="https://www.npmjs.com/package/react-github-permalink" target="_blank" rel="noreferrer">react-github-permalink</a> - Provide a Github permalink and this React component will display the codeblock. I use this component regularly in my blog.</li>
+          <li> <a href="https://www.npmjs.com/package/@blacksheepcode/use-cookie-state" target="_blank" rel="noreferrer">use-cookie-state</a> - A useState like React hook that is responsive to cookie changes that occur outside of the React context. Includes polyfill for browsers that do not support the CookieStore API.</li>
+
           <li> <a href="https://github.com/dwjohnston/ts-tutorial-series" target="_blank" rel="noreferrer">TypeScript Tutorial Series</a> - A TypeScript tutorial series, complete with interactive exercises, starting from the very basics and going up to generics and mapped and index types.</li>
 
           <li> <a href="https://github.com/dwjohnston/javascript-101" target="_blank" rel="noreferrer">Javascript 101</a> - A JavaScript tutorial series for people who know nothing about coding. Complete with interactive exercises.</li>

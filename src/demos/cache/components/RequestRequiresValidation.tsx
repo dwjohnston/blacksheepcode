@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 
-export function RequestRequiresValidation(props: {endpoint: "requires-validation" | "immutable"}) {
+export function RequestRequiresValidation(props: { endpoint: "requires-validation" | "immutable" }) {
 
 
     const [data, setData] = useState("(not set)");
@@ -13,7 +13,7 @@ export function RequestRequiresValidation(props: {endpoint: "requires-validation
 
         <button onClick={() => {
             fetch(`/demos/cache/${props.endpoint}`, {
-                cache: "no-cache"
+                cache: "no-store"
             }).then(v => v.json()).then((v) => {
                 setData(v.data);
             })
