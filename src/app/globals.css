@@ -118,6 +118,8 @@ code {
 }
 
 .icon-links {
+  align-items: center;
+  align-self: flex-start;
   display: flex;
   gap: 0.5em;
 
@@ -330,6 +332,11 @@ header {
   margin: 0 auto;
 }
 
+
+header .title {
+  display: block;
+  margin-bottom: 1em;
+}
 
 header {
 
