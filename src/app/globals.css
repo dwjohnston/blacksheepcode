@@ -348,6 +348,7 @@ header {
 }
 
 header a:hover {
+  color: var(--color-foreground-impact);
   text-decoration: underline;
 }
 
