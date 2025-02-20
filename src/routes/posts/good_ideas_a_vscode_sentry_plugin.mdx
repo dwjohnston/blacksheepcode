@@ -3,6 +3,7 @@ meta:
   title: "Good idea: A VSCode plugin that highlights how often an error appears in Sentry, or other monitoring tools"
   description: I liberally throw errors defensively, often not expecting the error scenario to ever actually occur - it would be nice if I could see some real metrics about how often a thing is occurring, without having to leave the IDE. 
   dateCreated: 2025-02-20
+  image: sentry_in_ide
 
 series: 
   name: good_ideas
@@ -108,10 +109,9 @@ Then what we see is:
 ```ts
   async function deleteUser(user: User) {
   
-
-    // PROD: 0 errors in last six months, 0.00%
-    // TEST: 240 errors in last six months, 1.10%
     if (!user.id){
+      // PROD: 0 errors in last six months, 0.00%
+      // TEST: 240 errors in last six months, 1.10%
       throw new SentryReportingError({
         type: "type-narrowing",
         message: "User ID did not exist"
@@ -126,21 +126,19 @@ Then what we see is:
 
 Where those comments are annotations provided to the IDE via a plugin.
 
-Such reporting does not just need to exist for thrown errors, possibly if we found that often users without IDs were existing, we might just the code to:
+Such reporting does not just need to exist for thrown errors, possibly if we found that often users without IDs were existing, we might change the code to:
 
 ```ts
   async function deleteUser(user: User) {
-  
-
-    // PROD: 0 errors in last six months, 0.00%
-    // TEST: 240 errors in last six months, 1.10%
-    if (!user.id){
+      if (!user.id){
+      // PROD: 0 errors in last six months, 0.00%
+      // TEST: 240 errors in last six months, 1.10%
       reportToSentry({
         type: "type-narrowing",
         message: "User ID did not exist"
       }); 
 
-      handleNoUserIdHere();
+      return handleNoUserIdHere();
     }
 
     fetch(usersPath(user.id), {
@@ -148,6 +146,5 @@ Such reporting does not just need to exist for thrown errors, possibly if we fou
     })
   }
 ```
-
 
 Do you know of any such tool already existing?
