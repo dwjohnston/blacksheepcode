@@ -60,12 +60,11 @@ We have a few ways we might resolve this:
   }
 ```
 
-
-Throwing an error creates a TypeScript type guard (TODO FIND LINK), TypeScript is able to infer that the following the `throw` statement the type can no longer be undefined, and can thus treat it like a string. 
+Throwing an error creates a TypeScript [type guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types), TypeScript is able to infer that the following the `throw` statement the type can no longer be undefined, and can thus treat it like a string. 
 
 Encountering this error will be lot easier to debug than the error that will maybe result from our 404 error - now we're not going down a rabbit hole of investigating if there's something wrong with our API. 
 
-But also remember, _we are not expecting that this scenario will actually happen_ the main reason we're throwing an error is just to appease TypeScript, and it's better to throw and error than to just ignore it. 
+But also remember, _we are not expecting that this scenario will actually happen_ the main reason we're throwing an error is just to appease TypeScript, and it's better to throw an error than to just ignore it. 
 
 ## What about tightening the contract? 
 
@@ -73,7 +72,36 @@ But also remember, _we are not expecting that this scenario will actually happen
 
 You might be right. But tightening the contract is easier said than than done. If we've got this type all through our codebase, making that type non-optional maybe no small feat. 
 
-See my post here TODO about the living with bad codebases. 
-
 ## But there's always a chance that the error is being thrown 🤔
 
+In a large code base it's unclear what is really happening in the application. 
+
+In the case that sometimes that that user ID doesn't exist, we might be giving the user a bad experience when we throw the error. 
+
+If we're using a tool like Sentry we could have our [middleware](https://docs.sentry.io/platforms/javascript/guides/express/) reporting such errors. 
+
+But the problem here is that's whole step removed from where we are, logging into sentry, searching for the particular error message is a bit of friction that a lot of developers aren't going to be bothered with. 
+
+Instead, _it would be nice if we could see the prevalence of the errors in the IDE itself_. 
+
+That is, we do something like this: 
+
+```ts
+  async function deleteUser(user: User) {
+  
+    if (!user.id){
+      // PROD: 0 errors in last six months
+      // TEST: 240 errors in last six months
+      throw new SentryReportingError({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      })
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Those comments are not comments at all, but annotations provided by the IDE via a plugin.
