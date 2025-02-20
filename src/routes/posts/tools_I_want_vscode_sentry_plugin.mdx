@@ -1,0 +1,150 @@
+---
+meta:
+  title: "Tools I Want: A VSCode plugin that highlights how often an error appears in Sentry, or other monitoring tools"
+  description: I liberally throw errors defensively, often not expecting the error scenario to ever actually occur - it would be nice if I could see some real metrics about how often a thing is occurring, without having to leave the IDE. 
+  dateCreated: 2025-02-20
+  image: sentry_in_ide
+
+series: 
+  name: tools_i_want_to_exist
+  part: 2
+---
+
+I estimate that about 90% of the 'throw new Error' lines I write are for the purpose of type narrowing, and I usually don't expect them to occur. 
+
+For example, say I have some code like this: 
+
+```typescript
+type User = {
+    id?: string; 
+    userName?: string; 
+  }
+
+
+  function usersPath(userId: string){
+    return `/users/${userId}`
+  }
+  
+  async function deleteUser(user: User) {
+  
+    //Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+    //   Type 'undefined' is not assignable to type 'string'.ts(2345)
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+  
+```
+
+We have a simple type error, user.id could be undefined. 
+
+For the sake of argument, let's assume that we're confident that this scenario isn't going to occur.
+
+We have a few ways we might resolve this: 
+
+- We could add a fallback value, like `usersPath(user.id ?? "default-id")`. This doesn't make sense in this scenario - this would likely just cause a random 404 error at run time when it attempts to delete a user that doesn't exist. 
+- We could add a `@ts-ignore`. At runtime we would `DELETE /users/undefined` - again giving us a random 404 error. 
+- We could coerce the type like `usersPath(user.id as string)` - but this would be the same as ignoring it - we would again get a random 404. 
+- We can throw an error. 
+
+```typescript 
+  async function deleteUser(user: User) {
+  
+    if (!user.id){
+      throw new Error("Encountered an user with no id.")
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Throwing an error creates a TypeScript [type guard](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types), TypeScript is able to infer that the following the `throw` statement the type can no longer be undefined, and can thus treat it like a string. 
+
+Encountering this error will be lot easier to debug than the error that will maybe result from our 404 error - now we're not going down a rabbit hole of investigating if there's something wrong with our API. 
+
+But also remember, _we are not expecting that this scenario will actually happen_ the main reason we're throwing an error is just to appease TypeScript, and it's better to throw an error than to just ignore it. 
+
+## What about tightening the contract? 
+
+"Ah ha!" you say - "The real problem is that loosely typed `User` - we should make the id a required property. It's a code smell that it's optional". 
+
+You might be right. But tightening the contract is easier said than than done. If we've got this type all through our codebase, making that type non-optional maybe no small feat. 
+
+## But there's always a chance that the error is being thrown 🤔
+
+In a large code base it's unclear what is really happening in the application. 
+
+In the case that sometimes that that user ID doesn't exist, we might be giving the user a bad experience when we throw the error. 
+
+If we're using a tool like Sentry we could have our [middleware](https://docs.sentry.io/platforms/javascript/guides/express/) reporting such errors. 
+
+But the problem here is that's whole step removed from where we are, logging into sentry, searching for the particular error message is a bit of friction that a lot of developers aren't going to be bothered with. 
+
+Instead:
+
+## It would be nice if we could see error reports in the IDE
+
+That is, we do something like this: 
+
+```ts
+  async function deleteUser(user: User) {
+  
+    if (!user.id){
+      throw new SentryReportingError({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      })
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Then what we see is:
+
+```ts
+  async function deleteUser(user: User) {
+  
+    if (!user.id){
+      // PROD: 0 errors in last six months, 0.00%
+      // TEST: 240 errors in last six months, 1.10%
+      throw new SentryReportingError({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      })
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Where those comments are annotations provided to the IDE via a plugin.
+
+Such reporting does not just need to exist for thrown errors, possibly if we found that often users without IDs were existing, we might change the code to:
+
+```ts
+  async function deleteUser(user: User) {
+      if (!user.id){
+      // PROD: 0 errors in last six months, 0.00%
+      // TEST: 240 errors in last six months, 1.10%
+      reportToSentry({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      }); 
+
+      return handleNoUserIdHere();
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Do you know of any such tool already existing?
