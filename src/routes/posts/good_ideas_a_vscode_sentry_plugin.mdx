@@ -2,12 +2,11 @@
 meta:
   title: "Good idea: A VSCode plugin that highlights how often an error appears in Sentry, or other monitoring tools"
   description: I liberally throw errors defensively, often not expecting the error scenario to ever actually occur - it would be nice if I could see some real metrics about how often a thing is occurring, without having to leave the IDE. 
-  dateCreated: 2023-10-09
+  dateCreated: 2025-02-20
 
 series: 
   name: good_ideas
-  part: 1
-  description: Good ideas
+  part: 2
 ---
 
 I estimate that about 90% of the 'throw new Error' lines I write are for the purpose of type narrowing, and I usually don't expect them to occur. 
@@ -42,9 +41,9 @@ For the sake of argument, let's assume that we're confident that this scenario i
 
 We have a few ways we might resolve this: 
 
-- We could add a fallback value, a la usersPath(user.id ?? "default-id")` This doesn't make sense in this scenario - this would likely just cause a random 404 error at run time when it attempts to delete a user that doesn't exist. 
+- We could add a fallback value, like `usersPath(user.id ?? "default-id")`. This doesn't make sense in this scenario - this would likely just cause a random 404 error at run time when it attempts to delete a user that doesn't exist. 
 - We could add a `@ts-ignore`. At runtime we would `DELETE /users/undefined` - again giving us a random 404 error. 
-- We could coerce the type a la `usersPath(user.id as string)` - but this would be the same as ignoring it - we would again get a random 404. 
+- We could coerce the type like `usersPath(user.id as string)` - but this would be the same as ignoring it - we would again get a random 404. 
 - We can throw an error. 
 
 ```typescript 
@@ -82,7 +81,9 @@ If we're using a tool like Sentry we could have our [middleware](https://docs.se
 
 But the problem here is that's whole step removed from where we are, logging into sentry, searching for the particular error message is a bit of friction that a lot of developers aren't going to be bothered with. 
 
-Instead, _it would be nice if we could see the prevalence of the errors in the IDE itself_. 
+Instead:
+
+## It would be nice if we could see error reports in the IDE
 
 That is, we do something like this: 
 
@@ -90,8 +91,6 @@ That is, we do something like this:
   async function deleteUser(user: User) {
   
     if (!user.id){
-      // PROD: 0 errors in last six months
-      // TEST: 240 errors in last six months
       throw new SentryReportingError({
         type: "type-narrowing",
         message: "User ID did not exist"
@@ -104,4 +103,51 @@ That is, we do something like this:
   }
 ```
 
-Those comments are not comments at all, but annotations provided by the IDE via a plugin.
+Then what we see is:
+
+```ts
+  async function deleteUser(user: User) {
+  
+
+    // PROD: 0 errors in last six months, 0.00%
+    // TEST: 240 errors in last six months, 1.10%
+    if (!user.id){
+      throw new SentryReportingError({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      })
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+Where those comments are annotations provided to the IDE via a plugin.
+
+Such reporting does not just need to exist for thrown errors, possibly if we found that often users without IDs were existing, we might just the code to:
+
+```ts
+  async function deleteUser(user: User) {
+  
+
+    // PROD: 0 errors in last six months, 0.00%
+    // TEST: 240 errors in last six months, 1.10%
+    if (!user.id){
+      reportToSentry({
+        type: "type-narrowing",
+        message: "User ID did not exist"
+      }); 
+
+      handleNoUserIdHere();
+    }
+
+    fetch(usersPath(user.id), {
+      method: "DELETE"
+    })
+  }
+```
+
+
+Do you know of any such tool already existing?
