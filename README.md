@@ -2,6 +2,5 @@
 
 My blog. [https://blacksheepcode.com/](https://blacksheepcode.com/)
 
-Markdown files, turned into a blog with Remix. 
-
+Markdown files, turned into a blog with NextJs
 
