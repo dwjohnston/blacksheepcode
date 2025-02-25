@@ -1,0 +1,35 @@
+---
+meta:
+  title: How to prevent further modification commits to a file with a pre-commit hook
+  description: Sometimes you want to prevent accidentally modifying sets of test fixtures etc. Use this simple pre-commit hook to prevent it. 
+  dateCreated: 2025-02-25
+---
+
+I've been working on AI tool recently, and it involves saving large structured data files which I use my tests. 
+
+Sometimes I'll have a file that's working in one context, and I'm trying to work it work in another context, and I'll want to modify for that other context, just temporarily, to see if works. 
+
+But I don't want to make a accidentally make a permanent change to my 'source of truth' files. 
+
+A pre-commit [git hook](https://git-scm.com/book/ms/v2/Customizing-Git-Git-Hooks) helps here: 
+
+```sh
+#! /bin/sh -e
+
+# .git/hooks/pre-commit
+# Prevent the test files etc from accidentally being modified 
+REGEX='.*(preservedLogs|specs|testFixtures).*'
+git diff --name-only --cached | grep -qx "$REGEX" && { echo "❌ Excluded file included in the commit:"; git diff --name-only --cached | grep "$REGEX"; exit 1; }
+```
+
+Chmod this file with
+
+```sh
+chmod +x .git/hooks/pre-commit
+```
+
+and you're set!
+
+If your change _is_ intentional, you can always opt out of the pre-commit logic with `git commit --no-verify`.
+
+
