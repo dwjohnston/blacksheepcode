@@ -25,7 +25,7 @@ A pre-commit [git hook](https://git-scm.com/book/ms/v2/Customizing-Git-Git-Hooks
 # .git/hooks/pre-commit
 # Prevent the test files etc from accidentally being modified 
 REGEX='.*(preservedLogs|specs|testFixtures).*'
-git diff --name-only --cached | grep -qx "$REGEX" && { echo "❌ Excluded file included in the commit:"; git diff --name-only --cached | grep "$REGEX"; exit 1; }
+git diff --name-only --cached | grep -qxE "$REGEX" && { echo "❌ Excluded file included in the commit:"; git diff --name-only --cached | grep -E "$REGEX"; exit 1; }
 ```
 
 Chmod this file with
@@ -37,5 +37,7 @@ chmod +x .git/hooks/pre-commit
 and you're set!
 
 If your change _is_ intentional, you can always opt out of the pre-commit logic with `git commit --no-verify`.
+
+Note that git hooks in themselves will not be version controlled, so if you need this hook to be used by everyone in your project, you may wish to use a tool like [Husky](https://typicode.github.io/husky/).
 
 
