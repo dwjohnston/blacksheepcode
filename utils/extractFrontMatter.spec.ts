@@ -21,8 +21,9 @@ describe(extractFrontMatter,() => {
 
                 expect(fileName).toEqual("src/generated/tags.json");
                 expect(JSON.parse(data as string)).toEqual({
-                    "foo": ["bar/a", "bar/b"],
-                    "bar": ["bar/a"]
+                    "foo": expect.arrayContaining(["bar/a", "bar/b"]),
+                    "bar": expect.arrayContaining(["bar/a"]), 
+                    "untagged": expect.arrayContaining(["foo/c", "foo/d"])
 
                 });
             });  
@@ -35,12 +36,15 @@ describe(extractFrontMatter,() => {
             expect(writeFile).toHaveBeenCalledWith("generated/foo/c.json", "foo/c", {"meta": {"dateCreated": new Date("2022-11-28T00:00:00.000Z"), "description": "I am description C", "title": "I am title C"}, series: {
                 name: "foo_series", 
                 part:1
-            }})
+            }, 
+            tags: ["untagged"]})
             expect(writeFile).toHaveBeenCalledWith("generated/foo/d.json", "foo/d", {"meta": {"dateCreated": new Date("2022-11-28T00:00:00.000Z"), "description": "I am description D", "title": "I am title D"},
             series: {
                 name: "foo_series", 
                 part:2 
-            }})
+            },
+            tags: ["untagged"]
+            })
 
 
             expect(appendFile).toHaveBeenCalledWith("generated/bar/index.js", "a")

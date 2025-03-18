@@ -99,6 +99,10 @@ export async function extractFrontMatter(
     }
 
 
+    if(!fmContent.tags){
+      fmContent.tags = ["untagged"];
+    }
+
     fmContent.tags?.forEach((tag: string) => {
       if(!tagsMap[tag]){
         tagsMap[tag] = [] as Array<string>;
