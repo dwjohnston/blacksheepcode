@@ -16,6 +16,8 @@ const tagToLabelMap = {
     "javascript_nitty_gritty": "JavaScript",
     "developer_experience": "Developer Experience",
     "openapi": "OpenAPI",
+    "software_engineering": "Software Engineering",
+    "infrastructure": "Infrastructure",
 } as Record<string, string | undefined>;
 
 export function ListOfTagsPanel(){
