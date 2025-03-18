@@ -1,9 +1,20 @@
 import Link from "next/link";
 import tags from "../../generated/tags.json";
 
+
+console.log(Object.entries(tags))
 // Sort by the number of posts in each tag
-const uniqueTags = Object.entries(tags).toSorted((v) => {
-    return v[1].length;
+const uniqueTags = Object.entries(tags).toSorted((a,b) => {
+
+
+    // This is a bit hacky, but basically because all the test/draft posts are untagged, they increase the count.
+    if(a[0] === "untagged"){
+        return 1;
+    }
+    if(b[0] === "untagged"){    
+        return -1;
+    }
+    return b[1].length - a[1].length;
 }).map((v) => {
     return v[0];
 });
@@ -18,6 +29,7 @@ const tagToLabelMap = {
     "openapi": "OpenAPI",
     "software_engineering": "Software Engineering",
     "infrastructure": "Infrastructure",
+    "untagged": "Untagged"
 } as Record<string, string | undefined>;
 
 export function ListOfTagsPanel(){
