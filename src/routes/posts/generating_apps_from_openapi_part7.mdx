@@ -7,9 +7,13 @@ meta:
 series: 
   name: generating_apps_from_open_ai
   part: 8
+
+tags: 
+  - "openapi"
+  - "testing"
 ---
-import { GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
-import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
+import { GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
 
 What if our application interacts with a third party API (eg. Stripe, Sendgrid, etc). Our black box tests run against a real running application, albeit with an in-memory database, but we don't want it to making real API calls - we likely want to the mock the behaviour of our third party API so our tests can run in a deterministic manner. 
 

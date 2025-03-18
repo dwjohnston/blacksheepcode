@@ -121,10 +121,12 @@ code {
   a {
     font-weight: bold;
   }
+
   span {
     display: block;
-    
+
   }
+
   li {
     margin-bottom: 1em;
   }
@@ -374,7 +376,7 @@ header a:hover {
   text-decoration: underline;
 }
 
-nav {
+nav:not(.tags-panel) {
   flex: 1 0 100%;
   font-family: monospace;
   display: flex;
@@ -384,6 +386,22 @@ nav {
   .active {
     font-weight: bold;
   }
+}
+
+.tags-panel {
+  ul {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
+  li {
+    display: block;
+    flex-basis: 50%;
+    font-weight: bold;
+  }
+
+
 }
 
 
