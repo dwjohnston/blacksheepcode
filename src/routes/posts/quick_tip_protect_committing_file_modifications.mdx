@@ -4,6 +4,9 @@ meta:
   description: Sometimes you want to prevent accidentally modifying sets of test fixtures etc. Use this simple pre-commit hook to prevent it. 
   dateCreated: 2025-02-25
   image: accidental_commit
+
+tags:  
+  - "developer_experience"
 ---
 
 import accidental_commit from "@/assets/accidental_commit.jpg";
@@ -15,7 +18,7 @@ I've been working on AI tool recently, and it involves saving large structured d
 
 Sometimes I'll have a file that's working in one context, and I'm trying to work it work in another context, and I'll want to modify for that other context, just temporarily, to see if works. 
 
-But I don't want to make a accidentally make a permanent change to my 'source of truth' files. 
+But I don't want to accidentally make a permanent change to my 'source of truth' files. 
 
 A pre-commit [git hook](https://git-scm.com/book/ms/v2/Customizing-Git-Git-Hooks) helps here: 
 

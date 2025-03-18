@@ -16,6 +16,8 @@ const metaSchema = z.object({
 export const frontMatterSchema = z.object({
     meta:  metaSchema,
     series: seriesSchema.optional(),
+    tags: z.array(z.string()).optional(),
+
 })
 
 export type FrontMatter = z.infer<typeof frontMatterSchema>;

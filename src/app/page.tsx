@@ -1,4 +1,5 @@
 import { ListOfArticles } from "@/components/ListOfArticles/ListOfArticles";
+import { ListOfTagsPanel } from "@/components/ListOfTagsPanel/ListOfTagsPanel";
 import { SheepImage } from "@/components/SheepImage/SheepImage";
 import { getAllPostFrontmatter } from "@/utils/blogPosts";
 
@@ -22,6 +23,7 @@ export default async function Home() {
 			</div>
 
 			<div className="main">
+				<ListOfTagsPanel/>
 				<h2>Blog</h2>
 				<ListOfArticles allFrontmatter={articles} />
 			</div>

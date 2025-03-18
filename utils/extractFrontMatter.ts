@@ -37,11 +37,19 @@ async function _generateSubfolder(subPath: string) : Promise<string> {
  * The other arguments are there for the purpose of dependency injection - they allow us to write tests for this function, which out having to do any actual file writing. 
  *  
  * @param folderPath 
- * @param writeFile 
+ * @param writeFrontmatterFile 
  * @param appendIndexFile 
  * @param generateSubfolder 
  */
-export async function extractFrontMatter(folderPath: string, writeFile : WriteFileFn = _writeFile, appendIndexFile : AppendIndexFileFn = _appendIndexFile, generateSubfolder : CreateSubfolderFn = _generateSubfolder) {
+export async function extractFrontMatter(
+  folderPath: string,
+  writeFrontmatterFile : WriteFileFn = _writeFile,
+  appendIndexFile : AppendIndexFileFn = _appendIndexFile,
+  generateSubfolder : CreateSubfolderFn = _generateSubfolder,
+  writeFileSync: typeof fs.writeFileSync = fs.writeFileSync
+) {
+
+  const tagsMap = {} as Record<string, string[]>;
 
   const endToken = ".mdx";
   function getParts(inputString: string): [string, string] {
@@ -90,15 +98,22 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
     `)
     }
 
+
+    if(!fmContent.tags){
+      fmContent.tags = ["untagged"];
+    }
+
+    fmContent.tags?.forEach((tag: string) => {
+      if(!tagsMap[tag]){
+        tagsMap[tag] = [] as Array<string>;
+      }
+
+      tagsMap[tag].push( `${subPath}/${fileName}`)
+    });
+
     const basePath = await generateSubfolder(subPath);
-
-
-
-    await writeFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, fmContent);
-
-
+    await writeFrontmatterFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, fmContent);
     await appendIndexFile(path.join(basePath, 'index.js'), fileName);
-
 }
 
 
@@ -124,5 +139,8 @@ export async function extractFrontMatter(folderPath: string, writeFile : WriteFi
   }
 
   await findMdxFiles(folderPath)
+
+  writeFileSync(path.join("src", "generated", "tags.json"), JSON.stringify(tagsMap, null, 2));
+  console.log("🏷️ Tags written to tags.json")
 }
 

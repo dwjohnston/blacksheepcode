@@ -7,10 +7,13 @@ meta:
 series: 
     name: remix_blog
     part: 2
+tags: 
+  - "react"
+  
 ---
    
-import {GithubPermalinkRsc, GithubIssueLinkRsc} from "react-github-permalink/dist/rsc";
-import {InfoPanel} from "@/components/InfoPanel/InfoPanel"
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
 
 <InfoPanel level="warning">
   <p>The MDX Bundler solution requires server-side file system access, and as such is not suitable for serverless application deployments using services like AWS Lambda or Netlify.</p>
