@@ -6,6 +6,7 @@ meta:
 
 tags: 
   - "testing"
+  - "react"
 ---
 
 Here's a common scenario I encounter with React applications, where making changes becomes more difficult that we'd like it to be. 
@@ -28,7 +29,7 @@ export function Header() {
 } 
 ```
 
-And let's we have tests for this, we're taking the recommended ([Redux](https://redux.js.org/usage/writing-tests#integration-testing-connected-components-and-redux-logic), [Tanstack Query](https://tanstack.com/query/v4/docs/framework/react/guides/testing#testing-network-calls)) approach of including our state management logic in impliciitly in our test, and mocking the API calls using a tool like MSW. 
+And let's we have tests for this, we're taking the recommended ([Redux](https://redux.js.org/usage/writing-tests#integration-testing-connected-components-and-redux-logic), [Tanstack Query](https://tanstack.com/query/v4/docs/framework/react/guides/testing#testing-network-calls)) approach of including our state management logic in implicitly in our test, and mocking the API calls using a tool like MSW. 
 
 ```tsx
 //Header.test.tsx
@@ -107,7 +108,7 @@ describe(App, () => {
 })
 ```
 
-Now at this point, this copy pasting might be setting off alarm bells in your head, this feels like a code smell, but let's contine to make the point. 
+Now at this point, this copy pasting might be setting off alarm bells in your head, this feels like a code smell, but let's continue to make the point. 
 
 ## Making a change 
 
@@ -420,7 +421,7 @@ However, the caution I would give is that this approach of only doing calls into
 
 ## Conclusions 
 
-Solutions that allow an 'opt in' to new functionality are less disruptive, but are not a panacea, ulimately if opting in requires making changes in every affected test, then it will still be a difficult task. 
+Solutions that allow an 'opt in' to new functionality are less disruptive, but are not a panacea, ultimately if opting in requires making changes in every affected test, then it will still be a difficult task. 
 
 The problem with having state management calls at lower levels of your render tree is that components higher up the tree now need to be implicitly aware of what these API calls are. This can be mitigated by simply allowing those components to error out, though this might pose its own set of issues. 
 

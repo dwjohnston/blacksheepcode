@@ -52,7 +52,7 @@ export function MyComponent() {
 }
 ```
 
-This is kind of gross right? We end up including a bunch of logic up in our component for displaying a simple confirmation modal, that messys up and distracts from what we're actually trying to do. 
+This is kind of gross right? We end up including a bunch of logic up in our component for displaying a simple confirmation modal, that messies up and distracts from what we're actually trying to do. 
 
 This is where a pattern of encapsulating the open/closed state in a hook, and exposing just the needed parts to the calling components. 
 
@@ -83,7 +83,7 @@ export function MyComponent() {
                 })
             }}
             >
-                <button onClick ={() => setModalIsOpen(true)} type="submit">Submit</form> 
+                <button type="submit">Submit</form> 
         </form>
         
     </>

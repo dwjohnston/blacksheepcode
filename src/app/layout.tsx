@@ -3,17 +3,18 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "react-github-permalink/dist/github-permalink.css";
 import { mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
+import * as Sentry from "@sentry/nextjs";
 
-import githubSvg from "@/assets/github-mark.svg";
 import { githubPermalinkRscConfig } from "react-github-permalink/dist/rsc";
-import Image from "next/image";
-import { useRouter } from "next/router";
 import { Nav } from "@/components/Nav/Nav";
 const inter = Inter({ subsets: ["latin"] });
 
 githubPermalinkRscConfig.setConfig({
   // Can't use the prefix GITHUB in github actions so just have a second token just for github actions
-  githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN
+  githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN, 
+  onError: ((err) => {
+    Sentry.captureException(err);
+  })
 })
 
 export const metadata: Metadata = mergeFrontmatterAndDefaultMetadata({
