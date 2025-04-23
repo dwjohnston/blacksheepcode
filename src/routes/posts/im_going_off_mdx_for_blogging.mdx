@@ -1,0 +1,75 @@
+---
+meta:
+  title: I'm going off MDX for blogging
+  description: I like standardised formats like markdown. MDX allows markdown, plus sprinkle in some React. However, I'm considering that maybe I'd be better off just using React.
+  dateCreated: 2025-05-23
+
+series: 
+    name: remix_blog
+    description: Creating a blog with Remix
+    part: 1
+
+tags: 
+  - "react"
+  - "blogging"
+
+---
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+
+
+<GithubPermalinkRsc />
+This blog uses the [MDX file format](https://mdxjs.com/) as the source code for the blog posts. 
+
+Here is an example code snippet, for this very page (how meta): 
+
+
+
+At build time, the MDX files then go through a series of transformations. 
+
+- The front matter YAML is extracted to JSON files, and these are used to populate the 'view posts by tag' and 'this post is part a series' functionality. 
+- The MDX itself is compiled into regular React JavaScript. 
+
+## The rationale for using MDX
+
+The rationale for using MSX is really that I want to use Markdown, but it's nice to be able to put a React component in here and there. 
+
+## The rationale for using Markdown 
+
+I'm a fan of open standards. I'm also [a big fan of JSON Schema and OpenAPI](/posts?tag=openapi).
+
+The main reason is that if you're using an open standard, then you now get a whole wealth of compatable tooling for free. 
+
+For example with Markdown we have [remark](https://github.com/remarkjs/remark) and all of its [associated plugins](https://github.com/remarkjs/remark/blob/main/doc/plugins.md#list-of-plugins). 
+
+Not only do these standard formats allow us to transform the given structure data into something useful, but it also serves as a target for other tools to transform _to_. 
+
+Two entirely seperate tools can thus be compatable by having the standard format as common interchange. 
+
+## What I'm not liking about MDX - lack of language support in VSCode
+
+Some improvements can be had with the experience by adding the [vscode-mdx](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) plugin.
+
+However, I still have these problems.
+
+### 1. Lack of autocompletion
+
+The plugin does not current support TypeScript, and so properties of a component will no have autocomplete suggestions.
+
+### 2. Lack of type checking in my IDE.
+
+Similarly, if I missed some mandatory properties, I will not see errors in my IDE. If I reference components that don't exist I will not see errors in my IDE. 
+
+### 3. Lack of type enforcement in my front matter YAML. 
+
+The YAML in my front matter has reference to specifc magic strings (eg, tag names, series names). 
+
+These are typed freehand, whereas with full typescript support they I could get the autocomplete making it much easier to write them.
+
+## Conclussions 
+
+All this makes me consider whether I'm really getting good value out of MDX. 
+
+Especially as I start to add more and more React components, I have to question whether it's much more of a hassle to just be writing straight HTML/JSX.
+
+
+
