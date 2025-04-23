@@ -13,6 +13,20 @@ import mitm from "@/assets/mitm.png"
 import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
 import har from "@/assets/har.png"
 
+import {InfoPanel} from "@/components/InfoPanel/InfoPanel";
+
+<InfoPanel level="info">
+  <p>
+    There may be awkward confusion around the term 'proxy' here. 
+  </p>
+  <p>
+   If all you're needing is having your frontend relative requests (`/api/example`) redirect to a service that isn't your NextJS server, then you can use the [NextJS rewrites configuration documented here](https://nextjs.org/docs/app/api-reference/config/next-config-js/rewrites).
+  </p>
+  <p>
+   This post pertains to proxying all requests the Next application might be making (including said rewrites) to a proxy server such as MITM proxy, while having them continue to intended destination.
+  </p>
+</InfoPanel>
+
 I found myself in a situation where I wanted to record the requests my NextJS application was making. Where for a straight client-side SPA I could use the network tab of the developer dev tools: 
 
 <img src ={har.src} alt="Screenshot indicating the HAR download button in Chrome's devtools" className="blog-image" style={{maxHeight: 400, display: "block", margin: "40px auto"}}/>
@@ -27,14 +41,20 @@ I have a sample application set up at [this repository here](https://github.com/
 
 There are four kinds of requests we need to handle.
 
+<details>
+<summary>
 ### Straight client side requests 
+</summary>
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/src/components/ComponentFetch.tsx#L1-L15"/>
 
 This is the most basic, and this doesn't require special NextJS configuration - the request to jsonplaceholder is made directly from the browser, and if our browser is configured to use a proxy those requests will indeed be proxied. 
 
+</details>
 
+<details>
+<summary>
 ### Client side requests with rewrites 
-
+</summary>
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/src/components/ComponentFetchRelative.tsx#L1-L13"/>
 
 In this scenario we request the data via a relative path, and we configure NextJS to rewrite the request in the `next.config.js` file: 
@@ -42,19 +62,25 @@ In this scenario we request the data via a relative path, and we configure NextJ
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/next.config.mjs#L7-L16"/>
 
 In this case the browser proxy configuration is not able to proxy these requests - as the requests are made to application server which is doing the requests on the browsers behalf.
-
+</details>
+<details>
+<summary>
 ### Server side requests - with native fetch
+</summary>
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/a7349693e1a8bd6e8d29800be64755062f86a070/src/app/page3/page.tsx#L5-L16"/>
 
 In this scenario the request is made on the server as a RSC. We need a way to instruct our application to proxy these requests via our proxy. 
-
+</details>
+<details>
+<summary>
 ### Server side requests - with node-fetch
+</summary>
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/nextjs-proxying/blob/0bb4f13f98c2b5a6c51cac59669736f1a5f982ed/src/app/page6/page.tsx#L1-L15"/>
 
 This is the same scenario but we're using node-fetch instead of native fetch. 
-
+</details>
 ## Solution - use a secondary proxy
 
 The best solution I've found is to add your own secondary proxy, and have it proxy its traffic through your target proxy.
