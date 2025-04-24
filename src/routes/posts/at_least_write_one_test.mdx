@@ -1,0 +1,102 @@
+---
+meta:
+  title: At least write one test.
+  description: The value of writing one test isn't in testing the code's correctness - it's in testing its consumability.
+  dateCreated: 2025-04-23
+
+tags: 
+  - software_engineering
+  - testing
+---
+
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+
+
+A key philosophy of mine is 'at least write one test'. 
+
+This is intended to be a pragmatic rule of thumb that allows developers to prioritise some amount of expedience, while also writing code that is maintainable.
+
+The idea is, if we write a single test _now_ - while we're writing the feature, then later, if something goes wrong, or we need to extend the feature, it's going to be a lot easier to write a second test then - we can simply follow the existing pattern. 
+
+Whereas, if no such test existed, when another developer (or yourself, in six months time) comes across the feature and needs to extend it, there's a lot more friction in writing a test, and chances are higher that [they will continue doing what they've seen already](./philosophy_assume_the_next_developer_will_copy_paste), and also not write a test.
+
+This philosophy does not prescribe writing comprehensive tests, or strict coverage standards. Whether comprehensive tests are required/a good idea is a different story, and will be organisation/context specific. The 'at least write one test' philosphy allows for those advocating for a more expedient approach, to utilise a test-light approach, while also putting themselves into a position to increase their test coverage later. 
+
+## Tests as a test of your codes consumability
+
+There's a second philosophy here, and this is really the core of the argument - the value of a test isn't just in its testing of code's correctness, a test also tests how usable some code is.
+
+Often some code will rely on some amount of context or external behaviour existing. For example the code might make an external API call or need to to access some kind of instantiated class instance. 
+
+Just writing one test isn't necessarily a trivial task - and that's the point - writing the one test let's you know what assumptions you're making about the context that is required for this code to work.
+
+Let's take some example code. 
+
+
+<details>
+<summary>
+### Example Code 1 - Naive fetch
+</summary>
+If I write a function like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/6d7386efbc2900d279fbefb877929153cfbe091b/src/example-1/getFooValue.ts#L1-L12"/>
+
+How would we write a test for some code like this? 
+
+Well, we're going to have to do some kind of fetch mocking, maybe using a tool like [MSW](https://mswjs.io/).
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/6d7386efbc2900d279fbefb877929153cfbe091b/src/example-2/getFooValue.test.ts#L1-L15"/>
+
+Now this might be seem fair enough, reasonable test. 
+
+But understand what we're establishing here - _anytime we want to use the `getFooValue` function, we need to exist in a context where the fetch behaviour for `GET /foo/{id}` is defined._ 
+
+If we're writing a test for some code that uses `getFooValue`, we will also need to define fetch behaviour there too (or, we would mock `getFooValue` away). And probably, the way we would do that, would be looking at how we did the tests for `getFooValue` and copying that.
+
+
+So how else could we write this test? 
+</details>
+<details>
+<summary>
+### Example Code 2 - Injecting fetch functionalility as a function parameter
+</summary>
+What if we recieve fetching function as a parameter: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-2/getFooValue.test.ts#L1-L17"/>
+
+Of course, this does just shift the responsability of doing the actual fetching up to the calling function, and if we want to test that, we'd still need to define fetching mocking behaviour up for that test. 
+
+And this does seem like a somewhat redundant function - why not just pass the already fetched `Foo` object in. 
+
+</details>
+<details>
+<summary>
+### Example Code 3 - Using a service singleton
+</summary>
+
+We could take a more object-oriented approach, and we write some code like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-3/getFooValue.ts#L1-L23"/>
+
+Now we can write our test be defining the behaviour of the `FooService`
+
+
+Something I quite like about this approach, is that it allows us to define an default behavior - which will be to have the service throw 'not implemented' errors. 
+
+<GithubPermalinkRsc permalink="
+https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-3/getFooValue.test.ts#L5-L10"/>
+
+This is much nicer than say having your tests making real API requests, and those maybe erroring, maybe not, and having to dig into what request is failing and why. Not implmented errors give a clear, immediate nudge as to what the problem is. 
+</details>
+
+## Conclusions 
+
+Just writing one test is a good sense check on how easy your code is to work with. 
+
+If just writing one test is a trivial task, then great! It's not going to be a problem to do it. 
+
+If just writing one test is actually an ordeal, then, in my opinion it suggests a code smell, and you're becoming aware of a problem. 
+
+So what if that is the case? Do we put tools down until we can write that one test? 
+
+Well, I guess that's a topic for another day - but in the meantime you can read [How to get started on a codebase that has no tests](https://blacksheepcode.com/posts/how_to_get_started_testing).

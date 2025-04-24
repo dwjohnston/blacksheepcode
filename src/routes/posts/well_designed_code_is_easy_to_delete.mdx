@@ -1,0 +1,64 @@
+---
+meta:
+  title: Well designed code is easy to delete
+  description: The mark of some well designed code is that the act of replacing it is some what straight forward.
+  dateCreated: 2025-04-23
+
+tags: 
+  - "software_engineering"
+
+---
+
+I've been seeing a growing narrative recently that makes the argument 'focus on shipping / focus on solving customer's problems / the focus on clean code is a distraction that prevents your from delivering value to the business'. 
+
+This is a contrary argument to what I think is an older set of advice 'always be tidying up the code as you touch it / you don't need to ask for permission to improve the code base'. 
+
+I'm somewhat sympathetic to both points of view. 
+
+On one hand a lack of regard for code architecture, a focus on delivering functionality as soon as possible, tests be damned, is going to work, until it doesn't. In a greenfields project, you might get away with it for six months, a year, two years, and then each new feature is going to take longer and longer. Somewhat cynically speaking, if you're the original developer and you've since left, you're probably left looking pretty good out of it. 
+
+On the otherhand, I've worked in organisations where in the dicussion of every task to be done, there's a developer saying 'well we're going to need to refactor this thing, so it's going to take...', to the point where the term 'refactor' was triggering feelings of PTSD. 
+
+If we adopt the mantra of 'alawys be refactoring' then it becomes a death by a thousand refactors - simple seeming tasks constantly taking far longer than they should. 
+
+## When the organisation doubles in size, then rewrite the codebase
+
+I saw or heard a somewhat radical idea a while ago, but I'm unable to find it, the idea is when an organisation doubles in size, then you rewrite the codebase. Until then, developers live with the code. 
+
+This is obviously a somewhat radical and provacative idea, but it has some merit. 
+
+The idea is, that developers should live with the codebase they've got, and focus on being effective within their current paradigm. But at some point, you allow yourself/the developers to do some kind of large scale change. The point is, it's a somewhat deliberate act, rather than something that is constantly grinding away in a potentially impulsive manner. 
+
+## Good code is easy to delete 
+
+There are a lot of reasons why a codebase can become bad. Perhaps at the time better tools didn't exist. Or people were quite naturally, learning on the job. [I write about this here](./the_natural_state_of_software_is_chaos). 
+
+The idea is, we should accept that our code is going to become a convoluted mess. 
+
+The trick then, is in allowing it to be a convoluted mess that we can work with. 
+
+Micro services and clearly defined modules/packages are a good starting point for this effort. 
+
+A [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) can help enforce that a given makes its commits in the area they belong, meaning that business logic doesn't seep between module boundaries. 
+
+It's the job of technical leadership to embrace [Conway's law](https://en.wikipedia.org/wiki/Conway%27s_law) and create the team structures that will lend it to self clean code architecture. 
+
+Microservices with OpenAPI specs as their interfaces means that the entire codebase can be rewritten with a completely different toolchain, and the interface still works for other consumers. 
+
+But of course, simply adopting a microservice or modular architecture won't guarantee that will avoid an entangled mess - you could still end up with a entangled mess of tightly coupled microservices. 
+
+One idea I'm toying with, is that you should try avoid having the same development team be creating two services/modules that interact directly with each other. 
+
+The idea is, that will lend it self to shortcuts being taken, and tight coupling occuring, for the sake of some convenience. 
+
+Whereas, if the interaction between two different services, is between two different teams, then each has the incentive to keep the interface coherrent. 
+
+This may not be a pragmatic approach, depending on organisation size.
+
+
+
+
+
+
+
+

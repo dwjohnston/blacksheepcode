@@ -1,0 +1,325 @@
+---
+meta:
+  title: I am the title
+  description: I am the description
+  dateCreated: 2022-11-28
+---
+
+
+
+Let's start with using TypeSciript as our compiler. 
+
+
+## Part 1 - Target 
+
+In example 1 we have this code: 
+
+```typescript
+
+const x = {
+
+} as  { 
+    bar?: string;
+}
+
+
+console.log(x?.bar);
+```
+
+
+And when our TSConfig has: 
+
+```
+    "target": "ES5",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+```
+
+Then our output is 
+
+```
+"use strict";
+var x = {};
+console.log(x === null || x === void 0 ? void 0 : x.bar);
+```
+
+Whereas if we update our target to 
+
+```
+    "target": "ESNext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+```
+
+Then our output becomes:
+
+```
+"use strict";
+const x = {};
+console.log(x?.bar);
+```
+
+
+The moral of the story here: 
+The `target` property controls the general syntax features being outputted. If you need to support an older runtime you will need an older target.
+
+
+The previous example is an example of a fairly simple feature, if we use something like async/await, let's see what happens:
+
+```
+async function foo(){
+    console.log("x")
+}
+
+async function main() {
+    await foo();
+}
+
+main();
+```
+
+With target "ESNext":
+
+```
+"use strict";
+async function foo() {
+    console.log("x");
+}
+async function main() {
+    await foo();
+}
+main();
+```
+
+And with target "ES5":
+
+```
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+function foo() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            console.log("x");
+            return [2 /*return*/];
+        });
+    });
+}
+function main() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, foo()];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+main();
+
+```
+
+We get a whole lot of polyfill logic to implement generate and awaitng logic. 
+
+So using old targets will inflate your bundle size a little, but it's possibly not enough to matter.
+
+Performance:
+
+
+Out of curiousity, does the native code perform better than the polyfilled code?
+
+I use the tool [Benchmark.js](https://www.npmjs.com/package/benchmark) - and the results I see are that the native async code is 5x faster. 
+
+## Part 2 - Module 
+
+So now let's example the `module` property. 
+
+We have some simple module code: 
+
+
+```typescript
+//index.ts
+
+import {foo} from "./other-module"
+
+function main(){
+    foo();
+}
+
+main();
+
+```
+
+```typescript
+//other-module.ts
+
+export function foo() {
+    console.log("x");
+}
+```
+
+If the module property is `ESNext` we get regular ESM code:
+
+```
+import { foo } from "./other-module";
+function main() {
+    foo();
+}
+main();
+```
+
+Whereas if the module property is `NodeNext` we get CJS:
+
+```
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const other_module_1 = require("./other-module");
+function main() {
+    (0, other_module_1.foo)();
+}
+main();
+```
+
+If we use UMD then we get the combined AMD and CJS style:
+
+```
+(function (factory) {
+    if (typeof module === "object" && typeof module.exports === "object") {
+        var v = factory(require, exports);
+        if (v !== undefined) module.exports = v;
+    }
+    else if (typeof define === "function" && define.amd) {
+        define(["require", "exports", "./other-module"], factory);
+    }
+})(function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const other_module_1 = require("./other-module");
+    function main() {
+        (0, other_module_1.foo)();
+    }
+    main();
+});
+
+```
+
+This seems pretty straightforward so far. 
+
+
+## A little caveat - module side effects 
+
+In this example we're going to add a console log to our secondary module in the module scope itself:
+
+```javascript
+console.log("module sideffect");
+
+export function foo() {
+    console.log("x");
+}
+```
+
+Our index module will import the function, but won't call it: 
+
+```javascript
+import {foo} from "./other-module"; // remains uncalled
+
+function main(){
+    console.log("Main function");
+}
+
+main();
+```
+
+_Note that this code contains zero TypeScript._
+
+When we compile this, we get:
+
+```javascript 
+function main() {
+    console.log("Main function");
+}
+main();
+export {};
+
+```
+
+TypeScript drops the import, and we do not get the side effect of the import occuring. 
+
+(I believe this is some kind of optimisation, but I can not find a canonical discussion about it).
+
+
+However, if we change the code to: 
+
+```
+import "./other-module"
+
+function main(){
+    console.log("Main function");
+}
+
+main();
+```
+
+Then TypeScript will not do the ommision and the module side effect will occur.
+
+
+
+If we copy the files, and so we have one file that's `index.ts` and the exact same content as `index.js`. 
+
+Let's use Bun to run both files, given that Bun helpfully runs TypeScript natively. 
+```
+% bun src/index.ts
+Main function
+```
+
+```
+% bun src/index.js
+module sideffect
+Main function
+```
+
+Note that the module side effect does not occur when running a TypeScript file!
+
+This behavior can be controlled with [`verbatimModuleSyntax`](https://www.typescriptlang.org/tsconfig/#verbatimModuleSyntax) 
+
+
+
+## 3.1 Dynamic imports 
+
+
+
+
+
+
