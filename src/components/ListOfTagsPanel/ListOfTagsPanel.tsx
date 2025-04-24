@@ -8,6 +8,7 @@ const uniqueTags = Object.entries(tags).toSorted((a,b) => {
 
 
     // This is a bit hacky, but basically because all the test/draft posts are untagged, they increase the count.
+    // We just make the untagged posts always be at the bottom
     if(a[0] === "untagged"){
         return 1;
     }
@@ -29,7 +30,8 @@ const tagToLabelMap = {
     "openapi": "OpenAPI",
     "software_engineering": "Software Engineering",
     "infrastructure": "Infrastructure",
-    "untagged": "Untagged"
+    "untagged": "Untagged", 
+    "blogging": "Blogging"
 } as Record<string, string | undefined>;
 
 export function ListOfTagsPanel(){
