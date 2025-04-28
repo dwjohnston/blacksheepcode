@@ -45,7 +45,7 @@ How would we write a test for some code like this?
 
 Well, we're going to have to do some kind of fetch mocking, maybe using a tool like [MSW](https://mswjs.io/).
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/6d7386efbc2900d279fbefb877929153cfbe091b/src/example-2/getFooValue.test.ts#L1-L15"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-1/getFooValue.test.ts#L1-L30"/>
 
 Now this might be seem fair enough, reasonable test. 
 
@@ -62,9 +62,15 @@ So how else could we write this test?
 </summary>
 What if we recieve fetching function as a parameter: 
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-2/getFooValue.ts#L1-L11"/>
+
+Now testing this is dead easy: 
+
+
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-2/getFooValue.test.ts#L1-L17"/>
 
-Of course, this does just shift the responsability of doing the actual fetching up to the calling function, and if we want to test that, we'd still need to define fetching mocking behaviour up for that test. 
+
+Of course, this does just shift the responsibility of doing the actual fetching up to the calling function, and if we want to test that, we'd still need to define fetching mocking behaviour up for that test. 
 
 And this does seem like a somewhat redundant function - why not just pass the already fetched `Foo` object in. 
 
@@ -80,11 +86,11 @@ We could take a more object-oriented approach, and we write some code like this:
 
 Now we can write our test be defining the behaviour of the `FooService`
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-3/getFooValue.test.ts#L11-L21"/>
 
 Something I quite like about this approach, is that it allows us to define an default behavior - which will be to have the service throw 'not implemented' errors. 
 
-<GithubPermalinkRsc permalink="
-https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-3/getFooValue.test.ts#L5-L10"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/at-least-write-one-test/blob/60d6cb8e1a67ba01f404b640ac83017f6d60ee54/src/example-3/getFooValue.test.ts#L5-L10"/>
 
 This is much nicer than say having your tests making real API requests, and those maybe erroring, maybe not, and having to dig into what request is failing and why. Not implmented errors give a clear, immediate nudge as to what the problem is. 
 </details>
