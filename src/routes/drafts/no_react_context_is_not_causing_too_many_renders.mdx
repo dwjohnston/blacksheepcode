@@ -1,0 +1,12 @@
+---
+meta:
+  title: No, React Context is not causing too many renders
+  description: A lot of people are under the impression that context shouldn't be used to store state, because it'll cause the entire application tree to re-render. This is a misnomer. 
+  dateCreated: 2025-05-08
+---
+
+I commonly see people operating under the assumption that React Context is not appropriate for managing state, because every time the state changes, it'll cause everything under the React provider to re-render. 
+
+This is a misnomer, and I'm here to disprove it. 
+
+Here's my application. 

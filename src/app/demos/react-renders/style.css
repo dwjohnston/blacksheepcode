@@ -1,0 +1,31 @@
+.render-tracker-demo {
+    display: flex;
+    gap: 1rem;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+.state-changer,
+.state-displayer,
+.some-unrelated-component {
+    width: 150px;
+    height: 150px;
+
+    border: dotted 1px black;
+    padding: 0.5em;
+}
+
+.state-changer {}
+
+.render-tracker {
+    background-color: var(--color-info-secondary);
+    position: relative;
+}
+
+
+.render-tracking-dot {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    background-color: red;
+}
