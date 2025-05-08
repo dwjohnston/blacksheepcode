@@ -4,9 +4,69 @@ meta:
   description: A lot of people are under the impression that context shouldn't be used to store state, because it'll cause the entire application tree to re-render. This is a misnomer. 
   dateCreated: 2025-05-08
 ---
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
 I commonly see people operating under the assumption that React Context is not appropriate for managing state, because every time the state changes, it'll cause everything under the React provider to re-render. 
 
 This is a misnomer, and I'm here to disprove it. 
 
 Here's my application. 
+
+https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L25-L44
+
+I do have a button at the top of the application that _will_ re-render the whole application. 
+
+This is to demonstrate that there is no trickery here. 
+
+https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L18-L23
+
+My context provider is simple. We store state in a `useState` hook, and provide it via the context provider. 
+
+https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L24
+
+I have two components, both of them use this state. 
+
+https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L28
+
+I have several unrelated components that don't use the context. 
+
+https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L47-L58
+
+My render tracking component display the dot in a different spot each time we see a render. 
+
+What's the result? 
+
+You can see for your self: 
+
+<DemoFrame
+  description = {<>
+  <p>Observe that clicking the top button will in fact cause a render of the entire application.</p>
+  <p>Observe that state changes the occur in the context, only affect the components affecting that context.</p>
+  </>}
+>
+  <MyRenderTrackerDemo/>
+</DemoFrame>
+
+## Where does this confusion come from? 
+
+I believe this confusion comes from two things. 
+
+### 1. You really shouldn't bung all your state into one provider. 
+
+Were I to add color/setColor, foo/setFoo and bar/setBar pairs to the same context provider, and had a new component FooComponent, using those new parts of state, these state changes _will_ cause re-renders. All the consumers of the one context provider will re-render when state changes. 
+
+<DemoFrame
+  description = {<>
+  <p>Observe that randomizing the color causes renders of the other context </p>
+  </>}
+>
+  <MyRenderTrackerDemo2/>
+</DemoFrame>
+
+This is fine if it's all related data and they needed to show the change anyway. 
+
+But if you have two sets of unrelated data, then just use two context providers!
+
+### \{children\} don't cause renders
+
+

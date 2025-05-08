@@ -5,6 +5,7 @@ import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
 import { CodeExampleLink } from "@/components/CodeExampleLink/CodeExampleLink";
 import { MyForm } from "@/demos/imperative_confirmation_modal/components/MyForm";
 import { MyRenderTrackerDemo } from "@/app/demos/react-renders/ReactRenders";
+import { MyRenderTrackerDemo as MyRenderTrackerDemo2 } from "@/app/demos/react-renders/ReactRenders2";
 
 async function getAllArticles() {
     return getAllPostFrontmatter("test")
@@ -19,6 +20,8 @@ export default async function PageLayout() {
 
         Test Posts
         <MyRenderTrackerDemo />
+        <MyRenderTrackerDemo2 />
+
         <ListOfArticles allFrontmatter={articles} />
         <MyForm />
         <CodeExampleLink link="foo" />
