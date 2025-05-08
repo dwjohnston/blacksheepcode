@@ -10,6 +10,7 @@ tags:
 ---
 
 import { Aside } from "@/components/Aside/Aside"
+import { TextHighlight } from "react-text-highlight";
 
 I've [written previously about testing strategies as it relates to React](./testing_strategies). 
 
@@ -227,19 +228,13 @@ We might have multiple suites of data, maybe `"scenario-1"` covers a scenario wh
 
 I need to be clear here - _I do not have experience with actually working with or implementing this technique_. 
 
-The main con here is setting up, and potentially maintaining these suites of test data will be _a lot_ of work. 
+The main con here is setting up, and potentially maintaining these suites of test data will be <TextHighlight commentContent={<div><p>
+For example, say <code>"scenario-a"</code> is a 'blue sky' scenario, and we're extending our <code>UserCard</code> to include usage of a new role type, <code>"super-admin"</code>. We add a user Deanna with the role <code>"super-admin"</code> - the problem is elsewhere in the codebase we have a bunch of tests that assert of on the number of users in a user list, and these now break. Instead of going through and updating all of those tests, we now create <code>"scenario-d"</code> - which is just <code>"scenario-a"</code> + our extra user.</p><p>
+Before long, we're up to <code>"scenario-z"</code> and nobody knows what all these scenarios do, but we can't modify them for fear of breaking someone's tests.</p><p>
+Possibly there's a solution here, where we create our test data in an extensible manner. ie. we never change data that exists, we can always add more data. Our tests are written in a manner that also respects this, for example we don't assert "there are three users in the list", we assert ("there are at least three users in the list").</p>
+</div>}>_a lot_ of work.</TextHighlight>
 
-<Aside>
-Say `"scenario-1"` is a 'blue sky' scenario, and we're extending our `UserCard` to include usage of a new role type, `"super-admin"`. We add a user Deanna with the role `"super-admin"` - the problem is elsewhere in the codebase we have a bunch of tests that assert of on the number of users in a user list, and these now break. Instead of going through and updating all of those tests, we now create `"scenario-d"` - which is just `"scenario-a"` + our extra user. 
-
-Before long, we're up to `"scenario-z"` and nobody knows what all these scenarios do, but we can't modify them for fear of breaking someone's tests. 
-
-Possibly there's a solution here, were we create our test data in an extensible manner. ie. we never change data that exists, we can always add more data. Our tests are written in a manner that also respects this, for example we don't assert "there are three users in the list", we assert ("there are at least three users in the list").  
-
-</Aside>
-
-
-Additionally, mocking the behaviour of endpoints that modifify the data (eg. submitting a new todo, and then asserting that the list now has all the data) entails additonal complexity - essentially we end up rewriting our application for a test environment. 
+Additionally, mocking the behaviour of endpoints that modify the data (eg. submitting a new todo, and then asserting that the list now has all the data) entails additional complexity - essentially we end up rewriting our application for a test environment. 
 
 ##### There are tools that can help 
 

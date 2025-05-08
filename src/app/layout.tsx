@@ -8,7 +8,8 @@ import * as Sentry from "@sentry/nextjs";
 import { githubPermalinkRscConfig } from "react-github-permalink/dist/rsc";
 import { Nav } from "@/components/Nav/Nav";
 const inter = Inter({ subsets: ["latin"] });
-
+import {TextHighlightProvider} from "react-text-highlight"
+import "react-text-highlight/dist/main.css";
 githubPermalinkRscConfig.setConfig({
   // Can't use the prefix GITHUB in github actions so just have a second token just for github actions
   githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN, 
@@ -88,9 +89,11 @@ export default function RootLayout({
 
 
         </header>
-        <div className="main-column">
-          {children}
-        </div>
+        <TextHighlightProvider>
+          <div className="main-column">
+            {children}
+          </div>
+        </TextHighlightProvider>
       </body>
     </html>
   );
