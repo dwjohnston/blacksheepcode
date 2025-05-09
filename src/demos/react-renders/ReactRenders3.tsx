@@ -25,7 +25,7 @@ export function ChildrenStyleTwo(props: React.PropsWithChildren) {
     </div >
 }
 
-export function MyRenderTrackerDemo3() {
+export function ReactRenders3() {
     return <div className="render-tracker-demo">
         <ChildrenStyleOne />
         <ChildrenStyleTwo>

@@ -8,7 +8,8 @@
 .state-changer,
 .state-displayer,
 .some-unrelated-component,
-.foo-component {
+.foo-component,
+.some-parent-component {
     width: 150px;
     height: 150px;
 

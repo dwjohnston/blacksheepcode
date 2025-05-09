@@ -6,47 +6,38 @@ import { RenderTracker } from "./common";
 type MyContextType = {
     value: string;
     setValue: (value: string) => void;
-    color: string;
-    setColor: (color: string) => void;
 }
 
 const MyContext = React.createContext<MyContextType>({
     value: "foo",
     setValue: () => {
         throw new Error("setValue not implemented");
-    },
-
-    color: "red",
-    setColor: () => {
-        throw new Error("setColor not implemented");
     }
-
 });
 
 
 const MyProvider = ({ children }: { children: React.ReactNode }) => {
     const [value, setValue] = React.useState("foo");
-    const [color, setColor] = React.useState("red");
-    const contextValue: MyContextType = { value, setValue, color, setColor };
-
+    const contextValue: MyContextType = { value, setValue };
     return <MyContext.Provider value={contextValue}>{children}</MyContext.Provider>;
 };
 
 
-export function MyRenderTrackerDemo2() {
+export function ReactRenders1() {
     const [value, setValue] = React.useState("foo");
 
     return <MyProvider>
 
         <button onClick={() => {
             setValue(`${Math.random()}`);
-        }}> Cause a render of the whole application</button>
+        }}
+            className="global-render-button"
+        > Cause a render of the whole application</button>
 
         <div className="render-tracker-demo">
 
             <StateChanger />
             <StateDisplayer />
-            <FooComponent />
 
             <SomeUnrelatedComponent />
             <SomeUnrelatedComponent />
@@ -54,7 +45,6 @@ export function MyRenderTrackerDemo2() {
         </div>
     </MyProvider >
 }
-
 
 
 
@@ -73,20 +63,6 @@ function StateDisplayer() {
     return <div className="state-displayer">
         <strong>State Displayer</strong>
         <div>{value}</div>
-        <RenderTracker />
-    </div>
-}
-
-function FooComponent() {
-    const { color, setColor } = useContext(MyContext);
-    return <div className="foo-component">
-        <strong>Foo Component</strong>
-        <button onClick={() => {
-            // This is Copilots suggestion lol
-            const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-            setColor(randomColor);
-        }}>Randomize color</button>
-        <div className="color-display" style={{ backgroundColor: color }}></div>
         <RenderTracker />
     </div>
 }

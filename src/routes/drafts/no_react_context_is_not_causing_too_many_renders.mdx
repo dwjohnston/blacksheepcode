@@ -5,38 +5,59 @@ meta:
   dateCreated: 2025-05-08
 ---
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4, } from "@/demos/react-renders"
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
 
-I commonly see people operating under the assumption that React Context is not appropriate for managing state, because every time the state changes, it'll cause everything under the React provider to re-render. 
+I commonly see people having the belief that React Context is not appropriate for managing state, because every time its state changes, it'll cause everything under the React provider to re-render. 
 
-This is a misnomer, and I'm here to disprove it. 
+This is causes people to avoid using Context, and jumping straight to tools like Redux or Zustand.
+
+It is a misnomer, and I'm here to disprove it. 
 
 Here's my application. 
 
+<details>
+<summary>
+</summary>
+<GithubPermalinkRsc permalink/>
 https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L25-L44
 
 I do have a button at the top of the application that _will_ re-render the whole application. 
 
 This is to demonstrate that there is no trickery here. 
-
+</details>
+<details>
+<summary>
+</summary>
 https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L18-L23
 
 My context provider is simple. We store state in a `useState` hook, and provide it via the context provider. 
-
+</details>
+<details>
+<summary>
+</summary>
 https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L24
 
 I have two components, both of them use this state. 
-
+</details>
+<details>
+<summary>
+</summary>
 https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L28
 
 I have several unrelated components that don't use the context. 
-
+</details>
+<details>
+<summary>
+</summary>
 https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L47-L58
 
 My render tracking component display the dot in a different spot each time we see a render. 
+</details>
 
 What's the result? 
 
-You can see for your self: 
+You can see for yourself: 
 
 <DemoFrame
   description = {<>
@@ -44,12 +65,12 @@ You can see for your self:
   <p>Observe that state changes the occur in the context, only affect the components affecting that context.</p>
   </>}
 >
-  <MyRenderTrackerDemo/>
+  <ReactRenders1/>
 </DemoFrame>
 
 ## Where does this confusion come from? 
 
-I believe this confusion comes from two things. 
+I think this confusion comes from two things. 
 
 ### 1. You really shouldn't bung all your state into one provider. 
 
@@ -57,10 +78,10 @@ Were I to add color/setColor, foo/setFoo and bar/setBar pairs to the same contex
 
 <DemoFrame
   description = {<>
-  <p>Observe that randomizing the color causes renders of the other context </p>
+  <p>Observe that randomizing the color causes renders of the other context consumers </p>
   </>}
 >
-  <MyRenderTrackerDemo2/>
+  <ReactRenders2/>
 </DemoFrame>
 
 This is fine if it's all related data and they needed to show the change anyway. 
@@ -69,4 +90,53 @@ But if you have two sets of unrelated data, then just use two context providers!
 
 ### \{children\} don't cause renders
 
+I think a lot of the confusion comes from knowing that the render of a component will cause all of its descendants to render.
 
+And because context providers usually live at the top of the application, people believe that the context provider, when it re-renders, will cause everything below it to render.
+
+Unfortunately, the terminology is a bit confusing here!
+
+Consider two seemingly similar components 
+
+https://github.com/dwjohnston/blacksheepcode/blob/d7e98c67f765d1fb229e122f3b5c89099e360b59/src/app/demos/react-renders/ReactRenders3.tsx#L8-L35
+
+The first directly renders the RenderTracker. 
+
+The second has it passed in via the `children` prop. 
+
+The terminology is a bit ambiguous, in both cases these can be called 'children' in common parlance.  
+
+However, they behave a lot differently!
+
+<DemoFrame
+  description = {<>
+  <p>Observe that the RenderTracker that is passed in as a child does not re-render when the state changes.</p>
+  </>}
+>
+  <ReactRenders3/>
+</DemoFrame>
+
+
+## Conclusions 
+
+React context is not the performance boogeyman that it often made out to be. 
+
+This common misconception has people reaching for tools like Redux and Zustand when it's really not needed.
+
+Yes, if you load up dozens of bits of state into one context provider, then you're going to have problems. 
+
+But to just pass state between components that are in different parts of your application, it's absolutely fine, and dare I say - it's much tidier solution using a global state provider like Redux of Zustand. 
+
+If you really want a performance boogeyman, it's controlled components. 
+
+For example here - we can see every keystroke causes a render: 
+
+
+
+<DemoFrame
+  description = {<>
+  <p>Type in the text box and note a render on every keystroke.</p>
+  </>}
+>
+  <ReactRenders4/>
+</DemoFrame>
