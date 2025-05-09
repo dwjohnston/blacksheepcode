@@ -11,6 +11,7 @@ export function ChildrenStyleOne() {
         <button onClick={() => {
             setValue((prev) => prev + 1);;
         }}>Increase count: {value}</button>
+        {/* 👇 Here we declare the RenderTracker directly in the component */}
         <RenderTracker />
     </div >
 }
@@ -21,6 +22,7 @@ export function ChildrenStyleTwo(props: React.PropsWithChildren) {
         <button onClick={() => {
             setValue((prev) => prev + 1);;
         }}>Increase count: {value}</button>
+        {/* 👇 Here, it is passed from the parent via the `children` prop */}
         {props.children}
     </div >
 }
