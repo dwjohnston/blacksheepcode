@@ -1,0 +1,46 @@
+.render-tracker-demo {
+    display: flex;
+    gap: 1rem;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+.state-changer,
+.state-displayer,
+.some-unrelated-component,
+.foo-component,
+.some-parent-component {
+    width: 150px;
+    height: 150px;
+
+    border: dotted 1px black;
+    padding: 0.5em;
+
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+
+.render-tracker {
+    background-color: var(--color-info-secondary);
+    position: relative;
+    flex: 1 0 auto;
+}
+
+.global-render-button {
+    margin: 0.5em;
+    margin-left: auto;
+    display: block;
+}
+
+.render-tracking-dot {
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    background-color: red;
+}
+
+.color-display {
+    width: 50px;
+    height: 50px;
+}
