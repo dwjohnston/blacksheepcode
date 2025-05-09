@@ -1,26 +1,30 @@
 ---
 meta:
-  title: No, React Context is not causing too many renders
+  title: No, react context is not causing too many renders
   description: A lot of people are under the impression that context shouldn't be used to store state, because it'll cause the entire application tree to re-render. This is a misnomer. 
   dateCreated: 2025-05-08
+  image: "screenshot_react_renders"
+tags: 
+  - "react"
+
 ---
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4, } from "@/demos/react-renders"
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
 
-I commonly see people having the belief that React Context is not appropriate for managing state, because every time its state changes, it'll cause everything under the React provider to re-render. 
+I commonly see people having the belief that react context is not appropriate for managing state, because every time its state changes, it'll cause everything under the React provider to re-render. 
 
-This is causes people to avoid using Context, and jumping straight to tools like Redux or Zustand.
+This is causes people to avoid using context, and jumping straight to tools like Redux or Zustand.
 
 It is a misnomer, and I'm here to disprove it. 
 
-Here's my application. 
+Here's my application:
 
 <details>
 <summary>
   ### Top level of the application
 </summary>
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L26-L48"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders.tsx#L26-L48"/>
 
 I do have a button at the top of the application that _will_ re-render the whole application. 
 
@@ -31,7 +35,7 @@ This is to demonstrate that there is no trickery here.
   ### Context provider 
 </summary>
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L18-L23"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders.tsx#L18-L23"/>
 
 My context provider is simple. We store state in a `useState` hook, and provide it via the context provider. 
 </details>
@@ -40,7 +44,7 @@ My context provider is simple. We store state in a `useState` hook, and provide 
     ### Context consumers
 </summary>
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L51-L68"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders.tsx#L51-L68"/>
 
 I have two components, both of them use this context. 
 </details>
@@ -49,7 +53,7 @@ I have two components, both of them use this context.
   ### Unrelated component
 </summary>
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L70-L75"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders.tsx#L70-L75"/>
 
 I have several instances of an unrelated component that doesn't use the context. 
 </details>
@@ -58,7 +62,7 @@ I have several instances of an unrelated component that doesn't use the context.
   ### Render tracking component
 </summary>
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/common.tsx#L2-L13"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/common.tsx#L2-L13"/>
 
 My render tracking component displays the dot in a different spot each time it renders.
 </details>
@@ -91,7 +95,7 @@ Were I to add color/setColor, foo/setFoo and bar/setBar pairs to the same contex
 >
   <details>
   <summary>Code</summary>
-  <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders2.tsx#L83-L95"/>
+  <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders2.tsx#L83-L95"/>
   </details>
   <ReactRenders2/>
 </DemoFrame>
@@ -150,7 +154,7 @@ For example here - we can see every keystroke causes a render:
 >
     <details>
   <summary>Code</summary>
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders4.tsx#L9-L17"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/5f046fbbb515b44cd0664370dda83438dc7a8c6b/src/demos/react-renders/ReactRenders4.tsx#L9-L17"/>
 
   </details>
   <ReactRenders4/>
