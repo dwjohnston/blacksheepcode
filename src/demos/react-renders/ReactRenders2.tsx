@@ -43,7 +43,7 @@ export function ReactRenders2() {
 
             onClick={() => {
                 setValue(`${Math.random()}`);
-            }}> Cause a render of the whole application</button>
+            }}> Render all</button>
 
         <div className="render-tracker-demo">
 
@@ -66,7 +66,7 @@ function StateChanger() {
     return <div className="state-changer">
         <strong>State Changer</strong>
 
-        <button onClick={() => setValue(`${Math.random()}`)}>Change State</button>
+        <button onClick={() => setValue(`${Math.random()}`)}>Change state</button>
         <RenderTracker />
     </div >
 }

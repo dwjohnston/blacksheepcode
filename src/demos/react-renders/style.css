@@ -27,6 +27,11 @@
     flex: 1 0 auto;
 }
 
+.global-render-button {
+    margin: 0.5em;
+    margin-left: auto;
+    display: block;
+}
 
 .render-tracking-dot {
     width: 10px;
