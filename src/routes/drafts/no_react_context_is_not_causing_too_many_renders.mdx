@@ -18,9 +18,9 @@ Here's my application.
 
 <details>
 <summary>
+  ### Top level of the application
 </summary>
-<GithubPermalinkRsc permalink/>
-https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L25-L44
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L26-L48"/>
 
 I do have a button at the top of the application that _will_ re-render the whole application. 
 
@@ -28,29 +28,37 @@ This is to demonstrate that there is no trickery here.
 </details>
 <details>
 <summary>
+  ### Context provider 
 </summary>
-https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L18-L23
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L18-L23"/>
 
 My context provider is simple. We store state in a `useState` hook, and provide it via the context provider. 
 </details>
 <details>
 <summary>
+    ### Context consumers
 </summary>
-https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L24
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L51-L68"/>
 
 I have two components, both of them use this state. 
 </details>
 <details>
 <summary>
+  ### Unrelated component
 </summary>
-https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/routes/drafts/no_react_context_is_not_causing_too_many_renders.mdx#L28
 
-I have several unrelated components that don't use the context. 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders.tsx#L70-L75"/>
+
+I have several instances of an unrelated components that don't use the context. 
 </details>
 <details>
 <summary>
+  ### Render tracking component
 </summary>
-https://github.com/dwjohnston/blacksheepcode/blob/dfa11dbff8e43e86352936240eed30f6554ab057/src/app/demos/react-renders/ReactRenders.tsx#L47-L58
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/common.tsx#L2-L13"/>
 
 My render tracking component display the dot in a different spot each time we see a render. 
 </details>
@@ -81,6 +89,10 @@ Were I to add color/setColor, foo/setFoo and bar/setBar pairs to the same contex
   <p>Observe that randomizing the color causes renders of the other context consumers </p>
   </>}
 >
+  <details>
+  <summary>Code</summary>
+  <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders2.tsx#L83-L95"/>
+  </details>
   <ReactRenders2/>
 </DemoFrame>
 
@@ -98,7 +110,7 @@ Unfortunately, the terminology is a bit confusing here!
 
 Consider two seemingly similar components 
 
-https://github.com/dwjohnston/blacksheepcode/blob/d7e98c67f765d1fb229e122f3b5c89099e360b59/src/app/demos/react-renders/ReactRenders3.tsx#L8-L35
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders3.tsx#L8-L35"/>
 
 The first directly renders the RenderTracker. 
 
@@ -131,12 +143,15 @@ If you really want a performance boogeyman, it's controlled components.
 
 For example here - we can see every keystroke causes a render: 
 
-
-
 <DemoFrame
   description = {<>
   <p>Type in the text box and note a render on every keystroke.</p>
   </>}
 >
+    <details>
+  <summary>Code</summary>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/302c939f42fdcab72d2c47a14d2759ebc1b6f0d4/src/demos/react-renders/ReactRenders4.tsx#L9-L17"/>
+
+  </details>
   <ReactRenders4/>
 </DemoFrame>
