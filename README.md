@@ -2,5 +2,22 @@
 
 My blog. [https://blacksheepcode.com/](https://blacksheepcode.com/)
 
-Markdown files, turned into a blog with NextJs
+Markdown files, turned into a blog with NextJs. 
+
+## Running it yourself: 
+
+```
+npm i
+npm run dev
+```
+
+If you're editing blog posts, you will need to run `npm run generate:all` between changes. 
+
+## Features
+
+There is a build time step that extracts FrontMatter meta data out of the MDX files, and that's how the social previews and tagging and series functionality works. 
+
+The comments are via Utterances. 
+
+See the posts here for details about how the blog works: https://blacksheepcode.com/posts?tag=blogging
 

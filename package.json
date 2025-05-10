@@ -4,7 +4,7 @@
   "scripts": {
     "build:base": "next build",
     "build": "npm run generate:all && npm run build:base",
-    "dev": "SHOW_TEST_PAGES=true next dev",
+    "dev": "SHOW_TEST_PAGES=true npm run generate:all && next dev",
     "start": "netlify serve",
     "next:start": "next start",
     "lint": "eslint .",
