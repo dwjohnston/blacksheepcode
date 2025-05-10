@@ -8,6 +8,7 @@ import { RenderTracker } from "./common";
 export function ChildrenStyleOne() {
     const [value, setValue] = React.useState(0)
     return <div className="some-parent-component">
+        <strong>ChildrenStyleOne</strong>
         <button onClick={() => {
             setValue((prev) => prev + 1);;
         }}>Increase count: {value}</button>
@@ -19,6 +20,7 @@ export function ChildrenStyleOne() {
 export function ChildrenStyleTwo(props: React.PropsWithChildren) {
     const [value, setValue] = React.useState(0)
     return <div className="some-parent-component">
+        <strong>ChildrenStyleTwo</strong>
         <button onClick={() => {
             setValue((prev) => prev + 1);;
         }}>Increase count: {value}</button>

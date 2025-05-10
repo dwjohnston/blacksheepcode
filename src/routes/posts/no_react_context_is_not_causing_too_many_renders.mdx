@@ -11,6 +11,22 @@ tags:
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4, } from "@/demos/react-renders"
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"; 
+
+<InfoPanel level="info">
+  <p>Want to play around with the code yourself?</p>
+
+  <p>[Checkout the codebase](https://github.com/dwjohnston/blacksheepcode), then run</p>
+  <pre>
+npm i 
+npm run dev 
+  </pre>
+
+  and edit the <code>src/apps/sandbox/page.tsx</code> while viewing the `/sandbox` path. 
+
+  [Raise an issue](https://github.com/dwjohnston/blacksheepcode/issues) if you have any trouble.
+</InfoPanel>
+
 
 I commonly see people having the belief that react context is not appropriate for managing state, because every time its state changes, it'll cause everything under the React provider to re-render. 
 
@@ -104,7 +120,7 @@ This is fine if it's all related data and they needed to show the change anyway.
 
 But if you have two sets of unrelated data, then you can just use two context providers!
 
-### \{children\} don't cause renders
+### \{children\} don't re-render
 
 I think a lot of the confusion comes from knowing that the render of a component will cause all of its descendants to render.
 
@@ -131,7 +147,6 @@ However, they behave a lot differently!
 >
   <ReactRenders3/>
 </DemoFrame>
-
 
 ## Conclusions 
 
@@ -161,3 +176,11 @@ For example here - we can see every keystroke causes a render:
 </DemoFrame>
 
 Don't be afraid of context providers. It's often the perfect tool for the job. 
+
+#### Am I saying that you don't need a global state manager? 
+
+No. 
+
+For any decently sized application, using context for global state management is going to become cumbersome. Particularly if you have your slices of state potentially wanting to interact with each other. 
+
+But for example, say you had a single page, that had two components in separate branches of its component hierarchy that needed to share state, and this page was the only place these components were used - then this is where using a context provider might be appropriate. I would suggest it might be a tidier solution that adding some state your global state provider that's not relevant to rest of the application. 
