@@ -121,16 +121,13 @@ function getValueForKey(key: Types) : KeysAndValues  {
 
 
 function doThing(key: Types){
+    const result = getValueForKey(key);
 
-
-const result = getValueForKey(key);
-
-// Now, the type guard narrows the result type, which includes both the key and value. 
-  if(result.key === "A"){
-    // "alpha"
-    result.value
-  }
-
+    // Now, the type guard narrows the result type, which includes both the key and value. 
+      if(result.key === "A"){
+        // "alpha"
+        result.value
+      }
 }
 ```
 
