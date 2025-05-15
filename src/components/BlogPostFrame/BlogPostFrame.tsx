@@ -2,7 +2,7 @@ import { Suspense, type PropsWithChildren } from "react";
 import { FrontmatterBox } from "../FrontmatterBox/FrontmatterBox";
 import { EditWithGithub } from "../EditWithGithub/EditWithGithub";
 import PostComments from "../PostComments/PostComments";
-import { MyTextHighlightProvider } from "./TextHighlightProvider";
+// Removed unused import
 
 export function BlogPostFrame(props: PropsWithChildren<{ pathname: string }>) {
     return <>
