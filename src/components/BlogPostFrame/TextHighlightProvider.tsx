@@ -2,7 +2,7 @@
 import "./react-text-highlight.css";
 
 
-import React, { useRef, useState } from "react";
+import { useRef } from "react";
 import { TextHighlightProvider } from "@blacksheepcode/react-text-highlight";
 export function MyTextHighlightProvider(props: React.PropsWithChildren<{}>) {
 
