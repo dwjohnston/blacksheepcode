@@ -11,7 +11,8 @@
     "types": "tsc && tsc -p cypress/tsconfig.json",
     "test:cypress": "cypress open",
     "test:cypress:ci": "cypress run --browser chrome",
-    "generate:all": "npm run generate:mdx && npm run generate:mdxjson && npm run generate:imagebarrel && npm run generate:rss && npm run generate:sitemap",
+    "clean": "rm -rf .next src/generated/**/*",
+    "generate:all": "npm run clean && npm run generate:mdx && npm run generate:mdxjson && npm run generate:imagebarrel && npm run generate:rss && npm run generate:sitemap",
     "generate:mdxjson": "rm -rf src/generated/frontmatter && tsx utils/extractFrontMatter.bin.ts",
     "generate:imagebarrel": "tsx utils/generateImageBarrelFiles.ts",
     "generate:rss": "tsx utils/generateRss.ts",
@@ -21,6 +22,7 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
+    "@blacksheepcode/react-text-highlight": "^0.4.0",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/mdx": "^3.0.1",
     "@mdx-js/react": "^3.0.1",

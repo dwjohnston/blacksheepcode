@@ -117,15 +117,25 @@ code {
   background-color: var(--color-background-lighten);
 }
 
+
+details {
+  cursor: pointer;
+}
+
+.main-column {
+  background-color: var(--color-background-paper);
+  max-width: var(--column-width);
+  margin: 0.5em auto;
+  padding: 2em;
+
+  box-shadow: 2px 2px 2px var(--color-foreground-highlight)
+}
+
 #page-opensource {
   a {
     font-weight: bold;
   }
 
-  span {
-    display: block;
-
-  }
 
   li {
     margin-bottom: 1em;
@@ -407,14 +417,7 @@ nav:not(.tags-panel) {
 
 
 
-.main-column {
-  background-color: var(--color-background-paper);
-  max-width: var(--column-width);
-  margin: 0.5em auto;
-  padding: 2em;
 
-  box-shadow: 2px 2px 2px var(--color-foreground-highlight)
-}
 
 .logo-container {
   width: 100px;
