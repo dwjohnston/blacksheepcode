@@ -118,7 +118,9 @@ code {
 }
 
 
-
+details {
+  cursor: pointer;
+}
 
 .main-column {
   background-color: var(--color-background-paper);
@@ -134,10 +136,6 @@ code {
     font-weight: bold;
   }
 
-  span {
-    display: block;
-
-  }
 
   li {
     margin-bottom: 1em;

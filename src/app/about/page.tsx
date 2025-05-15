@@ -30,7 +30,6 @@ export default function Page() {
 
 			<b>Favourite board games</b>
 			<ul>
-				<li>Agricola</li>
 				<li>Terra Mystica</li>
 				<li>War of the Ring</li>
 				<li>Twilight Struggle</li>
@@ -44,14 +43,24 @@ export default function Page() {
 
 			<b>Favourite Pinball</b>
 
+			<p>
+				Real talk, if I&apos;m playing on site, I&apos;m probably going to have a lot more fun playing 90s era machines. They tend to be easier and more apparent what you&apos;re meant to be doing.
+			</p>
+			Older machines:
 			<ul>
-				<li>
-					{" "}
-					Hard to say. As of 2024 I own 1993 Data East Jurassic Park, which has
-					me learning how to solder and use a multimeter.
-				</li>
+				<li>Black Knight 2000</li>
+				<li>White Water</li>
+				<li>Getaway 2</li>
+				<li>Judge Dredd</li>
+				<li>Twilight Zone</li>
+			</ul>
+			Modern machines:
+			<ul>
+				<li>The Uncanny X-Men</li>
+				<li>Game of Thrones</li>
 			</ul>
 
+			I own a Data East Jurassic Park.
 			<h2>Contact</h2>
 
 			<a href="mailto:david@blacksheepcode.com">david@blacksheepcode.com</a>
