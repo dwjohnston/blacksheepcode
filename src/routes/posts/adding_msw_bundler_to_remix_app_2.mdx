@@ -15,7 +15,7 @@ tags:
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc"; 
 
 import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
-import { Aside } from "@/components/Aside/Aside";
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
 
 In the [previous post](./adding_msw_bundler_to_remix_app) I outlined how to make use of mdx-bundler to access your frontmatter metadata. This approach requires file system access as the files are parsed at run time. 
 
@@ -125,11 +125,9 @@ What I've done is I've said that title, description and date created are always 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/24c6f3ef9d09f9e061226e19e78a4c8d1ee03710/utils/extractFrontMatter.ts#L1-L109"/>
 
-<Aside>
-  <p>As an aside, this code was largely generated with assistance of ChatGPT, and then I tweaked it as I want.</p>
-  <p>Now looking at it, it looks kind of gross.</p>
-  <p>But right now, I don't care enough. The code is tested, and my philosophy is that '[good code is easy to delete](./well_designed_code_is_easy_to_delete)', the interface is fine, we can rewrite this later if we need.</p>
-</Aside>
+<TextHighlight comment={<>
+ <p>Now looking at it, it looks kind of gross.</p>
+ <p>But right now, I don't care enough. The code is tested, and my philosophy is that <a href="./well_designed_code_is_easy_to_delete">good code is easy to delete</a>, the interface is fine, we can rewrite this later if we need.</p></>}>I used ChatGPT to generate a lot of this</TextHighlight>
 
 Essentially the process here is: 
 

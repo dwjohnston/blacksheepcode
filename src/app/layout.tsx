@@ -8,11 +8,11 @@ import * as Sentry from "@sentry/nextjs";
 import { githubPermalinkRscConfig } from "react-github-permalink/dist/rsc";
 import { Nav } from "@/components/Nav/Nav";
 const inter = Inter({ subsets: ["latin"] });
-import {TextHighlightProvider} from "react-text-highlight"
-import "react-text-highlight/dist/main.css";
+import React from "react";
+import { MyTextHighlightProvider } from "@/components/BlogPostFrame/TextHighlightProvider";
 githubPermalinkRscConfig.setConfig({
   // Can't use the prefix GITHUB in github actions so just have a second token just for github actions
-  githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN, 
+  githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN,
   onError: ((err) => {
     Sentry.captureException(err);
   })
@@ -29,6 +29,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <head>
@@ -89,11 +90,10 @@ export default function RootLayout({
 
 
         </header>
-        <TextHighlightProvider>
-          <div className="main-column">
-            {children}
-          </div>
-        </TextHighlightProvider>
+
+        <MyTextHighlightProvider >
+          {children}
+        </MyTextHighlightProvider>
       </body>
     </html>
   );

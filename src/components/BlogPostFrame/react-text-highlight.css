@@ -1,0 +1,177 @@
+:root {
+
+
+    --highlight-bg-color: #fde05f;
+    --highlight-text-color: #000000;
+    --highlight-bg-color-hover: #fde05f;
+    --highlight-border-hover: rgb(186, 151, 105);
+    --highlight-border-selected: rgb(225, 139, 25);
+    --highlight-comment-box-shadow: rgba(0, 0, 0, 0.2);
+    --highlight-comment-bg: #f6e69c;
+
+
+
+}
+
+
+.page-with-margins {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 6px;
+
+    .main-column {
+        flex: 0 1 var(--column-width)
+    }
+
+    .left-gutter {
+
+        flex: 1 1 auto;
+    }
+
+}
+
+
+.right-gutter {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex: 1 1 auto;
+
+
+    /**
+    Can't use vars in media queries? wtf.
+    https://stackoverflow.com/questions/40722882/css-native-variables-not-working-in-media-queries
+    */
+    @media screen and (max-width: 985px) {
+
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+
+        --highlight-bg-color: #4a4b80;
+        --highlight-text-color: #fff;
+        --highlight-bg-color-hover: #4a4b80;
+        --highlight-border-hover: #5b5f99;
+        --highlight-border-selected: #9178e2;
+
+        --highlight-comment-box-shadow: rgba(0, 0, 0, 0.2);
+        --highlight-comment-bg: #223253;
+    }
+}
+
+
+.text-highlight {
+    background-color: var(--highlight-bg-color);
+    color: var(--highlight-text-color);
+    border: solid 1px transparent;
+}
+
+.text-highlight-comment {
+    background-color: var(--highlight-comment-bg);
+    color: var(--highlight-text-color);
+    box-sizing: border-box;
+
+    margin: 2px;
+    padding: 1em;
+    font-size: 0.75em;
+    max-width: 400px;
+    border: solid 1px transparent;
+
+
+
+    @media screen and (max-width: 985px) {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1em;
+        /* display: none; */
+
+        &.text-highlight-selected {
+            display: block;
+
+            /*Got help from this video: https://www.youtube.com/watch?v=vmDEHAzj2XE */
+            transition-property: display;
+            transition-duration: 1s;
+            transition-behavior: allow-discrete;
+            animation: 0.1s ease-out 0s 1 slideInFromBottom;
+
+        }
+
+        &:not(.text-highlight-selected) {
+            animation: 0.1s ease-out 0s 1 slideOutToBottom;
+            display: none;
+            transition-property: display;
+            transition-duration: 0.1s;
+            transition-behavior: allow-discrete;
+        }
+
+    }
+}
+
+
+.text-highlight-hover {
+    border-color: var(--highlight-border-hover);
+    box-shadow: 1px 1px 2px var(--highlight-comment-box-shadow);
+    transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.text-highlight-selected {
+    border: solid 1px var(--highlight-border-selected);
+}
+
+
+
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideOutToBottom {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+
+.text-highlight-comment>button.rth-close-button {
+    display: none;
+    margin: 2px 2px 0 auto;
+
+    background: none;
+    background-color: var(--highlight-comment-bg);
+    border: 1px solid var(--highlight-border-hover);
+    border-radius: 4px;
+    /* fully rounded edges */
+    padding: 0.5em 1em;
+    color: var(--highlight-text-color);
+    font: inherit;
+    font-size: 0.75em;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.2s, color 0.2s;
+
+
+    @media screen and (max-width: 985px) {
+        display: block;
+    }
+
+
+}

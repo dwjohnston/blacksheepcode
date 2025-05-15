@@ -2,16 +2,19 @@ import { Suspense, type PropsWithChildren } from "react";
 import { FrontmatterBox } from "../FrontmatterBox/FrontmatterBox";
 import { EditWithGithub } from "../EditWithGithub/EditWithGithub";
 import PostComments from "../PostComments/PostComments";
+import { MyTextHighlightProvider } from "./TextHighlightProvider";
 
 export function BlogPostFrame(props: PropsWithChildren<{ pathname: string }>) {
     return <>
         <FrontmatterBox slug={props.pathname}>
+
             {props.children}
-        </FrontmatterBox>
+        </FrontmatterBox >
         <EditWithGithub postName={props.pathname} />
 
         <Suspense>
             <PostComments />
         </Suspense>
+
     </>
 }
