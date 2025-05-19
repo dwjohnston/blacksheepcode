@@ -1,0 +1,186 @@
+---
+meta:
+  title: How to add an experimental feature to your code, without having it in your main version control
+  description: You might have a really good idea, but its not practical to get it commited to version control. You can keep the feature around for local use with some shell aliases and git commands.
+  dateCreated: 2025-05-19
+
+tags: 
+  - "software_engineering"
+---
+
+I've been infatuated with loggers for development recently. The idea is, I can put log statements in various parts of my application, and it will log the relevant data to a file. This means no having to set breakpoints and enable/disable my debugger, no scrolling back up the developer terminal. I just leave it running and then when I need it I find the relevant log. 
+
+Useful as this is for me, it's not practical for me to convince the rest of the organisation to adopt this pattern formally, not in the pull request I'm working on at least. Besides, I'm still working out what the interfaces should be, and interfaces have this nasty habit of being difficult to change once they're being used. 
+
+But I still like the tool and I still want to keep using it. 
+
+Here's how I keep it around, without having to commit it to version control proper. 
+
+The strategy is that we create one shell alias to cherry-pick a commit in to add the feature, and then another alias to rebase that single commit out.
+
+```
+A---B   (master)
+ \
+  C---D---E---F---G   (my-branch)
+ 
+      ^       ^
+      the experimental feature commits
+```
+
+Let's assume commits D and F are ones where I implement the feature. 
+
+
+**1. Create a single commit that removes the feature** 
+
+We'll call this commit Q. 
+
+
+```
+A---B   (master)
+ \
+  C---D---E---F---G---Q   (my-branch)
+                       
+                      ^
+              removes the feature
+```
+
+
+**2. Revert that commit**
+
+```
+git revert Q
+```
+
+```
+A---B   (master)
+ \
+  C---D---E---F---G---Q---R   (my-branch)
+                       
+                      ^   ^
+    removes the feature   reverts the removal 
+```
+We'll call this commit R.
+
+Essentially this is a commit that will _add the feature back in_.
+
+The idea is, when we later want to add the feature in, we'll cherry-pick a commit like this to add it in. 
+
+However, because we're likely squash merging to master, the commit Q that the revert commit R is reverting, will no longer exist. 
+
+ie. after we merge to master, the git tree looks like this: 
+
+```
+A---B---X (master)
+```
+
+Where X is all 
+
+```
+C---D---E---F---G---Q
+```
+
+squashed into one commit. 
+
+
+**3. Transform commit R to a regular commit** 
+
+```
+git reset HEAD~1
+git commit 
+```
+
+```
+A---B   (master)
+ \
+  C---D---E---F---G---Q---S (my-branch)
+
+                      ^   ^
+    removes the feature   Adds the feature back in 
+```
+
+We'll call this commit S. 
+
+Now, we can selectively call
+
+```
+git cherry-pick S 
+```
+
+to have our feature apply. 
+
+
+**4. Create shell aliases to add and remove the commits** 
+
+Add these to your `.bashrc` or `.zshrc` etc. 
+
+```
+feature_commit=S
+feature_commit_message=some-unique-commit-message-here
+alias addfeature="git cherry-pick $feature_commit && git commit --amend -m $feature_commit_message"
+alias removefeature='added_commit_sha=$(git log --grep="$feature_commit_message" --pretty=format:%h); git rebase --onto "$added_commit_sha"^ "$added_commit_sha"'
+
+```
+
+How this works: 
+
+Adding the feature is pretty straightfoward. The content of commit S exists in our local git object store, and git can retrieve it via the SHA S. 
+When we apply the commit, git will actually give it a different SHA. That's why need to also rename the commit message, so we can later find this applied commit by commit message, not by SHA. 
+
+Removing the commit now involves searching the git log for our unique commit message, and then we do a rebase to remove the commit. 
+
+We don't want to do a revert, because we don't want to pollute our git history with a whole bunch of applying the feature and removing it. It'll be squashed away anyway, but still.
+
+
+**5. Tidy up** 
+
+Manually remove commit S
+
+```
+git rebase -i HEAD~1
+```
+
+**6. Create a remote branch containing commit S**
+
+The solution works by commit content existing in your local git object store. 
+
+If your laptop died and you hadn't pushed it remotely, you'll have lost it. 
+
+**7. You're ready to go!**
+
+Apply the feature with 
+
+```
+addfeature
+```
+
+Remove the feature with 
+
+```
+removefeature
+```
+
+Note that you may need to deal with merge conflicts when you apply the feature. 
+
+
+**8. Updating the feature later**
+
+Apply the feature 
+
+```
+addfeature
+```
+
+Make your changes. 
+
+Amend the commit to include the new changes. 
+
+```
+git add -A
+git commit --amend 
+```
+
+Update your shell rc script to use this new commit SHA. 
+
+
+
+Let me know if you find this helpful!
