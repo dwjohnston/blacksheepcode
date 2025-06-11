@@ -11,7 +11,7 @@ tags:
   - "javascript_nitty_gritty"
 ---
 import { RequestRequiresValidation } from "@/demos/cache/components/RequestRequiresValidation"
-
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
 There are two general approaches to caching. 
@@ -27,6 +27,17 @@ This approach has two optimisations over no cache at all:
 1. The server typically does not need to go all the way to database to return data/check for its freshness. Some kind of local store can be used. 
 2. The response body does not need to be streamed again. 
 
+<InfoPanel level='warning'>
+<p>
+ Apologies, with the interactive demo, there is a bug where sometimes there will be a network error.
+</p> 
+<p>
+Possibly something to do with using Netlify, which is using AWS lambdas under the hood.
+</p>
+<p>
+If you encounter it, just try again.
+</p >
+</InfoPanel>
 
 <DemoFrame
   description={
