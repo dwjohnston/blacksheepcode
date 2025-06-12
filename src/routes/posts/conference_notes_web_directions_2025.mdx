@@ -1,0 +1,88 @@
+---
+meta:
+  title: Conference notes for Web Directions Code 2025 - The behaviour of browsers and their loading of resources.
+  description: Links to documentation and open issues.
+  dateCreated: 2025-06-11
+  image: "webdirections2025"
+
+
+series: 
+  name: loading_optimisations
+  part: 5
+
+tags: 
+  - "javascript_nitty_gritty"
+
+---
+import { GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+
+You can read full blog posts on the topic in the posts above. 
+
+## Summary of points
+
+- Browsers _parse_ and _render_ HTML content as the document is streamed. 
+- Stylesheets are render blocking
+   - Consider a seperate theming/branding stylesheet before your main one. 
+- HTTP1/1 has a maximum of simultaneous connections 
+   - Consider upgrading to H2 or H3
+- The smaller your scripts are, the sooner they can act
+- Large bundles means any change in the bundle invalidates the whole thing. 
+- Synchronous module imports all need to be resolved before the module can act. 
+  - They're like one large bundle, but with more server round trips. 
+  - Except: 
+      - The individual modules can be preloaded
+      - The individual modules can be cached indepedendantly.
+- You can preload resources with headers
+  - Possibly more convenient than modifying the document. 
+  - eg. headers can be applied with nginx and the like. 
+- If you're using ESM modules - beware of the cache invalidation cascade!
+  - You can solve it with importmaps
+  - Also, consider if it really matters.
+
+## Browser features
+
+<table>
+  <caption>Browser features and their documentation links</caption>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Can I use</th>
+      <th>MDN</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Link header</td>
+      <td><a href="https://caniuse.com/mdn-http_headers_link">caniuse</a></td>
+      <td><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Link">MDN</a></td>
+    </tr>
+    <tr>
+      <td>Module preload</td>
+      <td><a href="https://caniuse.com/?search=modulepreload">caniuse</a></td>
+      <td><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/modulepreload">MDN</a></td>
+    </tr>
+    <tr>
+      <td>Import map</td>
+      <td><a href="https://caniuse.com/?search=importmap">caniuse</a></td>
+      <td><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap">MDN</a></td>
+    </tr>
+  </tbody>
+</table>
+
+## Preload scanning
+<a href="https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work#preload_scanner">https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_browsers_work#preload_scanner</a>
+
+## HTTP1/1 Max Connections
+[https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser](https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser)
+
+## Vite and Rollup motivations
+
+[https://rollupjs.org/introduction/#the-why](https://rollupjs.org/introduction/#the-why)
+
+[https://vite.dev/guide/why.html](https://vite.dev/guide/why.html)
+
+## Vite issues re: cache invalidation cascades
+
+<GithubIssueLinkRsc issueLink="https://github.com/vitejs/vite/issues/6773" />
+<GithubIssueLinkRsc issueLink="https://github.com/vitejs/vite/issues/18551" />
+<GithubIssueLinkRsc issueLink="https://github.com/vitejs/vite/issues/2483" />
