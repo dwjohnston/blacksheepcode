@@ -1,0 +1,36 @@
+---
+meta:
+  title: Delete a range of commits
+  description: The --onto option of a git rebase can be used to delete a range of commits
+  dateCreated: 2025-06-26
+
+tags: 
+  - "git"
+
+---
+
+Say you've got a git tree that looks like this 
+
+```
+A --- B --- C --- D --- E --- F
+```
+
+And you want to delete commits B, C, D, E. 
+
+You could do a
+
+```
+git rebase -i HEAD~6
+```
+
+and mark each commit to be delete, but this is pretty cumbersome - and it won't work programatically. 
+
+In this case the `--onto` option for git rebase is useful: 
+
+```
+git rebase --onto B^ E
+```
+
+will do the trick. 
+
+
