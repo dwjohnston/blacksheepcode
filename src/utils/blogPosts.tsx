@@ -35,7 +35,7 @@ export function getFolderAndFilenameFromSlug(slug: string): {
         throw new Error("Expected folder to exist");
     }
     if (!fName) {
-        throw new Error("Expect fName to exist");
+        throw new Error("Expected fName to exist");
     }
     return {
         folder: folder as BlogPostFolders,

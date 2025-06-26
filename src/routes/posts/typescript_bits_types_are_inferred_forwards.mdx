@@ -74,7 +74,7 @@ function doThing(key: Types){
 
 ```
 
-Here, we can easily deduce that the the type of `result` should only be `"alpha"`. But because the generation of the type `result` occured _before_ the type guard, TypeScript can't 'go back in time' so to speak, to narrow the type. 
+Here, we can easily deduce that the type of `result` should only be `"alpha"`. But because the generation of the type `result` occurred _before_ the type guard, TypeScript can't 'go back in time' so to speak, to narrow the type. 
 
 If we were to change our code to: 
 

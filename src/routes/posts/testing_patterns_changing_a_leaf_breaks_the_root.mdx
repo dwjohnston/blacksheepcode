@@ -37,7 +37,7 @@ And let's we have tests for this, we're taking the recommended ([Redux](https://
 // MSW boilerplate here
 
 const handlers = [
-  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  // We configure the behaviour that will determine the `useSelf` behaviour here.
   http.get('/self', () => {
     return HttpResponse.json({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -86,7 +86,7 @@ Now note that for a test for this, we'll also need to define that that MSW behav
 
 // The exact same MSW config
 const handlers = [
-  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  // We configure the behaviour that will determine the `useSelf` behaviour here.
   http.get('/self', () => {
     return HttpResponse.json({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -140,7 +140,7 @@ And our test:
 // MSW boilerplate here
 
 const handlers = [
-  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  // We configure the behaviour that will determine the `useSelf` behaviour here.
   http.get('/self', () => {
     return HttpResponse.json({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -247,7 +247,7 @@ For example it might look like this initially:
 ```js
 //msw-defaults.js
 export const defaultHandlers = [
-  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  // We configure the behaviour that will determine the `useSelf` behaviour here.
   http.get('/self', () => {
     return HttpResponse.json({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
@@ -273,7 +273,7 @@ Now, when we make the change adding notifications to the application, we also up
 ```diff
 //msw-defaults.js
 export const defaultHandlers = [
-  // We configure the the behaviour that will determine the `useSelf` behaviour here.
+  // We configure the behaviour that will determine the `useSelf` behaviour here.
   http.get('/self', () => {
     return HttpResponse.json({
       id: 'c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d',
