@@ -147,7 +147,7 @@ function getTodo(id: string): Promise<ApplicationResource<TodoItem>> {
 }
 ```
 
-That is, all references individual resources have a consistent structure, up to the the `data` property. 
+That is, all references individual resources have a consistent structure, up to the `data` property. 
 
 Omitting the ID of the resource from the individual `TodoItem`, `User` types means that we don't need to worry about it omitting it later for patch or create requests. 
 
