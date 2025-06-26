@@ -1,7 +1,18 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  // Optimize images
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  // Optimize compilation
+  swcMinify: true,
+  // Configure build optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+};
 
 
 
