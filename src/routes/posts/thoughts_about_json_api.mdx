@@ -80,7 +80,7 @@ function editTodo(payload: Partial<Omit<TodoItem, "id">>) : Promise<TodoItem>{
 
 ### Pain point #2 - Additional metadata 
 
-Our Todos might also include data like createdBy, createdDate. Additionally, and CRUD application might have access based permissions where admins can edit and item, but regular users can not. A good user interface will disable the edit button if the user can not edit the thing. Also, note that the metadata fields are likely the same for all resource types, TodoItem, User, Widget, etc. 
+Our Todos might also include data like createdBy, createdDate. Additionally, a CRUD application might have access based permissions where admins can edit an item, but regular users cannot. A good user interface will disable the edit button if the user cannot edit the thing. Also, note that the metadata fields are likely the same for all resource types, TodoItem, User, Widget, etc. 
 
 Bundling those values into the resource itself is pain, for two reasons: 
 
