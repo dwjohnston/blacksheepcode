@@ -2,7 +2,7 @@
 meta:
   title: It is better to have the same meeting four times with four people each, than to have one large meeting with sixteen people. 
   description: If some idea or decision needs to be socialised amongst many people, it may be tempting to get everyone into one meeting and sort it out in one go. 
-  dateCreated: 2025-05-20
+  dateCreated: 2025-06-25
 
 tags: 
   - software_engineering
@@ -27,7 +27,9 @@ This is a false efficiency.
 
 ## People who are bored aren't paying attention anyway
 
-If the meeting is only tangentally related to 
+If the meeting is only tangentally relevant to half the people in the meeting, those people are probably not paying attention anyway, so any efficiency in having them there is wiped.  
+
+This problem will be particularly acute with remote work, where people are likely browsing the internet, or trying to work on their pull request while being in the meeting. 
 
 ## Large meetings are not effective at soliciting input
 
@@ -49,39 +51,49 @@ Often in these large meetings, two people will be getting into the details and t
 
 In a smaller meeting those details can just be gotten into. 
 
-
-The nature of a meeting should change with size. The smaller the meeting, the more informal it can be, and the more input can be effectively solicited. The larger a meeting, the more formally structured it should be, the more _planned_ it should be, A large all hands with 200 people should be a rehearsed and polished experience. 
+The nature of a meeting should change with size. The smaller the meeting, the more informal it can be, and the more input can be effectively solicited. The larger a meeting, the more formally structured it should be, the more _planned_ it should be, A large all hands with 200 people should be a rehearsed and polished experience, something akin to a conference presentation.  
 
 ## Smaller meetings can be shorter
 
-A smaller meeting, with a clear agenda, can just end after ten minutes, if everything is 
+A smaller meeting, with a clear agenda, can just end after ten minutes, if everything is sorted.
 
+## How the hypothetical (series of) meetings _should_ be run 
 
-## How the hypothetical meeting _should_ be run 
-
-First meeting: 
+**First meeting** 
 
 The BA, designer and one or two of the developers have a meeting, where the design is demonstrated and it's opportunity for the developers to interrogate edge cases in the design ('what should happen if that API request times out?'). 
 
 The point of this meeting is to identify any clear holes in the design, and to act as a starting point for the developers.
 
-The developers can also think about how the testers are going to test this thing, whether it's a straight forward thing, or whether some kind of 
+The developers can also think about how the testers are going to test this thing, whether it's a straight forward thing, or whether some kind of mock workaround is required. 
 
-Second meeting: 
+**Second meeting** 
 
 At this point the developers might get together to discuss the the technical drama that they might have in building the feature. 
 
-Third meeting: 
+Let's say that at this point the developers identify a flaw in the initial design - perhaps the feedback from the server can't happen synchronously, it might occur a minute or two later. The developers can come up with alternative design, a notification toast that sits in the corner of the page, and take this to the designers. 
 
-The developers and the testers, 
+**Third meeting** 
+
+The devs meet back with the designer. 
+
+Maybe this ends up being a really quick 'hey, the initial design isn't going to work, how about a notification toast?', 'yes that makes sense, let me create a design for you'. 
 
 
+## It sounds like I want more meetings 
 
+In a way yes. 
+
+There is a flaw 
 
 ## Practical tips for better meetings
 
-- Have an agenda. The agenda should include a timeline of checkpoints - 'At 10 minutes, Joe should be giving a brief overview of what an XYZ-Foo is and why need one. At 15 minutes, Joe will be making the case for using the Z-Zelta technique to implement our XYZ-Foo.'
+- Have an agenda. 
+
+The agenda should include a timeline of checkpoints - 'At 10 minutes, Joe should be giving a brief overview of what an XYZ-Foo is and why need one. At 15 minutes, Joe will be making the case for using the Z-Zelta technique to implement our XYZ-Foo.'
 Timeline the meeting such that it aims to finish at least ten minutes before the full hour, twenty minutes would be better. This will allow some overage, without having to completely cut things short. A meeting that needs to run right up to the full hour is a badly planned meeting.
+
+The agenda should also include the _meeting goals_. Is the purpose of the meeting 
 
 - Start the meeting with the agenda.
 
