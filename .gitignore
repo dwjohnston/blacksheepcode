@@ -6,6 +6,8 @@ node_modules
 .env
 *.log
 
+# Build performance metrics
+build-performance.json
 
 # Sentry Config File
 .sentryclirc

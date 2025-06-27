@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import "react-github-permalink/dist/github-permalink.css";
 import { mergeFrontmatterAndDefaultMetadata } from "@/utils/blogPosts";
@@ -7,7 +6,6 @@ import * as Sentry from "@sentry/nextjs";
 
 import { githubPermalinkRscConfig } from "react-github-permalink/dist/rsc";
 import { Nav } from "@/components/Nav/Nav";
-const inter = Inter({ subsets: ["latin"] });
 import React from "react";
 import { MyTextHighlightProvider } from "@/components/BlogPostFrame/TextHighlightProvider";
 githubPermalinkRscConfig.setConfig({
@@ -33,17 +31,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* https://webmasters.stackexchange.com/questions/126661/pagespeed-insights-reports-that-google-analytics-is-blocking-main-thread-in-page */}
+        {/* Preconnect to external domains for performance */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
 
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        
+        {/* Use preload for critical CSS */}
+        <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+        <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" />
+        
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" media="(prefers-color-scheme: light)" />
+        
+        {/* Load fonts conditionally - avoid blocking build in CI environments */}
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" />
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" />
+        
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NB66YHJYM"></script>
         <script
           dangerouslySetInnerHTML={{
@@ -60,7 +71,7 @@ export default function RootLayout({
         </script>
       </head>
 
-      <body className={inter.className}>
+      <body className="inter-font opensans-font">
 
         <header>
           <div className="header-flex-container">
