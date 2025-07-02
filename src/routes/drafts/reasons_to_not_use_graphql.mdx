@@ -17,7 +17,7 @@ In this post I'm going to make the case _against_ GraphQL, but first, let's make
 A RESTful scenario (one I've been before!) that can be solved with GraphQL looks like this: 
 
 - The user navigates to their todos page, and this requests `GET /todos`. 
-- Once the todo's have been fetched, we inspect the `todo.projectGroupID` and we fetch the relvant project groups with `GET /groups/{groupId}`. 
+- Once the todo's have been fetched, we inspect the `todo.projectGroupID` and we fetch the relevant project groups with `GET /groups/{groupId}`. 
 - Once the individual project groups have been fetched, we inspect them to get the `projectGroup.groupLeaderUserId` and we fetch the leaders of each group with `GET /users/{userId}`. 
 
 This causes a serial loading waterfall, meaning that realistically the page might not ready for a full second. 
