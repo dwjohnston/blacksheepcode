@@ -3,7 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
 Sentry.init({
   dsn: "https://1cad6b69367913399c1afbfc1c2ce4f4@o4506532749901824.ingest.us.sentry.io/4506532751081472",
 

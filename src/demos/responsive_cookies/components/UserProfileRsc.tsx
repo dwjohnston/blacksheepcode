@@ -8,8 +8,8 @@ export type UserProfileRscProps = {
 
 const defaultUser: User = { name: 'John Doe', age: 30 }
 
-export function UserProfileRsc(props: UserProfileRscProps) {
-  const cookieStore = cookies();
+export async function UserProfileRsc(props: UserProfileRscProps) {
+  const cookieStore = await cookies();
 
   const user = cookieStore.get("user-2"); 
   const serverCookie = cookieStore.get("server-cookie"); 
