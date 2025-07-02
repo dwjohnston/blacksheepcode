@@ -305,7 +305,7 @@ We don't have a clear way to distingush between _ommiting_ the property, and set
 
 The [n+1 problem](https://hygraph.com/blog/graphql-n-1-problem) is an issue with GraphQL implementations where, in a naive implementation GraphQL can request exact same resource from an upstream, multiple times, for the same query. |
 
-For example, if we have a list of todos, and we're fetching the projectGroups, many of the todos may have the same projectGroupId, and without adding a mitigation GraphQL ends up making the the same request multiple times. 
+For example, if we have a list of todos, and we're fetching the projectGroups, many of the todos may have the same projectGroupId, and without adding a mitigation GraphQL ends up making the same request multiple times.
 
 In fairness, this is not entirely unique to GraphQL. A RESTful BFF that attempted to reduce the serial loading waterfalls could encounter the same problem. 
 
