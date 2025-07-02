@@ -86,6 +86,140 @@ Granted that many observability tools do now offer GraphQL compatability, these 
 
 ### Bitty GraphQL issues 
 
+#### Lack of type literal support
+
+
+In TypeScript we could define an object like this: 
+
+```typescript
+type User = {
+  userType: "student", 
+  classesEnrolledIn: string[]
+}  | {
+  userType: "teacher", 
+  classesTeaching: string[], 
+  qualifications: string[]  
+}
+```
+
+This is what's known as a <TextHighlight comment={<><p>
+See <a href ="https://basarat.gitbook.io/typescript/type-system/discriminated-unions">TypeScript documentation here.</a></p>
+ </>}>_discriminating union_</TextHighlight>. 
+
+We can then _discriminate_ based on the `userType` property: 
+
+```typescript 
+function processUser(user: User) {
+  if(user.userType === "student") {
+    // definitely exists
+    user.classesEnrolledIn
+
+    // definitely does not exist
+    user.qualifications
+  }
+}
+```
+
+An OpenAPI spec could define a similar shape like: 
+
+<details open>
+  <summary>OpenAPI yaml</summary>
+
+```
+# Example OpenAPI 3.0 spec for the discriminated union User type
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+paths:
+  /users/{userId}:
+    get:
+      summary: Get a user by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A user object (student or teacher)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      oneOf:
+        - $ref: '#/components/schemas/StudentUser'
+        - $ref: '#/components/schemas/TeacherUser'
+      discriminator:
+        propertyName: userType
+        mapping:
+          student: '#/components/schemas/StudentUser'
+          teacher: '#/components/schemas/TeacherUser'
+    StudentUser:
+      type: object
+      required: [userType, classesEnrolledIn]
+      properties:
+        userType:
+          type: string
+          enum: [student]
+        classesEnrolledIn:
+          type: array
+          items:
+            type: string
+    TeacherUser:
+      type: object
+      required: [userType, classesTeaching, qualifications]
+      properties:
+        userType:
+          type: string
+          enum: [teacher]
+        classesTeaching:
+          type: array
+          items:
+            type: string
+        qualifications:
+          type: array
+          items:
+            type: string
+```
+</details>
+
+GraphQL does not support literal types in this same way. 
+
+<GithubIssueLinkRsc issueLink="https://github.com/graphql/graphql-spec/issues/878"/>
+
+In Graphql we might define a schema like 
+
+```
+enum UserType {
+  STUDENT
+  TEACHER
+}
+
+type StudentUser {
+  userType: UserType!
+  classesEnrolledIn: [String!]!
+}
+
+type TeacherUser {
+  userType: UserType!
+  classesTeaching: [String!]!
+  qualifications: [String!]!
+}
+
+union User = StudentUser | TeacherUser
+```
+
+
+But this will lack the ability to discriminate based on the `userType` property. 
+
+Clients like Apollo have the [`__typename`](https://www.apollographql.com/docs/apollo-server/schema/schema#the-__typename-field) which can be used to discriminate, but of course that requires you to use Apollo. 
+
+
 #### Ambiguity on nullability of input fields
 
 Let's say we have a UserProfile object: 
@@ -99,8 +233,7 @@ type UserProfile = {
 ```
 
 In a RESTful API we could use a <TextHighlight comment={<><p>
-  Note the use of HTTP semantics! We know that a partial update is supported by the established convention of HTTP semantics.
-</p>
+  Note the use of HTTP semantics! We know that a partial update is supported by the established convention of HTTP semantics.</p>
  </>}>PATCH operation</TextHighlight>. to to just update a single field. 
 
 ie. we might do some code like: 
@@ -128,7 +261,21 @@ In a GraphQL API there is ambiguity between omitting a field, and explitly setti
 ie. We could achieve the same functionality with the following GraphQL schema: 
 
 ```
+type UserProfile {
+  name: String!
+  address: String!
+  favouriteColor: String
+}
 
+input PatchUserProfileInput {
+  name: String
+  address: String
+  favouriteColor: String
+}
+
+type Mutation {
+  patchUserProfile(userProfile: PatchUserProfileInput!): UserProfile
+}
 ```
 
 but in this case note that we could submit a payload: 
@@ -151,62 +298,6 @@ and this _might_ mean the same as
 
 We don't have a clear way to distingush between _ommiting_ the property, and setting it to null. 
 
-
-#### Lack of type literal support
-
-
-In TypeScript we could define an object like this: 
-
-```typescript
-type User = {
-  userType: "student", 
-  classesEnrolledIn: string[]
-}  | {
-  userType: "teacher", 
-  classesTeaching: string[], 
-  qualifications: string[]  
-}
-```
-
-This is what's known as a <TextHighlight comment={<>
-<p>
-See <a href ="https://basarat.gitbook.io/typescript/type-system/discriminated-unions">TypeScript documentation here.</a></p>
- </>}>_discriminating union_</TextHighlight>. 
-
-We can then _discriminate_ based on the `userType` property: 
-
-```typescript 
-function processUser(user: User) {
-  if(user.userType === "student") {
-    // definitely exists
-    user.classesEnrolledIn
-
-    // definitely does not exist
-    user.qualifications
-  }
-}
-```
-
-An OpenAPI spec could define a similar shape like: 
-
-```
-```
-
-GraphQL does not support literal types in this same way. 
-
-<GithubIssueLinkRsc issueLink="https://github.com/graphql/graphql-spec/issues/878"/>
-
-In Graphql we might define a schema like 
-
-```
-```
-
-
-But this will lack the ability to discriminate based on the `userType` property. 
-
-Clients like Apollo have the [`__typename`](https://www.apollographql.com/docs/apollo-server/schema/schema#the-__typename-field) which can be used to discriminate, but of course that requires you to use Apollo. 
-
-#### 
 
 ### You will now need to deal with problems that are specific to GraphQL 
 
@@ -234,7 +325,7 @@ By introducing query whitelisting any consumer now has a dependency on the team 
 
 ## Conclusions
 
-If the reason you are considering GraphQL is because you think it's going to be _easier_ than REST, it's not. 
+If the reason you are considering GraphQL is because you've seen the conference presentation and you think it's going to be all smooth sailing - it's not.
 
 Consider what you'll be losing. 
 
