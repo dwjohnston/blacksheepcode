@@ -57,6 +57,22 @@ body {
   --column-width: 1100px;
 }
 
+pre,
+pre:hover {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+pre code {
+  display: block;
+  overflow-x: auto;
+  white-space: pre-wrap !important;
+}
+
+.react-github-permalink .link-wrapper a {
+  word-break: break-word;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
 
