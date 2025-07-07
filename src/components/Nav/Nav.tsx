@@ -6,6 +6,8 @@ const PATHS = {
 	"/posts": "Blog",
 	"/about": "About",
 	"/open-source": "Open Source",
+	"/ai-policy": "AI Policy",
+
 };
 
 export function Nav() {
