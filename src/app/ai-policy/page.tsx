@@ -13,7 +13,7 @@ export default function AiPolicyPage() {
         </p>
 
         <p>
-            I do sometimes use AI as a research tool (e.g. 'tell me what technologies solve X problem') and suggestions from AI may make it into a blog post. However the content and subject of blog posts always respresents my genuine thoughts, opinions or experiences on a topic; I do not use AI to suggest topic ideas.
+            I do sometimes use AI as a research tool (e.g. &apos;tell me what technologies solve X problem&apos;) and suggestions from AI may make it into a blog post. However the content and subject of blog posts always respresents my genuine thoughts, opinions or experiences on a topic; I do not use AI to suggest topic ideas.
         </p>
 
         <p>
