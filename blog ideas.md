@@ -11,6 +11,11 @@ TypeScript
 - string to enum
 
 Patterns of extensibility 
+   - consumer opts in
+
+Tools I like
+- Whatever the menu tool is
+- 
 
 
 
