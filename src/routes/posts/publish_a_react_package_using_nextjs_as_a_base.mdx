@@ -9,6 +9,23 @@ tags:
   - "react"
 ---
 import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
+
+<InfoPanel level="info">
+  <p>
+    This post has been developed into a template repository. See <a href="https://github.com/dwjohnston/ultimate-react-package-template">Ultimate React Package Template</a>.
+  </p>
+  <p>
+    The template includes:
+  </p>
+  <ul>
+      <li>Storybook</li>
+      <li>A NextJS site for documentation</li>
+      <li>Tests with Storybook</li> 
+      <li>Branch deploys and testing</li>
+      <li>A versioning strategy using changesets</li>
+  </ul>
+</InfoPanel>
 
 This is a short guide on publishing a React component library package to NPM, using NextJS as the compiler. 
 
@@ -27,7 +44,10 @@ All code for this tutorial can be found in [this repo](https://github.com/dwjohn
 
 ### Step 1: Scaffold your project using `create-next-app`
 
-Run `npx create-next-app` and follow the prompts
+Run:
+```bash
+npx create-next-app
+```
 
 ### Step 2: Create a `src/library` folder and create your components 
 
@@ -35,13 +55,17 @@ This is where you will create your component(s) for publishing.
 
 Everything else will still be a regular NextJS project. You can use this as a sandbox for development, it won't be packaged for export. 
 
+Example component:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/339763c59d918f526c7726f166e055cc9e6448c7/src/library/MyComponent.tsx#L1-L6"/>
+
 ### Step 3: Create a `src/exports.ts` to export your files 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/src/exports.ts#L1"/>
 
 ### Step 4: Add a `tsconfig.build.json`
 
-You now have two tsconfigs, one for the regular NextJS application, and one specifically for building the package for publishing. 
+After this you will have two tsconfigs, one for the regular NextJS application, and one specifically for building the package for publishing. 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/an-example-react-package-built-with-nextjs-tooling/blob/6693d8e06152de64bc794031d6e14b601fb07f31/tsconfig.build.json#L1-L29"/>
 

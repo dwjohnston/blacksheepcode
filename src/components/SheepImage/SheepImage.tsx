@@ -20,7 +20,7 @@ export function SheepImage(props: { mode?: "dark" | "light" }) {
     }
 
     return <div className={`sheep-image-wrapper`}>
-        <Image src={dark} className="dark" alt="A black sheep typing at a computer" />
-        <Image src={light} className="light" alt="A black sheep typing at a computer"  />
+        <Image src={dark} className="dark" alt="A black sheep typing at a computer. AI Generated." />
+        <Image src={light} className="light" alt="A black sheep typing at a computer. AI Generated."  />
     </div>
 }
