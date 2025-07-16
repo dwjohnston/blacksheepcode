@@ -42,3 +42,6 @@ How I went about solving a problem:
 
 I'm opposed to including state management as part of your test. 
 
+# Things I should learn
+
+Window managment with Mac. 
