@@ -25,7 +25,18 @@ React bits:
 - Extensible content.
    - i.e a form that might have different variants. Rather than providing these variants via props, you can allow additional content to be passed as a prop and have some kind of registration function that allows intecepting the form submission event to display addition errors.
 
+How I went about solving a problem: 
 
+- Created scripts to create test users
+- Migration to new subscripions upstream payments upstream.
+   - FF at root level, rewrite the whole thing.
+   - Confluence document to track things.
+ 
+- Migration to new upstream
+   - Confluence doc to ask questions, track bugs.
+   - Map on to the old response.
+ 
+  
 
 ## Big
 
