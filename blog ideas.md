@@ -17,6 +17,13 @@ Tools I like
 - Whatever the menu tool is
 - 
 
+React bits: 
+
+- Debug panel
+- Errorable components
+- Serviced componets
+- Extensible content.
+   - i.e a form that might have different variants. Rather than providing these variants via props, you can allow additional content to be passed as a prop and have some kind of registration function that allows intecepting the form submission event to display addition errors.
 
 
 
