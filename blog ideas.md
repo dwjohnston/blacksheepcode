@@ -17,6 +17,9 @@ Tools I like
 - Whatever the menu tool is
 - 
 
+File logger
+
+
 React bits: 
 
 - Debug panel
@@ -36,7 +39,6 @@ How I went about solving a problem:
    - Confluence doc to ask questions, track bugs.
    - Map on to the old response.
  
-  
 
 ## Big
 
