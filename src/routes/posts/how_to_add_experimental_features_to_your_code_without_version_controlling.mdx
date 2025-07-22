@@ -181,6 +181,14 @@ git commit --amend
 ```
 
 Update your shell rc script to use this new commit SHA. 
+ 
+Here's an alias to help (this updates a `.zshrc`): 
+
+```
+alias updatefeature='latest_commit=$(git rev-parse HEAD); \
+   sed -i "" "s/^feature_commit=.*/feature_commit=\"$latest_commit\"/" ~/.zshrc; \
+   source ~/.zshrc'
+```
 
 
 
