@@ -19,6 +19,13 @@ Tools I like
 
 File logger
 
+A list of phrases I'm suspicious of: 
+ - 'Best practices'
+ - Security concern
+ - Performance concern
+
+
+
 
 React bits: 
 
