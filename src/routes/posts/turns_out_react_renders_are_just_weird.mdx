@@ -1,0 +1,202 @@
+---
+meta:
+  title: Turns out react renders are just weird
+  description: In a previous post I make mention of  
+  dateCreated: 2025-07-30
+tags: 
+  - "react"
+
+---
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+https://infoheap.com/online-react-jsx-to-javascript/
+
+In a [previous post]("./no_context_is_not_causing_too_many_renders.mdx") I debunk a common misnomer about React rendering performance as it relate to context - by pointing out that when a when a component renders, it does not cause of a render of its `props.children`. 
+
+Here's the example of two subtley different components: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/2fbbb700d23761ff460f4b41745eaee91fc7571c/src/demos/react-renders/ReactRenders3.tsx#L8-L39"/>
+
+
+<DemoFrame
+  description = {<>
+  <p>Observe that the RenderTracker that is passed in as a child does not re-render when the state changes.</p>
+  </>}
+>
+  <ReactRenders3/>
+</DemoFrame>
+
+
+A helpful takeaway here is that we can have rendering performance improvements by passing elements via the `children` prop or via slots, rather than rendering them directly in a component. 
+
+For example, instead of a component like this: 
+
+```jsx
+function MyWidgetPanel() {
+    const [value, setValue] = React.useState(0)
+
+    return <div className="widget-panel">
+        {/* 👇 Controlled component causing a render on every keystroke */}
+        <input type="text" value={value} onChange={(e) => setValue(e.target.value)} />
+        <div className="header">
+            <WidgetHeader />
+        </div>
+        <div className="main">
+            <WidgetContent />
+        </div>
+        <div className="footer">
+            <WidgetFooter />
+        </div>
+    </div >
+}
+```
+
+Which will re-render everything on every keystroke. 
+
+We can create a component like this: 
+
+```tsx
+type WidgetPanelProps = {
+    headerContent: React.ReactNode;
+    mainContent: React.ReactNode;
+    footerContent: React.ReactNode;
+}
+
+function MyWidgetPanel(props: WidgetPanelProps) {
+    const { headerContent, mainContent, footerContent } = props
+    const [value, setValue] = React.useState(0)
+
+    return <div className="widget-panel">
+        {/* 👇 Controlled component causing a render on every keystroke */}
+        <input type="text" value={value} onChange={
+            (e) => setValue(e.target.value)
+          } />
+        <div className="header">
+            {headerContent}
+        </div>
+        <div className="main">
+            {mainContent}
+        </div>
+        <div className="footer">
+            {footerContent}
+        </div>
+    </div >
+}
+```
+
+This component will still re-render on every key stroke, by the components passed in via the slots will not. 
+
+## But it's not that simple 
+
+It's _not_ accurate to say that 'any component passed in via slots/children are not subject to any rendering effects caused by it's containing component'. 
+
+Let's modify our example above: 
+
+In this example we similarly pass the render tracker in via the `props.children` prop. If we type in the textbox, we don't see any additional renders. 
+
+But note what happens when we click the Ping Pong button - not only does it re-render - but the component actually remounts!
+
+## What's happening here? 
+
+At this point we're going to dive into the JSX to JS transpilation and what happens with React.createElement - so let's simplify our application. 
+
+
+
+When we <TextHighlight comment={<p>I use <a href="https://infoheap.com/online-react-jsx-to-javascript/">this tool.</a></p>}>transpile this</TextHighlight>, we get this: 
+
+```js
+"use client";
+
+import React, { useContext, useState } from "react";
+
+export function PingPongElement(props) {
+    const [isLeft, setIsLeft] = useState(true);
+    return React.createElement(
+        "div",
+        null,
+        React.createElement(
+            "button",
+            { onClick: () => {
+                    setIsLeft(prev => !prev);;
+                } },
+            "Click Me"
+        ),
+        React.createElement(
+            "div",
+            { className: "ping-pong-left" },
+            isLeft && props.children
+        ),
+        React.createElement(
+            "div",
+            { className: "ping-pong-right" },
+            !isLeft && props.children
+        )
+    );
+}
+
+export function ReactRendersPingPong() {
+    return React.createElement(
+        "div",
+        { className: "ping-pong-demo" },
+        React.createElement(
+            PingPongElement,
+            null,
+            React.createElement(
+                "div",
+                null,
+                " The child element "
+            )
+        )
+    );
+}
+```
+
+Now, the important thing to note is that all we've got here is a couple of uncalled functions, - we haven't actually executed any code at this point. 
+
+In practice, what we would do is something like this: 
+
+```jsx
+import { createRoot } from 'react-dom/client';
+
+const domNode = document.getElementById('root');
+const root = createRoot(domNode);
+root.render(<ReactRendersPingPong />);
+```
+
+Which, when transpiled, looks like this: 
+
+```js
+import { createRoot } from 'react-dom/client';
+
+const domNode = document.getElementById('root');
+const root = createRoot(domNode);
+root.render(React.createElement(ReactRendersPingPong, null));
+```
+
+Setting aside that `root.render()` part of it, what happens if we just log the result of the React.createElement? 
+
+```
+console.log(React.createElement(ReactRendersPingPong))
+```
+
+We get an object like this: 
+
+```
+{
+  '$$typeof': Symbol(react.element),
+  type: [Function: ReactRendersPingPong],
+  key: null,
+  ref: null,
+  props: {},
+  _owner: null,
+  _store: {}
+}
+```
+
+Now, here's the important part. _We still haven't called the function'_. 
+
+React.createElement itself does not call the function, it just retains a reference to it. Essentially all we're doing with `createElement` is creating a tree of just the plain HTML elements and what 'proper' React components we have, and their props and their children. 
+
+It's when this object is returned to the `root.render` that the magic will happen. 
+
+

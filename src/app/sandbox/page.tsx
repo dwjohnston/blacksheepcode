@@ -1,4 +1,5 @@
 import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4 } from "@/demos/react-renders";
+import { ReactRendersPingPong } from "@/demos/react-renders/ReactRendersPingPong";
 
 export default function SandBox() {
     return <div>
@@ -6,6 +7,6 @@ export default function SandBox() {
             This is a sandbox page.
         </p>
 
-        <ReactRenders1 />
+        <ReactRendersPingPong />
     </div>
 }

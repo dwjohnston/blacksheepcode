@@ -25,6 +25,8 @@
     background-color: var(--color-info-secondary);
     position: relative;
     flex: 1 0 auto;
+    width: 150px;
+    height: 150px;
 }
 
 .global-render-button {
@@ -43,4 +45,19 @@
 .color-display {
     width: 50px;
     height: 50px;
+}
+
+.ping-pong-container {
+    height: 50px; 
+    display: flex;
+    flex-flow: row nowrap; 
+    gap: 12px;
+
+
+    >* {
+        border: solid 1px white;
+        flex: 0 0 150px;
+        width: 150px;
+        height: 150px;
+    }
 }
