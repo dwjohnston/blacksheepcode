@@ -1,0 +1,53 @@
+---
+meta:
+  title: "Tools I like: @inquirer/prompts"
+  description: "@inquirer/prompts is a JavaScript library for creating interactive CLI prompt menus"
+  dateCreated: 2025-07-j30
+  image: inquirer
+series: 
+  name: tools_i_like
+  part: 2
+---
+import Image from "next/image";
+import inquirer from "@/assets/inquirer.png";     
+
+
+I love [@inquirer/prompts](https://www.npmjs.com/package/@inquirer/prompts). 
+
+
+It Allows you to very easily create an interactive CLI menu like this: 
+
+<Image src={inquirer} className="blog-image" style={{maxHeight: 300}} alt="Screenshot showing an interactive CLI menu asking the user to fill their firstname, lastname and phone number."/>
+
+Creating such prompts is dead easy with a nice async interface: 
+
+```js
+import { input } from '@inquirer/prompts';
+
+function isValidPhoneNumber(phone) {
+  // Simple validation: must be 10-15 digits, can include spaces, dashes, parentheses, and plus sign
+  const cleaned = phone.replace(/[\s\-().+]/g, '');
+  return /^\d{10,15}$/.test(cleaned);
+}
+
+
+async function main() {
+    const firstName = await input({ message: 'What is your first name' });
+    const lastName =  await input({ message: 'What is your last name' });
+    const phoneNumber = await input({message: "What is your phone number", 
+        validate: (value) => {
+            if(isValidPhoneNumber(value)){
+                return true;
+            }
+            return "Must be a valid phone number."
+        }
+    })
+}
+
+main();
+```
+
+Brilliant. 
+
+
+
