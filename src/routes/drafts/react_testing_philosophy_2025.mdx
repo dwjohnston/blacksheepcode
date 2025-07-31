@@ -74,7 +74,7 @@ Instead of passing props via a containing element's props - we can just pass the
 (Example)
 
 I call these kind of components 'frames' <TextHighlight comment={<p>Though, as we'll see often we do end up creating frames that <i>are</i> stateful.</p>}>their responsibility tends not include any state management or dynamic content</TextHighlight>, they're purely layout containers for <TextHighlight comment ={<>
-<p>Stateful - the content/behaviour can change due to user interactions or other external events.</p><p>Contentful - The content is specifc to the individual user.</p></>}>stateful or contentful</TextHighlight> components.
+<p>Stateful - the content/behaviour can change due to user interactions or other external events.</p><p>Contentful - The content is specific to the individual user.</p></>}>stateful or contentful</TextHighlight> components.
 
 ## 6. Context to share state between components 
 
@@ -102,8 +102,34 @@ Adding this new behaviour will break all existing tests that do not have the 'de
 
 The interface of the the state fetching hook has not changed though. 
 
-We _should_ be able to define tests 
+We _should_ be able to define tests that just define what data is needed, and the actual implementation of how this data is retrieved should be not affect if the tests pass or not. 
 
 
 ## 8. Errorable components 
+
+Errorable components a pattern I've thought of, I have not used in any production sense, and is not something I see recommmended. 
+
+The concept is that we prevent the cascade of global state requirements, by allowing components to 'error out'. 
+
+Let's say we were building an application like Jira or Github. We have a UserAvatar component like so. This component can be used in a lot of places in the application:
+
+- In comments as the comment author.
+- In pull requests and issues as the issue/PR creator. 
+- When issues are referenced from elsewhere. 
+- When being \@tagged 
+- When being listed as an assignee. 
+
+Now let's say we're building a comment panel.
+
+We've got the `userId`, and that really is all we _should_ need in order to populate the UserAvatar. 
+
+We can, and _should_ create a component like this. 
+
+But the problem with a component like this, is that now when we render our `CommentPanel` we need to know what things to mock in order to not have the `UserAvatar` error out. 
+
+Or do we? 
+
+The suggestion is - we _do_ just let the `UserAvatar` error out, and encounter an error boundary. 
+
+This way go on with out day, creating the `CommentPanel` and so long as the `UserAvatar` exists, we don't actually care what it is doing. 
 
