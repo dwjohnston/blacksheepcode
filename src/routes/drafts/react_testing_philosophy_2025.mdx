@@ -1,0 +1,109 @@
+---
+meta:
+  title: My React testing philosophy as of 2025
+  description: I've written and talked frequently about testing React applications - here's how I currently think about things
+  dateCreated: 2025-07-31
+---
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+## 1. Presentational components are the easiest to test. 
+
+By presentational, I mean the components get any variance in their behaviour only from props. 
+
+They do not reach into global state, context, or other state providers like routing, nor do they directly make non-deterministic functional calls, like making calls to APIs.*
+
+Importantly, _this does not mean that they do not have state_. 
+
+It's absolutely fine for a component to have it's own state, via a `useState` hook, and infact:
+
+## 2. It's better for components to encapsulate their own state. 
+
+This is a code usability issue. This relates to testing, because the primary purpose of testing, I would argue, is to test the codes usability.
+
+If your component is designed that the user of the component has to do some extra work in order to make it work, you're just making it harder for them. 
+
+Let's take this 'like' button. 
+
+
+The button starts in a unliked state, we click it, it starts loading, and then it transitions into the 'liked' state, and then vice versa.
+
+There are two ways we can create this component. 
+
+In my opinion, the first approach is _much_ better. 
+
+The second approach might be easier to display in Storybook for example, but that's about its only advantage. 
+
+The second approach has two distinct disadvantages as I see it: 
+
+1. You lose the testing of state transitions. You no longer have a mechansim for testing 'first the button is enabled, then it's disabled, then it's enabled again'. 
+2. You shift the burden of this transition logic up to the parent. 
+
+### A compromise is possible - expose both 
+
+An implementation that exposes both is possible. 
+
+(Example)
+
+
+## 3. A presentational component can be made up of other presentational components, and be passing props through... 
+
+Let's continue with our `LikeButton` example - and let's say we've got `PokemonPanel`
+
+(Example) 
+
+Here - we still have a presentational component that is easy to test - presentational components are the easiest to test. 
+
+This pattern of passing the props through is called _prop drilling_ and it's often considered a dirty word. 
+
+I think you shouldn't let prop drilling scare you - the important part is that you've got nice testable components that are easy to reason about. 
+
+## 4. ... to a point. At some point prop drilling is unweildy.
+
+This 'continue creating presentational components that are made up of other presentational components' pattern at some point will lead to components that have 20 or so props, and there tends to be two issues: 
+
+1. It's unclear what all the props are for. Permutations of 20 different variables is not something we can realistically reason about. 
+2. If we need to make a change to one of the leaf components, we end up needing cascade changes up through multiple layers.  
+
+At this point, we need to start using different techniques. 
+
+
+## 5. Slots avoid prop drilling 
+
+Instead of passing props via a containing element's props - we can just pass the props directly to the component and declare the component in the containing element's slots. 
+
+(Example)
+
+I call these kind of components 'frames' <TextHighlight comment={<p>Though, as we'll see often we do end up creating frames that <i>are</i> stateful.</p>}>their responsibility tends not include any state management or dynamic content</TextHighlight>, they're purely layout containers for <TextHighlight comment ={<>
+<p>Stateful - the content/behaviour can change due to user interactions or other external events.</p><p>Contentful - The content is specifc to the individual user.</p></>}>stateful or contentful</TextHighlight> components.
+
+## 6. Context to share state between components 
+
+All the suggestions so far are doing all we can to avoid reaching into global state.
+
+The advantage of this is that any component can be rendered on its own, with no prerequisites.
+
+Use context is the first step where we start requiring some kind of setup. 
+
+But a context provider is a far lighter toucher than a full fledged state management provider. 
+
+The idea here is - some components are expected to exist within a certain context - and if you try render them outside of that context - they should immediately fail and it be aparent why. 
+
+## 7. Components with global state - mock the state away or mock APIS? 
+
+Here is where I become split. 
+
+A lot tooling providers will recommend not mocking away state management, and instead include state management as a implicit part of your test, and mock the API layer instead. 
+
+This reasoning is sound, and you can get pretty far with this strategy. 
+
+However, I have a counter-point described here. Essentially the scenario where you have a state fetching hook, and you're now migrating just certain users to a new endpoint.
+
+Adding this new behaviour will break all existing tests that do not have the 'detect which user I am' API behaviour already defined. 
+
+The interface of the the state fetching hook has not changed though. 
+
+We _should_ be able to define tests 
+
+
+## 8. Errorable components 
+

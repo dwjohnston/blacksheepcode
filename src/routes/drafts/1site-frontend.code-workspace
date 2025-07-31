@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "../../../../1site-frontend"
+		},
+		{
+			"path": "../../../../coles-digital-graphql"
+		},
+		{
+			"path": "../../.."
+		},
+		{
+			"path": "../../../../api-mocking-example"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "coles-digital-graphql/node_modules/typescript/lib"
+	}
+}

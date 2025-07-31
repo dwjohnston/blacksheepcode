@@ -1,0 +1,123 @@
+---
+meta:
+  title: A counterpoint to including state management as an implicit part of your frontend test
+  description: Common advice for testing React applications with state management is to not mock away the state management, and instead include it as an implicit part of your test. I provide a counter example of where this is troublesome. 
+  dateCreated: 2025-07-31
+tags: 
+  - "react"
+  - "testing"
+---
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc"; 
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
+
+Common advice I see as it relates to testing React applications is that you shouldn't 'mock away' your state management, via Jest module mock for example. 
+
+Instead, you should leave your state management as is, and mock the API layer. When you go to test your component, you're implictly testing the state management. 
+
+For example, [Redux's documentation is very clear about this](https://redux.js.org/usage/writing-tests): 
+
+>Prefer writing integration tests with everything working together. For a React app using Redux, render a `<Provider>` with a real store instance wrapping the components being tested. Interactions with the page being tested should use real Redux logic, with API calls mocked out so app code doesn't have to change, and assert that the UI is updated appropriately.
+
+>Do not try to mock selector functions or the React-Redux hooks! Mocking imports from libraries is fragile, and doesn't give you confidence that your actual app code is working.
+
+For React-Query - I have not found this philosophy explicitly stated, but if look at [TkDodo's blog](https://tkdodo.eu/blog/testing-react-query) they simply assume using this 'mock the API layer' strategy: 
+
+>Since React Query is an async server state management library, your components will likely make requests to a backend. When testing, this backend is not available to actually deliver data, and even if, you likely don't want to make your tests dependent on that.
+
+>...
+
+>Whenever you use React Query, you need a QueryClientProvider and give it a queryClient - a vessel which holds the QueryCache. The cache will in turn hold the data of your queries.
+
+>...
+
+>If you want to test a Component that uses a useQuery hook, you also need to wrap that Component in QueryClientProvider.
+
+For what it's worth, I generally agree with the motivations stated above. 
+
+But here, I'll give an example of a change to an application that becomes pretty problematic. 
+
+## Our application 
+
+We have a hook that fetches our todos.
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/api-mocking-example/blob/9b964ecb9fae8e09484cd3fdaef9278d49f2b139/frontend/src/serviceHooks/useTodos.ts#L4-L10"/>
+
+We use this in our `Todos` component
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/api-mocking-example/blob/9b964ecb9fae8e09484cd3fdaef9278d49f2b139/frontend/src/Todos.tsx#L4-L20"/>
+
+And we test our component by setting up some MSW mocks
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/api-mocking-example/blob/3d2beb0d341f1bba3772fa8f94a9b6b2301432ba/frontend/src/Todos.tsx#L1-L42"/>
+
+Nice and easy!
+
+## Our application evolves
+
+Now, let's assume that: 
+
+1. We're using that `useTodos` hook in a lot of places in our application, twenty or so different places. 
+
+2. The existing todos service is slow and we're migrating to a v2 of the service. We want to do a gradual roll out, and we use this application internally, so what we'll do is only internal users will use the v2 endpoint in the mean time. 
+
+Well, we could do something like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/api-mocking-example/blob/d255306bd0539d6455873dbef9344442660d14d4/frontend/src/serviceHooks/useTodos.ts#L5-L14"/>
+
+
+But what happens to our test? 
+
+Our test starts failing!
+
+```
+stderr | src/Todos.test.tsx > Todos > renders todos from API
+[MSW] Warning: intercepted a request without a matching request handler:
+
+  • GET /v1/profile
+
+If you still wish to intercept this unhandled request, please create a request handler for it.
+Read more: https://mswjs.io/docs/http/intercepting-requests
+
+ ❯ src/Todos.test.tsx (1 test | 1 failed) 1030ms
+   × Todos > renders todos from API 1027ms
+     → Unable to find an element with the text: Learn TypeScript. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+```
+
+<InfoPanel level="warning">
+  <p>It's worth also noting that there's a sense that we've changed our interface/behaviour of our hook. The hook now will not longer immediately show as being in the 'loading' state, while the profile is loading, it'll be in the 'pending' state.</p>
+
+</InfoPanel>
+
+We've introduced a new endpoint, which we haven't defined mock behavior for. 
+
+Defining that behaviour will be trivial in this one example. 
+
+But what about for the other nineteen examples? Perhaps some of those pages already have some functionality relating to internal users and have the profile mocking already set up, so now we need to set up a mock for the v2 endpoint. Before long, what was a simple task has run into a quagmire of updating tests. 
+
+Note that we haven't changed the interface of our hook, it still returns a query result of a list of todos, which is what we actually care about.
+
+ What we really want, for the purpose of testing any of these components is a way of saying 'The list of the todos will be ..., I don't really care how they got to be that way'. 
+
+## Conclusions 
+
+There are other ways we could avoid this testing quagmire. For example, we could opt the consumer into using the new endpoint: 
+
+```js
+export function useTodos(shouldUseV2=false) {
+  return useQuery({
+    queryKey: ['todos'],
+    queryFn: shouldUseV2 ? fetchTodosV2: fetchTodos, 
+    enabled: profileResult.isSuccess,
+  });
+}
+```
+
+that way, the individual tests could opt in to the change one at a time, though, this might present a whole new set of problems. 
+
+In my opinion, it really is the case that we want to be able to draw boundary between 'getting the data into our React component' and the 'fetching, caching, transforming, retries' etc, that occurs in state management solutions. 
+
+That the suggest solution is to draw the boundary to include the state management, I think demonstrates a flaw with React's architecture. 
+
+What we really want is an ability to provide data to our components, via an async function that returns the data. In testing contexts, we need a way to define (inject!) this async behaviour. 
+
+React Server Components are a step in this direction - the data loading mechanism is just that - async functions - though there's still no first class dependency injection mechanism. 

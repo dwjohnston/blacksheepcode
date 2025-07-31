@@ -73,6 +73,11 @@ pre code {
   word-break: break-word;
 }
 
+blockquote {
+  font-family: Merriweather, serif;
+  font-weight: 300;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
 
