@@ -1,0 +1,71 @@
+A common issue I see in frontend codebases, is we have have a component with an interface like this: 
+
+```
+
+
+
+type AutocompleteProps<T> = {
+
+    searchValue: string; 
+    onChangeSearchValue: (str: string) => void; 
+
+    selectedValue: T: 
+    onChangeSelectedValue: (value: T) => void; 
+
+    renderItem: (value: T) => React.ReactNode; 
+    
+    isLoading: boolean; 
+    availableOptions: Array<T>; 
+
+}
+```
+
+There's a sense that components with an interface like this would be easy to test, we could write something like: 
+
+```
+[tests]
+```
+
+It might be desirable to to write examples like this for Storybook, where we _just_ want to see the component as it is loading. 
+
+## Components like this are a pain
+
+Components like this are tedious to use. 
+
+The problem with components like these is that the actual important functionality of the component has been left to the consumer. 
+
+In order to use one of these components, we would have to write some code like this: 
+
+```
+EXAMPLE
+```
+
+🤮
+
+Imagine we had a form that had three such inputs!
+
+Note also that such 
+
+## Instead, encapusulate as much state as you can in your component. 
+
+The better interface is one that looks like this: 
+
+```
+[example]
+```
+
+This allows the component to do a lot more the heavy lifting for you - "Hey, you give the async function, and I'll take care of all of the internal state for you".
+
+Some example tests would look like this: 
+
+```
+example
+```
+
+These kinds of tests make far more sense to me, where each one tells a story. 
+
+## There's nothing say that you couldn't do both
+
+Technically what we could do is do something like expose these components with less functionality as `AutocompleteStateless` and then use this component in our `Autocomplete` component that then provides the the functionality. 
+
+I'm not sure how much value this would actually have, and I argue that it's the functioning `Autocomplete` component that is the important one.  
