@@ -1,32 +1,33 @@
+---
+meta:
+  title: Encapsulate as much state as possible in your component
+  description: A common pattern I see is a passing every bit of a component's state in as a prop. This just puts the responsibility of that component's actual useful logic on to the parent. 
+  dateCreated: 2025-09-08
+---
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+import { AutocompleteA } from "example-react-autocomplete";
+
 A common issue I see in frontend codebases, is we have have a component with an interface like this: 
 
-```
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/ade0ca08dd8883c372ae7c11bd76133c8841aae9/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L17"/>
 
+Whereby every bit of state that component could be in, is controlled by the parent and passed in as props.
 
-
-type AutocompleteProps<T> = {
-
-    searchValue: string; 
-    onChangeSearchValue: (str: string) => void; 
-
-    selectedValue: T: 
-    onChangeSelectedValue: (value: T) => void; 
-
-    renderItem: (value: T) => React.ReactNode; 
-    
-    isLoading: boolean; 
-    availableOptions: Array<T>; 
-
-}
-```
+Note that the decision to use an autocomplete component as the example is an intentional one - autocompletes are non-trivial - they can have issues with debouncing the live search, and out-of-order requests. 
 
 There's a sense that components with an interface like this would be easy to test, we could write something like: 
 
-```
-[tests]
-```
-
 It might be desirable to to write examples like this for Storybook, where we _just_ want to see the component as it is loading. 
+
+But these tests do not test one of the key aspects of what we are interested in here - the state transitions. 
+
+We could start doing tests like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/75790d91b34997b704297934aa21fd253968f341/src/lib/Autocomplete_A/Autocomplete.test.tsx#L50-L84"/>
+
+but this really is not helpful as a test. 
+
+Here in our test we're just asserting that the parent component correctly transition the prop changes on `isLoading` and `availableOptions` - we can't be sure that they're going to get that right. 
 
 ## Components like this are a pain
 
@@ -36,36 +37,55 @@ The problem with components like these is that the actual important functionalit
 
 In order to use one of these components, we would have to write some code like this: 
 
-```
-EXAMPLE
-```
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L102"/>
 
 🤮
 
 Imagine we had a form that had three such inputs!
 
-Note also that such 
-
 ## Instead, encapusulate as much state as you can in your component. 
 
 The better interface is one that looks like this: 
 
-```
-[example]
-```
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_B/Autocomplete.tsx#L14-L21"/>
 
 This allows the component to do a lot more the heavy lifting for you - "Hey, you give the async function, and I'll take care of all of the internal state for you".
 
 Some example tests would look like this: 
 
-```
-example
-```
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_B/Autocomplete.test.tsx#L57-L156"/>
 
-These kinds of tests make far more sense to me, where each one tells a story. 
+These tests tell a story, they're a lot more useful as a test. 
 
 ## There's nothing say that you couldn't do both
 
 Technically what we could do is do something like expose these components with less functionality as `AutocompleteStateless` and then use this component in our `Autocomplete` component that then provides the the functionality. 
 
 I'm not sure how much value this would actually have, and I argue that it's the functioning `Autocomplete` component that is the important one.  
+
+## Why is this pattern so common? 
+
+I suspect a big part of the reason that this pattern is so prevalent, is because of tools like Tanstack Query, which provide an interface that, to simplify, looks like this: 
+
+```typescript
+type LoadingResult<T> = {
+  data: T; 
+  state: "success"
+}| {
+  data: null;
+  state: "pending" | "error" | "loading" 
+}
+```
+
+that is, they're not providing async functions as their primary means of interface. 
+
+When developers see that their means for fetching data looks like this, then they're going to tend to reproduce that interface onto the components they're creating. 
+
+RTKQ does helpfully provide a [useLazyQuery](https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#uselazyquery) hook which lends itself more to the style that I've advocate. 
+
+You can see [this discussion on TanStack's Github](https://github.com/TanStack/query/discussions/1205) the basic answer to why a lazy/imperative function is not provided, is because it would be trivial for someone to implement themselves.
+
+This isn't at all to say that tools like Tanstack are bad, it's just that there is a case to be made for using async functions. Async function quite handily encapsulate the state of a query, as well as the data, all in one handy object. Tools like Tanstack still have their place in that they provide query duplication/caching.
+
+
+
