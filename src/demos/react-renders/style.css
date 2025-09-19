@@ -18,13 +18,49 @@
 
     display: flex;
     flex-flow: column nowrap;
+
+
+    &.double-wide {
+        width: 300px;
+    }
+
+    .left-right {
+        display: flex; 
+        flex-flow: row nowrap;
+        gap: 1em;
+        >* {
+            border: solid 1px white;
+            flex: 1 1 50%;
+        }
+    }
 }
 
 
 .render-tracker {
     background-color: var(--color-info-secondary);
-    position: relative;
-    flex: 1 0 auto;
+
+    width: 100px;
+    height: 100px;
+    display: flex; 
+    flex-flow: column nowrap;
+
+    strong {
+        font-size: 0.5em;
+        display: block;
+        margin:0;
+    }
+    .mount-value {
+        font-size: 0.5em;
+        margin: 0;
+    }
+
+    .tracking-dot-container {
+     position: relative;
+     flex: 1 0 auto;
+     margin: 0.25em;
+     border: dashed 1px grey;
+
+    }
 }
 
 .global-render-button {
@@ -38,6 +74,7 @@
     height: 10px;
     position: absolute;
     background-color: red;
+    border-radius: 10px;
 }
 
 .color-display {
