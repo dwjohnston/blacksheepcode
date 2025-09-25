@@ -29,7 +29,7 @@ import { RenderTracker } from "./common";
     const {children} = props;
     const [isLeft, setIsLeft] = React.useState(true)
     return <div className="some-parent-component double-wide">
-        <strong>ChildrenStyleOne</strong>
+        <strong>ChildrenStyleTwo</strong>
         <button onClick={() => {
             setIsLeft((prev) => !prev);;
         }}>Move to {isLeft ?"right": "left"}</button>
