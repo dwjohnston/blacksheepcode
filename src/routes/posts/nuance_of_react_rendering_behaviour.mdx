@@ -292,7 +292,7 @@ and _this_ is where the difference in rendering behaviour lays.
 
 Essentially, what's happening as I understand it - is that when a React component renders, it generates one of these tree node objects, and then steps over each object inside, and compares it with the one _from the previous render_. 
 
-If they are shallowly equal (i.e. `===` equal), then React does not need to bother stepping into that node in order to resolve its sub tree. 
+If they are shallowly equal (i.e. `===` equal), then React does not need to bother stepping into that node in order to resolve its subtree. 
 
 ## With React 19/Compiler this might not matter anyway
 
