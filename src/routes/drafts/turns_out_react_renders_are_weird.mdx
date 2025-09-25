@@ -7,8 +7,10 @@ meta:
 
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4, ReactRenders5 } from "@/demos/react-renders"
-import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
 import { InfoPanel } from "@/components/InfoPanel/InfoPanel"; 
+import RenderTree from "@/assets/render_tree.png"
+import Image from "next/image";
 
 
 In a previous post I highlighted a highlighted the difference between two subtley different components - one that recieves its content via the a `children` prop, and the other that renders its content directly. 
@@ -24,134 +26,125 @@ In a previous post I highlighted a highlighted the difference between two subtle
   <ReactRenders3/>
 </DemoFrame>
 
-At the time, the way I conceptualised it, is that it would be a bit like writing some code like this: 
+At the time, I described this as an _ambiguity about what we call 'children'_ in React. 
 
-```js
+However, if take a look at React's own [_Understanding Your UI as a tree_](https://react.dev/learn/understanding-your-ui-as-a-tree) documentation, we can see that they make no such distinction between children that are provided via the `props.children` prop and children that are directly rendered.
 
-
-function main(value){
-    console.log(`the value is ${value}`);
-}
-
-
-function a(){
-    return 'abcdefg';
-}
-
-main(a());
-
-```
-
-That is - the value is already calculated by the time the function `main` executes. 
-
-This is in contrast to some code like this: 
-
-```js
-function main(){
-    console.log(`the value is ${a()}`);
-}
-
-
-function a(){
-    return 'abcdefg';
-}
-
-main();
-```
-
-Where `a` executes as a _part_ of the execution of `main`. 
-
-
-But I have a counterpoint that demonstrates that this isn't what is happening. 
-
-<DemoFrame
-  description = {<>
-  <p>Observe that in both cases the render tracker remounts when it moves</p>
-  </>}
->
-  <ReactRenders5/>
-</DemoFrame>
-
-
-If it were true that, in the first style, the actual rendering of the component was done outside of the component - then what we would see here is the component would change position without remounting and without rerendering. 
-
-But that's not what we see. 
-
-## So what is going on here? 
-
-The way I've taken to understanding this is to just look at what's happening in the compilation and run steps. 
-
-So what I've done is I've created a simple vite project and we can inspect what happens. 
-
+In their example they have this jsx:
 
 ```jsx
-import  { type PropsWithChildren } from "react";
+    <>
+      <FancyText title text="Get Inspired App" />
+      <InspirationGenerator>
+        <Copyright year={2004} />
+      </InspirationGenerator>
+    </>
+```
 
-function Inner() {
-    return <span>Hello world!</span>
+and this corresponding render tree diagram: 
+
+<Image src={RenderTree} alt ="A tree diagram showing the InspirationGenerator node having two children - FancyText and Copyright"/>
+
+They make no distiction between `FancyText` and `Copyright` even though one is directly rendered and the other is provided by `props.children`. 
+
+See my issue querying why the difference in rendering behaviour is not mentioned here: 
+
+<GithubIssueLink issueLink="https://github.com/reactjs/react.dev/issues/8007"/>
+
+This kind of lines up with how I've conceptualised of what React is doing, where if I write some kind like this: 
+
+```jsx
+function Foo(){
+  return <Bar text="hello world!"/>
 }
+```
 
-function A(props: PropsWithChildren<object>){
-    return <div>
+it would be like me writing
+
+```js
+function Foo(){
+  return Bar({text: "hello world!"})
+}
+```
+
+_this isn't quite accurate_. 
+
+Let's look at some actual compiled JSX: 
+
+```jsx
+export function ChildrenStyleOne() {
+    return <div id="foo">
+        <p>A regular node</p>
+        <SomeThing text="world!" />
+    </div>
+}
+``` 
+
+compiles to: 
+
+```js
+function ChildrenStyleOne() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", {
+    id: "foo",
+    children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", {
+        children: "A regular node",
+      }),
+      // Note `SomeThing` remains uncalled.  👇 
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SomeThing, { text: "world!" }),
+    ],
+  });
+}
+```
+
+That is, the compiled function does not _call_ `SomeThing` it merely retains a reference to it and what is props will be. 
+
+
+```tsx
+export function ChildrenStyleTwo(props: React.PropsWithChildren) {
+    return <div id="bar">
+        <p>A regular node</p>
         {props.children}
     </div>
 }
-
-
-function B(){
-    return <div>
-        <Inner/>
-    </div>
-}
-
-
-function Main(){
-    return <div className="foo" onClick={() =>{}}>
-        <A><Inner/></A>
-        <B/>
-    </div>
-}
-
-export default Main
 ```
 
-Here's what we get: 
+compiles to: 
 
-```js
-import { j as jsxRuntimeExports } from "../_virtual/jsx-runtime-CocFHxF7.js";
-import "../_virtual/index-BAGgfTGQ.js";
-function Inner() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Hello world!" });
+```
+function ChildrenStyleTwo(props) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", {
+    id: "bar",
+    children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", {
+        children: "A regular node",
+      }),
+      // 👇 a straight reference to props.children
+      props.children,
+    ],
+  });
 }
-function A(props) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: props.children });
-}
-function B() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Inner, {}) });
-}
-function Main() {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "foo", onClick: () => {
-  }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(A, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Inner, {}) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(B, {})
-  ] });
-}
-export {
-  Main as default
-};
 ```
 
-Now of course, at this point we haven't actually executed any code - JSX is just short hand for this. 
+This makes sense, rather than React resolving the entire UI tree a single event loop, it makes sense that the React engine 'takes a breath' between each UI node, and waits till the next event loop to resolves the next nodes. This way - resolving the UI tree is not one big thread blocking execution. 
 
-So what happens if we actually call this code? 
+At this point we've just got some compiled code - let's actually call this code: 
 
-```js
-console.log(
-  util.inspect(Main(), { showHidden: false, depth: null, colors: true })
-);
+```jsx
+function log(obj) {
+  console.log(
+    util.inspect(obj, {
+      showHidden: false,
+      depth: null,
+      colors: true,
+    })
+  );
+}
+
+log(ChildrenStyleOne({}));
 ```
 
-Well, we get this: 
+logs: 
 
 ```
 {
@@ -160,131 +153,149 @@ Well, we get this:
   key: null,
   ref: null,
   props: {
-    className: 'foo',
-    onClick: [Function: onClick],
+    id: 'foo',
     children: [
       {
         '$$typeof': Symbol(react.transitional.element),
-        type: [Function: A],  // 👈the function remains uncalled!
+        type: 'p',
         key: null,
         ref: null,
-        props: {
-          children: {
-            '$$typeof': Symbol(react.transitional.element),
-            type: [Function: Inner], // 👈the function remains uncalled!
-            key: null,
-            ref: null,
-            props: {}
-          }
-        }
+        props: { children: 'A regular node' }
       },
+      // 👇 this is the node we are interested in 
       {
         '$$typeof': Symbol(react.transitional.element),
-        type: [Function: B], // 👈the function remains uncalled!
+        type: [Function: SomeThing],
         key: null,
         ref: null,
-        props: {}
+        props: { text: 'world!' }
       }
     ]
   }
 }
 ```
 
-This highlights the important part - 
+We can see here we still haven't called `SomeThing` - we're still just maintaining a reference to the function and the props that will be passed to it. 
 
-_when the function is is eventually called - it does not call all of the sub-components_. 
-
-It _just_ declares what the children are -
-
-
-To take my initial, it's more akin to doing something like this: 
+If log the `props.children` style function call: 
 
 ```js
-function main(value){
-    return {
-        headline: "hello", 
-        content: value,
-    }
-}
-
-
-function a(){
-    return 'abc'
-}
-
-main(a());
+log(
+  ChildrenStyleTwo({
+    children: jsxRuntimeExports.jsx(SomeThing, {}),
+  })
+);
 ```
 
+We get: 
+
+```
+{
+  '$$typeof': Symbol(react.transitional.element),
+  type: 'div',
+  key: null,
+  ref: null,
+  props: {
+    id: 'foo',
+    children: [
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: 'p',
+        key: null,
+        ref: null,
+        props: { children: 'A regular node' }
+      },
+      // 👇 this is the node we are interested in 
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: [Function: SomeThing],
+        key: null,
+        ref: null,
+        props: { text: 'world!' }
+      }
+    ]
+  }
+}
+```
+
+We get _the exact same looking structure_. 
+
+## What gives? Where does the difference in rendering behaviour come from? 
+
+Well, observe what happens if we call this code: 
 
 ```js
-function main(){
-    return {
-        headline: "hello", 
-        content: a(),
-    }
-}
+const childrenStyleOneProps = {};
 
+const a = ChildrenStyleOne(childrenStyleOneProps);
+const b = ChildrenStyleOne(childrenStyleOneProps);
 
-function a(){
-    return 'abc'
-}
-
-main();
+console.log(a.props.children[1] === b.props.children[1]);
 ```
 
-```js
+That is - we're asking, is this object: 
 
-
-function main(value){
-    return {
-        headline: "hello", 
-        content: value,
-    }
-}
-
-
-function a(){
-    return 'abc'
-}
-
-main(a); //A is uncalled
+```
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: [Function: SomeThing],
+        key: null,
+        ref: null,
+        props: { text: 'world!' }
+      }
 ```
 
+the same the first time we call it, vs the second time we call it? 
 
-```js
+And the answer is: 
 
-
-function main(value){
-    return {
-        headline: "hello", 
-        content: a,
-    }
-}
-
-
-function a(){
-    return 'abc'
-}
-
-main(); //A is uncalled
+```
+false
 ```
 
+Whereas, in this case; 
 
-But note that in this paradigm  - both of these still end up returning the same result. \
+```
+const childrenStyleTwoProps = {
+  children: jsxRuntimeExports.jsx(SomeThing, {}),
+};
+
+const c = ChildrenStyleTwo(childrenStyleTwoProps);
+const d = ChildrenStyleTwo(childrenStyleTwoProps);
+
+console.log(c.props.children[1] === d.props.children[1]);
+
+```
+
+the answer is
+
+```
+true
+```
+
+and _this_ is where the difference in rendering behaviour lays. 
+
+Essentially, what's happening as I understand it - is that when a React component renders, it generates one of these tree node objects, and then steps over each object inside, and compares it with the one _from the previous render_. 
+
+If they are shallowly equal (i.e. `===` equal), then React does not need to bother stepping into that node in order to resolve its sub tree. 
+
+## With React 19/Compiler this might not matter anyway
+
+The state of [Compiler](https://react.dev/learn/react-compiler) is it's an opt feature that is ready to use. 
+
+Compiler will automatically memoise properties and components. 
+
+I've updated my vite.config.js to allow incremental adoption of compiler: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/vite.config.ts#L6-L13"/>
+
+And I add the `"use memo"` annotation to my component:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/vite.config.ts#L6-L13"/>
 
 
 
-## Why remounts when the component moves? 
-
-This is an straight forward one to answer -
-
-https://react.dev/learn/preserving-and-resetting-state
-
-Essentially because in React's model of the world, a component  in the render tree is only considered 'the same component' if it occupies the exact same place in the render tree. 
-
-When we move the component react treats this as a new component. 
 
 
-## So why _is_ there an optimisation when we pass a component as children? 
 
-I'm stumped for an answer right now - it must be some kind of optimisation they make.
+
