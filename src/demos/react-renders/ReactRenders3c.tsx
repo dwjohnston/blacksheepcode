@@ -34,7 +34,7 @@ import { RenderTracker } from "./common";
 
 
 export function ReactRenders3c() {
-    return <div className="demo">
+    return <div className="demo side-by-side">
         <ChildrenStyleOne />
         <ChildrenStyleTwo>
             <RenderTracker />

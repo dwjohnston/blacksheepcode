@@ -1,55 +1,70 @@
 ---
 meta:
-  title: Turns out react renders are a bit weird 
-  description: I am the description
-  dateCreated: 2022-11-28
+  title: The nuance of React rendering behaviour as it relates to children
+  description: Components that are passed as props.children and components that are directly declared by a component have different rendering behaviour - yet they are both just called 'children'. The adoption of React 19's compiler might mean that this distinction does not matter.
+  dateCreated: 2025-09-22
+  image: "screenshot_react_renders"
+tags: 
+  - "react"
+series: 
+    name: react_performance
+    part: 2
 ---
 
+
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
-import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4, ReactRenders5 } from "@/demos/react-renders"
+import { ReactRenders3, ReactRenders3c } from "@/demos/react-renders";
 import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
 import { InfoPanel } from "@/components/InfoPanel/InfoPanel"; 
 import RenderTree from "@/assets/render_tree.png"
 import Image from "next/image";
 
+<InfoPanel level="info">
+  All code examples can be found here:
 
-In a previous post I highlighted a highlighted the difference between two subtley different components - one that recieves its content via the a `children` prop, and the other that renders its content directly. 
+  [https://github.com/dwjohnston/react-renders](https://github.com/dwjohnston/react-renders)
+</InfoPanel>
 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/2fbbb700d23761ff460f4b41745eaee91fc7571c/src/demos/react-renders/ReactRenders3.tsx#L8-L39"/>
+In a [previous post](./no_react_context_is_not_causing_too_many_renders) I highlighted a highlighted the difference between two subtley different components - one that recieves its content via the a `children` prop, and the other that renders its content directly. 
+
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/src/react-renders/ReactRenders3.tsx#L8-L32"/>
 
 <DemoFrame
   description = {<>
-  <p>Observe that the RenderTracker that is passed in as a child does not re-render when the state changes.</p>
+  <p>Observe that the RenderTracker that is directly declared by the component rerenders on each state change.</p>
+  <p>Observe that the RenderTracker that is passed in via props.children does not.</p>
   </>}
 >
   <ReactRenders3/>
 </DemoFrame>
 
-At the time, I described this as an _ambiguity about what we call 'children'_ in React. 
+At the time, I described this as an "ambiguity about what we call 'children' in React". 
 
 However, if take a look at React's own [_Understanding Your UI as a tree_](https://react.dev/learn/understanding-your-ui-as-a-tree) documentation, we can see that they make no such distinction between children that are provided via the `props.children` prop and children that are directly rendered.
 
 In their example they have this jsx:
 
 ```jsx
-    <>
-      <FancyText title text="Get Inspired App" />
-      <InspirationGenerator>
-        <Copyright year={2004} />
-      </InspirationGenerator>
-    </>
+<>
+  <FancyText title text="Get Inspired App" />
+  <InspirationGenerator>
+    <Copyright year={2004} />
+  </InspirationGenerator>
+</>
 ```
 
 and this corresponding render tree diagram: 
 
-<Image src={RenderTree} alt ="A tree diagram showing the InspirationGenerator node having two children - FancyText and Copyright"/>
+<Image src={RenderTree} alt ="A tree diagram showing the InspirationGenerator node having two children - FancyText and Copyright" 
+width={500} style={{display: "block",margin: "0 auto"}}/>
 
 They make no distiction between `FancyText` and `Copyright` even though one is directly rendered and the other is provided by `props.children`. 
 
 See my issue querying why the difference in rendering behaviour is not mentioned here: 
 
-<GithubIssueLink issueLink="https://github.com/reactjs/react.dev/issues/8007"/>
+<GithubIssueLinkRsc issueLink="https://github.com/reactjs/react.dev/issues/8007"/>
 
 This kind of lines up with how I've conceptualised of what React is doing, where if I write some kind like this: 
 
@@ -126,9 +141,9 @@ function ChildrenStyleTwo(props) {
 }
 ```
 
-This makes sense, rather than React resolving the entire UI tree a single event loop, it makes sense that the React engine 'takes a breath' between each UI node, and waits till the next event loop to resolves the next nodes. This way - resolving the UI tree is not one big thread blocking execution. 
+This makes sense, rather than React resolving the entire UI tree a single event loop, it makes sense that the React engine 'takes a breath' between each UI node, and waits till the next event loop to resolve the next nodes. This way - resolving the UI tree is not one big thread blocking execution. 
 
-At this point we've just got some compiled code - let's actually call this code: 
+At this point we've just got some compiled code - let's actually execute the code: 
 
 ```jsx
 function log(obj) {
@@ -291,11 +306,15 @@ I've updated my vite.config.js to allow incremental adoption of compiler:
 
 And I add the `"use memo"` annotation to my component:
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/vite.config.ts#L6-L13"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/src/react-renders/ReactRenders3c.tsx#L8-L20"/>
 
+and now we see that no rerenders occur in either case:
 
-
-
-
-
+<DemoFrame
+  description = {<>
+  <p>Observe that both Render trackers do not rerender on state changes</p>
+  </>}
+>
+  <ReactRenders3c/>
+</DemoFrame>
 

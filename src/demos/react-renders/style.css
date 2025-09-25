@@ -10,8 +10,7 @@
 .some-unrelated-component,
 .foo-component,
 .some-parent-component {
-    width: 150px;
-    height: 150px;
+
 
     border: dotted 1px black;
     padding: 0.5em;
@@ -80,4 +79,32 @@
 .color-display {
     width: 50px;
     height: 50px;
+}
+
+
+
+main {
+    display: flex; 
+    flex-flow: column nowrap; 
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto;
+
+
+    width: 800px;
+}
+
+details {
+    margin: 1em;
+}
+
+.side-by-side {
+    display: flex;
+    justify-content:  space-around;
+
+ & > * {
+    flex: 0 0 250px;
+ }
+
+
 }

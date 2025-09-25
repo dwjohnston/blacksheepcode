@@ -2,6 +2,11 @@ const { withSentryConfig } = require("@sentry/nextjs");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+   experimental: {
+    reactCompiler: {
+      compilationMode: 'annotation',
+    },
+  },
 
   // Ignores the opentelemetry warning
   // see: https://github.com/open-telemetry/opentelemetry-js/issues/4173
