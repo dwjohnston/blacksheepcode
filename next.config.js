@@ -1,7 +1,22 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+
+  // Ignores the opentelemetry warning
+  // see: https://github.com/open-telemetry/opentelemetry-js/issues/4173
+  webpack: (
+        config,
+        { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+    ) => {
+        if (isServer) {
+            config.ignoreWarnings = [
+                { module: /opentelemetry/, },
+            ]
+        }
+        return config
+    },
+};
 
 
 

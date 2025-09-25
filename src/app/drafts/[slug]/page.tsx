@@ -12,23 +12,26 @@ export async function generateStaticParams() {
     })
 }
 
-export async function generateMetadata({ params }: { params: {
+export async function generateMetadata(props: { params: Promise<{
     slug: string
-} }) {
+}> }) {
+
+    const params = await props.params;
     return getMetadata(`/drafts/${params.slug}`);
 }
 
 export default async function PageLayout(props: PropsWithChildren<{
-    params: {
+    params: Promise<{
         slug: string
-    }
+    }>
 }>) {
     if(process.env.SHOW_DRAFT_PAGES !== "true") {
         notFound();
     }
 
-    const content = await getBlogContent( props.params.slug,"drafts");
-    return <BlogPostFrame pathname={`/drafts/${props.params.slug}`}>
+    const params = await props.params;
+    const content = await getBlogContent( params.slug,"drafts");
+    return <BlogPostFrame pathname={`/drafts/${params.slug}`}>
         {content}
     </BlogPostFrame>
 
