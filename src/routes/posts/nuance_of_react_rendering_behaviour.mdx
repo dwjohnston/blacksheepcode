@@ -1,0 +1,320 @@
+---
+meta:
+  title: The nuance of React rendering behaviour as it relates to children
+  description: Components that are passed as props.children and components that are directly declared by a component have different rendering behaviour - yet they are both just called 'children'. The adoption of React 19's compiler might mean that this distinction does not matter.
+  dateCreated: 2025-09-22
+  image: "screenshot_react_renders"
+tags: 
+  - "react"
+series: 
+    name: react_performance
+    part: 2
+---
+
+
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+import { ReactRenders3, ReactRenders3c } from "@/demos/react-renders";
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"; 
+import RenderTree from "@/assets/render_tree.png"
+import Image from "next/image";
+
+<InfoPanel level="info">
+  All code examples can be found here:
+
+  [https://github.com/dwjohnston/react-renders](https://github.com/dwjohnston/react-renders)
+</InfoPanel>
+
+
+In a [previous post](./no_react_context_is_not_causing_too_many_renders) I highlighted the difference between two subtly different components - one that receives its content via a `children` prop, and the other that renders its content directly. 
+
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/src/react-renders/ReactRenders3.tsx#L8-L32"/>
+
+<DemoFrame
+  description = {<>
+  <p>Observe that the RenderTracker that is directly declared by the component rerenders on each state change.</p>
+  <p>Observe that the RenderTracker that is passed in via props.children does not.</p>
+  </>}
+>
+  <ReactRenders3/>
+</DemoFrame>
+
+At the time, I described this as an "ambiguity about what we call 'children' in React". 
+
+However, if take a look at React's own [_Understanding Your UI as a tree_](https://react.dev/learn/understanding-your-ui-as-a-tree) documentation, we can see that they make no such distinction between children that are provided via the `props.children` prop and children that are directly rendered.
+
+In their example they have this jsx:
+
+```jsx
+<>
+  <FancyText title text="Get Inspired App" />
+  <InspirationGenerator>
+    <Copyright year={2004} />
+  </InspirationGenerator>
+</>
+```
+
+and this corresponding render tree diagram: 
+
+<Image src={RenderTree} alt ="A tree diagram showing the InspirationGenerator node having two children - FancyText and Copyright" 
+width={500} style={{display: "block",margin: "0 auto"}}/>
+
+They make no distinction between `FancyText` and `Copyright` even though one is directly rendered and the other is provided by `props.children`. 
+
+See my issue querying why the difference in rendering behaviour is not mentioned here: 
+
+<GithubIssueLinkRsc issueLink="https://github.com/reactjs/react.dev/issues/8007"/>
+
+This kind of lines up with how I've conceptualised of what React is doing, where if I write something like this: 
+
+```jsx
+function Foo(){
+  return <Bar text="hello world!"/>
+}
+```
+
+it would be like me writing
+
+```js
+function Foo(){
+  return Bar({text: "hello world!"})
+}
+```
+
+_this isn't quite accurate_. 
+
+Let's look at some actual compiled JSX: 
+
+```jsx
+export function ChildrenStyleOne() {
+    return <div id="foo">
+        <p>A regular node</p>
+        <SomeThing text="world!" />
+    </div>
+}
+``` 
+
+compiles to: 
+
+```js
+function ChildrenStyleOne() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", {
+    id: "foo",
+    children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", {
+        children: "A regular node",
+      }),
+      // Note `SomeThing` remains uncalled.  👇 
+      /* @__PURE__ */ jsxRuntimeExports.jsx(SomeThing, { text: "world!" }),
+    ],
+  });
+}
+```
+
+That is, the compiled function does not _call_ `SomeThing`; it merely retains a reference to it and what its props will be. 
+
+
+```tsx
+export function ChildrenStyleTwo(props: React.PropsWithChildren) {
+    return <div id="bar">
+        <p>A regular node</p>
+        {props.children}
+    </div>
+}
+```
+
+compiles to: 
+
+```
+function ChildrenStyleTwo(props) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", {
+    id: "bar",
+    children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", {
+        children: "A regular node",
+      }),
+      // 👇 a straight reference to props.children
+      props.children,
+    ],
+  });
+}
+```
+
+This makes sense, rather than React resolving the entire UI tree a single event loop, it makes sense that the React engine 'takes a breath' between each UI node, and waits till the next event loop to resolve the next nodes. This way - resolving the UI tree is not one big thread blocking execution. 
+
+At this point we've just got some compiled code - let's actually execute the code: 
+
+```jsx
+function log(obj) {
+  console.log(
+    util.inspect(obj, {
+      showHidden: false,
+      depth: null,
+      colors: true,
+    })
+  );
+}
+
+log(ChildrenStyleOne({}));
+```
+
+logs: 
+
+```
+{
+  '$$typeof': Symbol(react.transitional.element),
+  type: 'div',
+  key: null,
+  ref: null,
+  props: {
+    id: 'foo',
+    children: [
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: 'p',
+        key: null,
+        ref: null,
+        props: { children: 'A regular node' }
+      },
+      // 👇 this is the node we are interested in 
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: [Function: SomeThing],
+        key: null,
+        ref: null,
+        props: { text: 'world!' }
+      }
+    ]
+  }
+}
+```
+
+We can see here we still haven't called `SomeThing` - we're still just maintaining a reference to the function and the props that will be passed to it. 
+
+If we log the `props.children` style function call: 
+
+```js
+log(
+  ChildrenStyleTwo({
+    children: jsxRuntimeExports.jsx(SomeThing, {}),
+  })
+);
+```
+
+We get: 
+
+```
+{
+  '$$typeof': Symbol(react.transitional.element),
+  type: 'div',
+  key: null,
+  ref: null,
+  props: {
+    id: 'foo',
+    children: [
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: 'p',
+        key: null,
+        ref: null,
+        props: { children: 'A regular node' }
+      },
+      // 👇 this is the node we are interested in 
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: [Function: SomeThing],
+        key: null,
+        ref: null,
+        props: { text: 'world!' }
+      }
+    ]
+  }
+}
+```
+
+We get _the exact same looking structure_. 
+
+## What gives? Where does the difference in rendering behaviour come from? 
+
+Well, observe what happens if we call this code: 
+
+```js
+const childrenStyleOneProps = {};
+
+const a = ChildrenStyleOne(childrenStyleOneProps);
+const b = ChildrenStyleOne(childrenStyleOneProps);
+
+console.log(a.props.children[1] === b.props.children[1]);
+```
+
+That is - we're asking, is this object: 
+
+```
+      {
+        '$$typeof': Symbol(react.transitional.element),
+        type: [Function: SomeThing],
+        key: null,
+        ref: null,
+        props: { text: 'world!' }
+      }
+```
+
+the same the first time we call it, vs the second time we call it? 
+
+And the answer is: 
+
+```
+false
+```
+
+Whereas, in this case; 
+
+```
+const childrenStyleTwoProps = {
+  children: jsxRuntimeExports.jsx(SomeThing, {}),
+};
+
+const c = ChildrenStyleTwo(childrenStyleTwoProps);
+const d = ChildrenStyleTwo(childrenStyleTwoProps);
+
+console.log(c.props.children[1] === d.props.children[1]);
+
+```
+
+the answer is
+
+```
+true
+```
+
+and _this_ is where the difference in rendering behaviour lays. 
+
+Essentially, what's happening as I understand it - is that when a React component renders, it generates one of these tree node objects, and then steps over each object inside, and compares it with the one _from the previous render_. 
+
+If they are shallowly equal (i.e. `===` equal), then React does not need to bother stepping into that node in order to resolve its subtree. 
+
+## With React 19/Compiler this might not matter anyway
+
+The state of [Compiler](https://react.dev/learn/react-compiler) is it's an opt feature that is ready to use. 
+
+Compiler will automatically memoise properties and components. 
+
+I've updated my vite.config.js to allow incremental adoption of compiler: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/vite.config.ts#L6-L13"/>
+
+And I add the `"use memo"` annotation to my component:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/react-renders/blob/b91494bff90774073c10ba7a2a362d37c8d083ef/src/react-renders/ReactRenders3c.tsx#L8-L20"/>
+
+and now we see that no rerenders occur in either case:
+
+<DemoFrame
+  description = {<>
+  <p>Observe that both Render trackers do not rerender on state changes</p>
+  </>}
+>
+  <ReactRenders3c/>
+</DemoFrame>
+

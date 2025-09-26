@@ -10,21 +10,56 @@
 .some-unrelated-component,
 .foo-component,
 .some-parent-component {
-    width: 150px;
-    height: 150px;
+
 
     border: dotted 1px black;
     padding: 0.5em;
 
     display: flex;
     flex-flow: column nowrap;
+
+
+    &.double-wide {
+        width: 300px;
+    }
+
+    .left-right {
+        display: flex; 
+        flex-flow: row nowrap;
+        gap: 1em;
+        >* {
+            border: solid 1px white;
+            flex: 1 1 50%;
+        }
+    }
 }
 
 
 .render-tracker {
     background-color: var(--color-info-secondary);
-    position: relative;
-    flex: 1 0 auto;
+
+    width: 100px;
+    height: 100px;
+    display: flex; 
+    flex-flow: column nowrap;
+
+    strong {
+        font-size: 0.5em;
+        display: block;
+        margin:0;
+    }
+    .mount-value {
+        font-size: 0.5em;
+        margin: 0;
+    }
+
+    .tracking-dot-container {
+     position: relative;
+     flex: 1 0 auto;
+     margin: 0.25em;
+     border: dashed 1px grey;
+
+    }
 }
 
 .global-render-button {
@@ -38,9 +73,38 @@
     height: 10px;
     position: absolute;
     background-color: red;
+    border-radius: 10px;
 }
 
 .color-display {
     width: 50px;
     height: 50px;
+}
+
+
+
+main {
+    display: flex; 
+    flex-flow: column nowrap; 
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto;
+
+
+    width: 800px;
+}
+
+details {
+    margin: 1em;
+}
+
+.side-by-side {
+    display: flex;
+    justify-content:  space-around;
+
+ & > * {
+    flex: 0 0 250px;
+ }
+
+
 }

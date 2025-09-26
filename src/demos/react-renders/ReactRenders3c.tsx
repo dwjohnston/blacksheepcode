@@ -5,7 +5,8 @@ import "./style.css";
 import { RenderTracker } from "./common";
 
 
-export function ChildrenStyleOne() {
+ function ChildrenStyleOne() {
+    "use memo"
     const [value, setValue] = React.useState(0)
     return <div className="some-parent-component">
         <strong>ChildrenStyleOne</strong>
@@ -18,7 +19,7 @@ export function ChildrenStyleOne() {
     </div >
 }
 
-export function ChildrenStyleTwo(props: React.PropsWithChildren) {
+ function ChildrenStyleTwo(props: React.PropsWithChildren) {
     const [value, setValue] = React.useState(0)
     return <div className="some-parent-component">
         <strong>ChildrenStyleTwo</strong>
@@ -32,7 +33,7 @@ export function ChildrenStyleTwo(props: React.PropsWithChildren) {
 }
 
 
-export function ReactRenders3() {
+export function ReactRenders3c() {
     return <div className="demo side-by-side">
         <ChildrenStyleOne />
         <ChildrenStyleTwo>

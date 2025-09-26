@@ -1,4 +1,4 @@
-import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders4 } from "@/demos/react-renders";
+import { ReactRenders1, ReactRenders2, ReactRenders3, ReactRenders5 } from "@/demos/react-renders";
 
 export default function SandBox() {
     return <div>
@@ -6,6 +6,6 @@ export default function SandBox() {
             This is a sandbox page.
         </p>
 
-        <ReactRenders1 />
+        <ReactRenders3 />
     </div>
 }
