@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@blacksheepcode/react-text-highlight": "^0.4.0",
-    "@mdx-js/loader": "^3.0.1",
+    "@mdx-js/loader": "^3.1.1",
     "@mdx-js/mdx": "^3.0.1",
     "@mdx-js/react": "^3.0.1",
     "@netlify/plugin-nextjs": "^5.11.4",
