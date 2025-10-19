@@ -5,15 +5,29 @@ meta:
   dateCreated: 2025-09-08
 ---
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
-import { AutocompleteA } from "example-react-autocomplete";
+import { SpecialButton2 } from "@/demos/encapsulate-state/SpecialButton2";
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
-A common issue I see in frontend codebases, is we have have a component with an interface like this: 
+
+Let's say we have a nice simple component like this: 
+
+<DemoFrame description="A button component with different states - try clicking it to see state transitions">
+  <SpecialButton2 onClick={async () => {
+    await new Promise((res) => setTimeout(res, 1000))
+    return {success: true}
+  }} state="pending" />
+</DemoFrame>
+
+
+You click the button, it transitions to a loading state, then it transitions to either a success or error state. 
+
+What I commonly see, is the component will be implemented with a interface like this: 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/ade0ca08dd8883c372ae7c11bd76133c8841aae9/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L17"/>
 
 Whereby every bit of state that component could be in, is controlled by the parent and passed in as props.
 
-Note that the decision to use an autocomplete component as the example is an intentional one - autocompletes are non-trivial - they can have issues with debouncing the live search, and out-of-order requests. 
+## Interfaces like this are a mistake
 
 There's a sense that components with an interface like this would be easy to test, we could write something like: 
 
@@ -21,47 +35,35 @@ It might be desirable to to write examples like this for Storybook, where we _ju
 
 But these tests do not test one of the key aspects of what we are interested in here - the state transitions. 
 
-We could start doing tests like this: 
+If we did want to test the state transitions, we could do it one of two ways: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/75790d91b34997b704297934aa21fd253968f341/src/lib/Autocomplete_A/Autocomplete.test.tsx#L50-L84"/>
+### 1. Create a wrapper component to contain the state in 
 
-but this really is not helpful as a test. 
+Here, we are getting a good demonstration of 'tests are test of how usuable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also_ what every consumer of our component is going to have to do. 
 
-Here in our test we're just asserting that the parent component correctly transition the prop changes on `isLoading` and `availableOptions` - we can't be sure that they're going to get that right. 
+### 2. Change the props via `rerender`
 
-## Components like this are a pain
 
-Components like this are tedious to use. 
+This is no test at all. We're simply stipulating that the props changed accurately, there's no gurantee that our parent component will infact make this change correctly. 
 
-The problem with components like these is that the actual important functionality of the component has been left to the consumer. 
+What this kind of interface really does, is it makes the _parent_ responsible for the logic of the state transition from pending to loading to error/success.  
 
-In order to use one of these components, we would have to write some code like this: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L102"/>
+## The better interface - one that encapsulates the state transitions internally. 
 
-🤮
 
-Imagine we had a form that had three such inputs!
 
-## Instead, encapusulate as much state as you can in your component. 
+Now we can write our tests like this:
 
-The better interface is one that looks like this: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_B/Autocomplete.tsx#L14-L21"/>
+This is much nicer!
 
-This allows the component to do a lot more the heavy lifting for you - "Hey, you give the async function, and I'll take care of all of the internal state for you".
-
-Some example tests would look like this: 
-
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/437fab0f1d0a805f42b72019e427860380aba72a/src/lib/Autocomplete_B/Autocomplete.test.tsx#L57-L156"/>
-
-These tests tell a story, they're a lot more useful as a test. 
 
 ## There's nothing say that you couldn't do both
 
-Technically what we could do is do something like expose these components with less functionality as `AutocompleteStateless` and then use this component in our `Autocomplete` component that then provides the the functionality. 
+Technically what we could do is do something like expose these components with less functionality as `SpecialButtonStateless` and then use this component in our `SpecialButton` component that then provides the the functionality. 
 
-I'm not sure how much value this would actually have, and I argue that it's the functioning `Autocomplete` component that is the important one.  
+I'm not sure how much value this would actually have, and I argue that it's the functioning `SpecialButton` component that is the important one.  
 
 ## Why is this pattern so common? 
 
@@ -85,7 +87,13 @@ RTKQ does helpfully provide a [useLazyQuery](https://redux-toolkit.js.org/rtk-qu
 
 You can see [this discussion on TanStack's Github](https://github.com/TanStack/query/discussions/1205) the basic answer to why a lazy/imperative function is not provided, is because it would be trivial for someone to implement themselves.
 
-This isn't at all to say that tools like Tanstack are bad, it's just that there is a case to be made for using async functions. Async function quite handily encapsulate the state of a query, as well as the data, all in one handy object. Tools like Tanstack still have their place in that they provide query duplication/caching.
+Here is how we extract such a lazy query from TanStack - it really is not well advertised: 
 
+
+## This isn't an argument against state management tools like TanStack Query
+
+This isn't at all to say that tools like Tanstack are bad. Tools like Tanstack are very useful in that they provide query deduplication and caching.
+
+But async interfaces, in my opinion\
 
 

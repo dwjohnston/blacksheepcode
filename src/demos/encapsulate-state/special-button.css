@@ -1,0 +1,29 @@
+.special-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.special-button.pending {
+    background-color: #007bff;
+    color: white;
+}
+
+.special-button.loading {
+    background-color: #6c757d;
+    color: white;
+    cursor: not-allowed;
+}
+
+.special-button.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.special-button.error {
+    background-color: #dc3545;
+    color: white;
+}
