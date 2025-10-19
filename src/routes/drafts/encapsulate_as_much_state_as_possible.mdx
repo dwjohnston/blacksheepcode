@@ -5,17 +5,14 @@ meta:
   dateCreated: 2025-09-08
 ---
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
-import { SpecialButton2 } from "@/demos/encapsulate-state/SpecialButton2";
+import { EncapsulateStateDemo } from "@/demos/encapsulate-state/Demo";
 import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
 
 Let's say we have a nice simple component like this: 
 
-<DemoFrame description="A button component with different states - try clicking it to see state transitions">
-  <SpecialButton2 onClick={async () => {
-    await new Promise((res) => setTimeout(res, 1000))
-    return {success: true}
-  }} state="pending" />
+<DemoFrame description={<p>Click the button to see it transition from pending to loading to success.</p>}>
+  <EncapsulateStateDemo/>
 </DemoFrame>
 
 
@@ -23,13 +20,15 @@ You click the button, it transitions to a loading state, then it transitions to 
 
 What I commonly see, is the component will be implemented with a interface like this: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/ade0ca08dd8883c372ae7c11bd76133c8841aae9/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L17"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.tsx#L4-L7"/>
 
 Whereby every bit of state that component could be in, is controlled by the parent and passed in as props.
 
 ## Interfaces like this are a mistake
 
 There's a sense that components with an interface like this would be easy to test, we could write something like: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.test.tsx#L7-L34"/>
 
 It might be desirable to to write examples like this for Storybook, where we _just_ want to see the component as it is loading. 
 
@@ -39,31 +38,41 @@ If we did want to test the state transitions, we could do it one of two ways:
 
 ### 1. Create a wrapper component to contain the state in 
 
-Here, we are getting a good demonstration of 'tests are test of how usuable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also_ what every consumer of our component is going to have to do. 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.test.tsx#L96-L127"/>
+
+Here, we are getting a good demonstration of 'tests are test of how usuable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also what every consumer of our component is going to have to do_. 
 
 ### 2. Change the props via `rerender`
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton.test.tsx#L129-L156"/>
 
 This is no test at all. We're simply stipulating that the props changed accurately, there's no gurantee that our parent component will infact make this change correctly. 
 
-What this kind of interface really does, is it makes the _parent_ responsible for the logic of the state transition from pending to loading to error/success.  
+What this kind of interface really does, is it _makes the parent responsible for the logic of the state transition_ from pending to loading to error/success.  
+
+Remember, the above example is a _very simple_ component. Imagine something like an Autocomplete component, which might contain state like what text the user has entered, is it loading, are there results, and so forth. 
 
 
 ## The better interface - one that encapsulates the state transitions internally. 
 
+If instead we create an interface like this: 
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton2.tsx#L5-L7"/>
 
 Now we can write our tests like this:
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/82a777fe054272e69432cfb0efc1296c961a4099/src/lib/SpecialButton/SpecialButton2.test.tsx#L7-L39"/>
 
 This is much nicer!
 
+Our test now resembles how we're going to use the component in practise, and it's very straight forward what's happening. 
 
 ## There's nothing say that you couldn't do both
 
 Technically what we could do is do something like expose these components with less functionality as `SpecialButtonStateless` and then use this component in our `SpecialButton` component that then provides the the functionality. 
 
-I'm not sure how much value this would actually have, and I argue that it's the functioning `SpecialButton` component that is the important one.  
+I think this would be of limited use - but might be helpful in a larger team with a dedicated design system, and wanting to see the component state statically. 
+I would argue that the functioning `SpecialButton` component that is the important for actually building the application.  
 
 ## Why is this pattern so common? 
 
@@ -89,11 +98,16 @@ You can see [this discussion on TanStack's Github](https://github.com/TanStack/q
 
 Here is how we extract such a lazy query from TanStack - it really is not well advertised: 
 
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/82a777fe054272e69432cfb0efc1296c961a4099/src/components/Demo.tsx#L55-L60"/>
+
+We use TanStack Query's `queryClient.ensureQueryData` 
+
+
 
 ## This isn't an argument against state management tools like TanStack Query
 
 This isn't at all to say that tools like Tanstack are bad. Tools like Tanstack are very useful in that they provide query deduplication and caching.
 
-But async interfaces, in my opinion\
+However, async functions as a particular example, are often the right abstraction to represent 'user does a thing, it loads for a bit, and then the state changes'. 
 
 
