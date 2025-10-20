@@ -1,7 +1,7 @@
 ---
 meta:
   title: Encapsulate as much state as possible in your component
-  description: A common pattern I see is a passing every bit of a component's state in as a prop. This just puts the responsibility of that component's actual useful logic on to the parent. 
+  description: A common pattern I see is passing every bit of a component's state in as a prop. This just puts the responsibility of that component's actual useful logic on to the parent. 
   dateCreated: 2025-09-08
 ---
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
@@ -47,13 +47,13 @@ If we did want to test the state transitions, we could do it one of two ways:
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.test.tsx#L96-L127"/>
 
-Here, we are getting a good demonstration of 'tests are test of how usuable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also what every consumer of our component is going to have to do_. 
+Here, we are getting a good demonstration of 'tests are test of how usable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also what every consumer of our component is going to have to do_. 
 
 ### 2. Change the props via `rerender`
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton.test.tsx#L129-L156"/>
 
-This is no test at all. We're simply stipulating that the props changed accurately, there's no gurantee that our parent component will infact make this change correctly. 
+This is no test at all. We're simply stipulating that the props changed accurately, there's no guarantee that our parent component will infact make this change correctly. 
 
 What this kind of interface really does, is it _makes the parent responsible for the logic of the state transition_ from pending to loading to error/success.  
 
@@ -105,7 +105,7 @@ that is, they're not providing async functions as their primary means of interfa
 
 When developers see that their means for fetching data looks like this, then they're going to tend to reproduce that interface onto the components they're creating. 
 
-RTKQ does helpfully provide a [useLazyQuery](https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#uselazyquery) hook which lends itself more to the style that I've advocate. 
+RTKQ does helpfully provide a [useLazyQuery](https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#uselazyquery) hook which lends itself more to the style that I advocate. 
 
 You can see [this discussion on TanStack's Github](https://github.com/TanStack/query/discussions/1205) the basic answer to why a lazy/imperative function is not provided, is because it would be trivial for someone to implement themselves.
 
