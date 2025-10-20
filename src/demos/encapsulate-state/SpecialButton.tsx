@@ -8,9 +8,6 @@ type SpecialButtonProps = {
 };
 
 export function SpecialButton(props: SpecialButtonProps) {
-
-
-
     return <button onClick={props.onClick} disabled={props.state === "loading"} className={`special-button ${props.state}`}>
         {props.state === "loading" && <span>Loading...</span>}
         {props.state === "error" && <span >Error!</span>}

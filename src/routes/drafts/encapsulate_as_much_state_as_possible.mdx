@@ -16,11 +16,18 @@ Let's say we have a nice simple component like this:
 </DemoFrame>
 
 
+
 You click the button, it transitions to a loading state, then it transitions to either a success or error state. 
 
 What I commonly see, is the component will be implemented with a interface like this: 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.tsx#L4-L7"/>
+
+<details>
+<summary>Implementation</summary>
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6e86372808d2771b8a6d13d8b70c68efc7fc7b56/src/lib/SpecialButton/SpecialButton.tsx#L9-L16"/>
+</details>
 
 Whereby every bit of state that component could be in, is controlled by the parent and passed in as props.
 
@@ -58,6 +65,12 @@ Remember, the above example is a _very simple_ component. Imagine something like
 If instead we create an interface like this: 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton2.tsx#L5-L7"/>
+
+<details>
+<summary>Implementation</summary>
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/c703f4fd15558d863c1a051d23c96d252f6a51fc/src/demos/encapsulate-state/SpecialButton2.tsx#L11-L30"/>
+</details>
 
 Now we can write our tests like this:
 
@@ -100,7 +113,7 @@ Here is how we extract such a lazy query from TanStack - it really is not well a
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/82a777fe054272e69432cfb0efc1296c961a4099/src/components/Demo.tsx#L55-L60"/>
 
-We use TanStack Query's `queryClient.ensureQueryData` 
+We use TanStack Query's [`queryClient.ensureQueryData`](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientensurequerydata) which is essentially a lazy query that will return the data if it already cached.  
 
 
 
