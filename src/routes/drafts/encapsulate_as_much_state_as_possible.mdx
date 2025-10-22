@@ -5,14 +5,16 @@ meta:
   dateCreated: 2025-09-08
 ---
 import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
-import { EncapsulateStateDemo } from "@/demos/encapsulate-state/Demo";
-import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+import { SpecialButtonDemo } from "@/demos/encapsulate-state/SpecialButtonDemo";
+import { AutocompleteDemo } from "@/demos/encapsulate-state/AutocompleteDemo";
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
 
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
 
 Let's say we have a nice simple component like this: 
 
 <DemoFrame description={<p>Click the button to see it transition from pending to loading to success.</p>}>
-  <EncapsulateStateDemo/>
+  <SpecialButtonDemo/>
 </DemoFrame>
 
 
@@ -57,8 +59,7 @@ This is no test at all. We're simply stipulating that the props changed accurate
 
 What this kind of interface really does, is it _makes the parent responsible for the logic of the state transition_ from pending to loading to error/success.  
 
-Remember, the above example is a _very simple_ component. Imagine something like an Autocomplete component, which might contain state like what text the user has entered, is it loading, are there results, and so forth. 
-
+Remember, the above example is a _very simple_ component. An Autocomplete component, which we will look at later, will contain state about what text the user has entered, whether it is loading, are there results, and so forth. 
 
 ## The better interface - one that encapsulates the state transitions internally. 
 
@@ -124,3 +125,50 @@ This isn't at all to say that tools like Tanstack are bad. Tools like Tanstack a
 However, async functions as a particular example, are often the right abstraction to represent 'user does a thing, it loads for a bit, and then the state changes'. 
 
 
+## A more complex example - Autocomplete
+
+Here we have an Autocomplete component:
+
+<DemoFrame description={<><p>Enter some search terms to see the behaviour of the Autocomplete component</p><p>
+  Hint: Use the terms 'apple', 'cherry' or 'grape'</p></>}>
+  <AutocompleteDemo/>
+</DemoFrame>
+
+Importantly, an autocomplete is a _non-trivial_ component. Done well, an autocomplete needs to handle: 
+
+- Debouncing the search - so each keystroke doesn't trigger a new API request. 
+- Cancelling previous requests - we don't want a situtation where a slower earlier request clobbers the the latest request. 
+- Pagination - if the API response is paginated and the user scrolls the bottom of the list, we need to load more. 
+
+The above example _does not_ implement these behaviours - <TextHighlight comment={<p>
+  Also, I didn't want to spend too much time on this.
+</p>}>this is an intentional decision - it represents the realistic evolution of a codebase as functionality is added or extended.</TextHighlight>
+
+Keep this in mind. 
+
+A native interface for this component might look like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L14"/>
+
+And then we could use this in our application like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L101"/>
+
+The consuming component needs to manage _three_ pieces of state to make this work, and needs to implement all of the loading logic. 
+
+Now imagine if you had a form that had three of these Autocompletes!  <TextHighlight comment={<p>In fairness, you would probably use some kind of higher-order function to provide this.</p>}>Imagine if you were also handling debouncing, cancellation and pagination logic!</TextHighlight> 
+
+Chances are, the developer will be <TextHighlight comment={<p>See <a href="./philosophy_assume_the_next_developer_will_copy_paste">Assume the next developer will copy paste what they see you do.</a></p>}>copy-pasting</TextHighlight> what they see, and copy pasting is always prone to copy paste errors. 
+
+A better interface looks like this: 
+
+<GithubPermalinkRsc permalink="
+https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_B/Autocomplete.tsx#L6-L21"/>
+
+The use of it is _much_ simpler: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/cc8aa5303c9b5924957c1dcd6e3fafe24cf1b1df/src/demos/encapsulate-state/AutocompleteDemo.tsx#L79-L91"/>
+
+Importantly, coming back to the debouncing, <TextHighlight comment={<p>
+  Cancelling logic will require changing the component interface, such that the searchFn returns some kind of <code>AbortablePromise</code> instead of a regular <code>Promise</code>.
+</p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapusulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
