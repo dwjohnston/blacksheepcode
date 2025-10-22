@@ -67,6 +67,8 @@ If instead we create an interface like this:
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton2.tsx#L5-L7"/>
 
+Note the difference being that this `onClick` handler returns a `Promise<{success: boolean}>`.
+
 <details>
 <summary>Implementation</summary>
 
@@ -75,7 +77,7 @@ If instead we create an interface like this:
 
 Now we can write our tests like this:
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/82a777fe054272e69432cfb0efc1296c961a4099/src/lib/SpecialButton/SpecialButton2.test.tsx#L7-L39"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/e7342740a23b935132e399021ae535b3e0e0e7ff/src/lib/SpecialButton/SpecialButton2.test.tsx#L7-L39"/>
 
 This is much nicer!
 
@@ -116,14 +118,11 @@ Here is how we extract such a lazy query from TanStack - it really is not well a
 
 We use TanStack Query's [`queryClient.ensureQueryData`](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientensurequerydata) which is essentially a lazy query that will return the data if it already cached.  
 
-
-
 ## This isn't an argument against state management tools like TanStack Query
 
 This isn't at all to say that tools like Tanstack are bad. Tools like Tanstack are very useful in that they provide query deduplication and caching.
 
 However, async functions as a particular example, are often the right abstraction to represent 'user does a thing, it loads for a bit, and then the state changes'. 
-
 
 ## A more complex example - Autocomplete
 
@@ -146,13 +145,13 @@ The above example _does not_ implement these behaviours - <TextHighlight comment
 
 Keep this in mind. 
 
-A native interface for this component might look like this: 
+A naive interface for this component might look like this: 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L14"/>
 
 And then we could use this in our application like this: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L101"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/e7342740a23b935132e399021ae535b3e0e0e7ff/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L110"/>
 
 The consuming component needs to manage _three_ pieces of state to make this work, and needs to implement all of the loading logic. 
 
