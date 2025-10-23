@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@blacksheepcode/react-text-highlight": "^0.4.0",
-    "@blacksheepcode/example-react-autocomplete": "git://github.com/dwjohnston/example-react-autocomplete.git#e7342740a23b935132e399021ae535b3e0e0e7ff",
+    "@blacksheepcode/example-react-autocomplete": "git://github.com/dwjohnston/example-react-autocomplete.git#8ad175616e705a74665f0cf70800f82d90c4bc4e",
     "@mdx-js/loader": "^3.0.1",
     "@mdx-js/mdx": "^3.0.1",
     "@mdx-js/react": "^3.0.1",

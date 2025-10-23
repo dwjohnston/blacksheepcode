@@ -1,5 +1,5 @@
 "use client";
-import { SpecialButton2 } from "./SpecialButton2";
+import { SpecialButton2 } from "@blacksheepcode/example-react-autocomplete";
 
 export function SpecialButtonDemo() {
     return <SpecialButton2 onClick={async () => {
