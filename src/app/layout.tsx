@@ -14,7 +14,6 @@ githubPermalinkRscConfig.setConfig({
   // Can't use the prefix GITHUB in github actions so just have a second token just for github actions
   githubToken: process.env.GITHUB_TOKEN ?? process.env.PERMALINK_READ_TOKEN,
   onError: ((err) => {
-    console.log(err)
     Sentry.captureException(err);
   })
 })
