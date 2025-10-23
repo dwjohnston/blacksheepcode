@@ -112,8 +112,10 @@ function ChildrenStyleOne() {
 }
 ```
 
-That is, the compiled function does not _call_ `SomeThing`; it merely retains a reference to it and what its props will be. 
+That is, the compiled function does not _call_ `SomeThing`; it merely retains a reference to `SomeThing` and what its props will be. 
 
+
+On the other hand: 
 
 ```tsx
 export function ChildrenStyleTwo(props: React.PropsWithChildren) {
