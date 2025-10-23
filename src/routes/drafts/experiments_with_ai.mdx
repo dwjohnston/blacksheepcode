@@ -1,0 +1,107 @@
+---
+meta:
+  title: Experiments with AI
+  description: Github's Copilot Premium Plus plan allows you to assign Copilot to Github issues. Here I talk about the varying levels of success I've had. 
+  dateCreated: 2025-10-23
+
+series: 
+  name: experiments_with_ai
+  part: 1
+  description: Experiments with AI
+---
+
+Summary: 
+
+
+- AI is really good at spell checking. It makes me feel a bit guilty for using AI in such an extravagent manner. 
+- There's a sense that AI can serve fairly effectively as duct taping some process that could easily be solved, but you haven't got around to yet. 
+
+- Treat AI like an enthusiastic junior developer - but one with no integrity and really wants a payrise. 
+- The problem with AI is that it's not very good at saying 'I don't know' or 'This isn't a great solution'. 
+- It doesn't disagree with you. If I were asking a senior developer these tasks, I feel like they would be more effective at coming back and getting me to agree with a delivery plan. 
+ - Possibly this is all stuff that I can configure AI to do. 
+
+- At least for my time strapped purposes - AI doesn't really solve the problem of not having enough time to do the thing - because reviewing the AI's code is still time consuming. 
+   - It might be time saving overall, but it's not a panacea. 
+   - ... unless you were to start merging AI generated code blindly. 
+
+
+- AI is waaaaay to verbose. 
+
+
+
+
+
+
+
+https://github.com/dwjohnston/blacksheepcode/pull/219
+
+Summary: Asked AI to fix all the typos. 
+
+Result: ✅ Brilliant. Really good at this kind of task. 
+
+
+https://github.com/dwjohnston/react-github-permalink/pull/60
+
+Summary: Asked it to create Stack Overflow links. 
+
+Result: It did a pretty good first pass. The actually output was pretty crappy, but the boiler plate is there. 
+
+Similary PRS: 
+https://github.com/dwjohnston/react-github-permalink/issues/37
+https://github.com/dwjohnston/react-github-permalink/issues/40
+
+
+
+https://github.com/dwjohnston/react-github-permalink/issues/74
+
+Summary: Asked it to create the documentation. 
+
+What I was hoping for here is the boilerplate CSS etc. 
+
+Result: Man it's verbose. 
+
+With a lot of this stuff, where it's not critical path code, it's easy to say 'yip good enough' and then you can see how a bunch of superflous CSS could be added and then it not be clear what its purpose is. 
+
+
+
+
+https://github.com/dwjohnston/matrix-action-runs/pull/2
+Summary: This here is me getting it to some very simple boilerplate. 
+
+Result: It's pretty good at it.  Still too verbose, but not so much that it's hard for me to pare down. 
+
+
+
+
+https://github.com/dwjohnston/vibe-coded-nemon/pull/2
+
+Summary: I created an issue asking it to create an old DOS game I played. 
+
+Something has gone wrong with it, where as the result of the feedback it now thinks its fixing bugs? 
+
+What was annoying about this is that it half implemented the thing, and either I didn't read its (overly verbose) PR description properly, or it hid the fact. 
+
+The game certainly didn't work right first go. 
+
+
+
+https://github.com/dwjohnston/example-react-autocomplete
+This is in IDE copilot. 
+
+I often give it the component interface and ask it to implement it, which it does a reasonable job, the code works. 
+
+It does write some pretty crappy code at times! (Or is it? Is this actually quite a good way to effectively 'cancel' the previous query?)
+
+Here's me cleaning it up: 
+
+https://github.com/dwjohnston/example-react-autocomplete/commit/e7342740a23b935132e399021ae535b3e0e0e7ff#diff-42a831359684503af2249bcc0c1875414d41c89b853f3dd619cccdb447528eac
+
+
+
+
+https://github.com/dwjohnston/vscode-sentry-plugin/pull/2
+
+I have no idea if this works or not. I have not checked it out, have not run it. 
+
+Demonstrates how easy it is to ask the AI to do something, but that that doesn't mean that I'm going to be able to use it. 
