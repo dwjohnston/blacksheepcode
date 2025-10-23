@@ -56,7 +56,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
 
-        --highlight-bg-color: #4a4b80;
+        --highlight-bg-color: #5790d459;
         --highlight-text-color: #fff;
         --highlight-bg-color-hover: #4a4b80;
         --highlight-border-hover: #5b5f99;
