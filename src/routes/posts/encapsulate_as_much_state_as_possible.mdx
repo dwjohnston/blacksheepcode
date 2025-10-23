@@ -55,7 +55,7 @@ Here, we are getting a good demonstration of 'tests are test of how usable your 
 
 <GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton.test.tsx#L129-L156"/>
 
-This is no test at all. We're simply stipulating that the props changed accurately, there's no guarantee that our parent component will infact make this change correctly. 
+This is no test at all. We're simply stipulating that the props changed accurately, there's no guarantee that our parent component will in fact make this change correctly. 
 
 What this kind of interface really does, is it _makes the parent responsible for the logic of the state transition_ from pending to loading to error/success.  
 
@@ -170,4 +170,4 @@ The use of it is _much_ simpler:
 
 Importantly, coming back to the debouncing, <TextHighlight comment={<p>
   Cancelling logic will require changing the component interface, such that the searchFn returns some kind of <code>AbortablePromise</code> instead of a regular <code>Promise</code>.
-</p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapusulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
+</p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapsulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
