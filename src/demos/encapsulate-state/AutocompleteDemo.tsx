@@ -64,7 +64,7 @@ const searchFn = async (searchTerm: string, pageNumber: number) => {
     }
 
     const filteredItems = mockItems.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (`item.name ${item.description}`).toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return {
@@ -81,8 +81,9 @@ export function AutocompleteDemo() {
         <div>
             <AutocompleteB
                 searchFn={searchFn}
-                renderItem={(item) => <div>{item.name}</div>}
+                renderItem={(item) => <div>{item.name} - {item.description}</div>}
                 itemKey="id"
+                selectedValueDisplayStringFn={(item) => item.name}
 
             />
         </div>

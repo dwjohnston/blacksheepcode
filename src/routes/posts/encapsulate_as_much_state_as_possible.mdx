@@ -161,13 +161,24 @@ Chances are, the developer will be <TextHighlight comment={<p>See <a href="./phi
 
 A better interface looks like this: 
 
-<GithubPermalinkRsc permalink="
-https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_B/Autocomplete.tsx#L6-L21"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.tsx#L15-L28"/>
 
 The use of it is _much_ simpler: 
 
-<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/ec78929111eeb5fd70ac09aeb678b905ec384922/src/lib/Autocomplete_B/Autocomplete.stories.tsx#L94-L105"/>
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.stories.tsx#L110-L121"/>
+
+And writing tests make sense: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.test.tsx#L202-L238"/>
 
 Importantly, coming back to the debouncing, <TextHighlight comment={<p>
   Cancelling logic will require changing the component interface, such that the searchFn returns some kind of <code>AbortablePromise</code> instead of a regular <code>Promise</code>.
 </p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapsulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
+
+Now you might think that that <TextHighlight comment={<p>
+  Not to mention that this implementation doesn't allow for an initially selected value - we would need to add an `initialValue` and `getPrettyNameForInitialValue` props.
+</p>}>`selectedValueDisplayStringFn` stuff</TextHighlight> doesn't really look like we're _simplifying_ the interface - but we are. 
+
+The component interface is _forcing_ the developer handle the transition from 'having a search term entered and selecting an item' to 'an item is selected and something is displayed in the search box', and it does this does this in a manner that can't forgotten (you'll get a type error). 
+
+The complexity of the interface comes from the inherrent complexity of the problem space - and as much as possible, the component has already done the thinking for you as a developer - and it's telling you 'these are the decision you need to make - what should be displayed when an item is selected?'. 
