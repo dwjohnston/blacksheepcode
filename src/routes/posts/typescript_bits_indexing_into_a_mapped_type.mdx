@@ -13,12 +13,11 @@ tags:
   - "typescript"
 ---
 
+Let's say we're trying to create a component that represents some table data, we want to use the thing like this: 
 
-Let say we have some data representing rows in a table: 
+```typescript
 
-```js
-
-const rows = [
+createTable([
   {
     id: "1", 
     name: "bob", 
@@ -33,14 +32,8 @@ const rows = [
     favouriteNumber: 999,
     favouriteColors: ["purple"], 
   }
-]
-
-```
-
-And then we have some column data that represent the row keys, and how the corresponding row values should be handled, 
-
-```
-const columns = [
+], 
+[
   {
     key: "name", 
     renderValue: (value) => { // 👈  Value should type 'string'
@@ -59,27 +52,273 @@ const columns = [
 
     }
   }
-]
-
+]);
 ```
-
-
 How can type this such that the typings of our `renderValue` functions have their types derived, from what is seen in the rows data? 
 
-## Step 1 - Declare a type for our rows. 
+## TL;DR 
+
+Do this: 
+
+```typescript 
+type RowData = Record<string, unknown> & {id: string}; 
+
+type ColumnData<T extends RowData> = { 
+  [K in keyof T]: {                      
+    key: K;                               
+    renderValue: (value: T[K]) => void;   
+  }
+}[keyof T]   
+
+function processTable<T extends RowData>(rows: Array<T>, columns: Array<ColumnData<T>>){
+
+}
+```
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIMVQoAbQDSUWlDYQQOAAzKCMAXXEXN2iY2LjXaP8QcU95ePSMuIUYgisiCAIANRRtCHEACgA3EuYy0K8wgEosXkq4ETSE6QVpdyTg0LDopSDWXGAqOBooMAI4XAgyMiMUACNNCGNTCzzbeGQ0R3K5hDJxAEECAhQQY24mfG09M6hL69uNJ-1Du+5GwSU3SUs3mi2Waw25Wy8XcAPSInEACIAIwAJgAzIiGNC4ihxMjselVpEcRkzPjCZkoMkoKjSTFugywkxYfTEgEkSgsWy3LlrAViqUKtVSs1MLw4VTcsBmARpgADAAkghFtWk8tkPKgjOi0kpbklcSSSNW3PSfPyRRqdSq1rFEq1OQgMrlUCVKutADozHrlaqIJ6QOrNekdW49QowgpGkA)
+
+## The Problem Approach
+
+### Step 1 - Declare a type for our rows. 
+
+We might start with something like this: 
 
 ```typescript
-type RowData = Record<string, unknown> & {key: string}; 
+type RowData = Record<string, unknown> & {id: string}; 
 ```
+
+Here,  we're saying that the row data can be _any_ object - so long as it has an 'id' property to uniquely identify it. 
 
 So far, so good. 
 
+### Step 2 - Declare a type for our columns 
 
-## Step 2 - Declare a type for our columns 
+We want to derive our column data type from our row data - the possible keys of the column should only be the properties of the RowData. 
 
-We want to derive our column data type from our row data. Using a generic here is appropriate. 
+Using a generic here is appropriate. 
 
-To start, let's just get the keys of the row data.
+We could do something like this: 
+
+```typescript
+type ColumnData<TRowData extends RowData, TKey extends keyof TRowData> = {
+    key: TKey;
+    renderValue: (value: TRowData[TKey]) => string; 
+}
+```
+
+### Looks good...
+
+This looks like it might work: 
+
+```typescript 
+processSingleRow({
+    id: "123", 
+    a: 1,
+    b: {
+        x: 1, 
+        y: 2
+    }
+}, {
+    key: "a",
+    renderValue :(value) => {
+        //(parameter) value: number
+        return `${value}`;
+    }
+});
+
+processSingleRow({
+    id: "123", 
+    a: 1,
+    b: {
+        x: 1, 
+        y: 2
+    }
+}, {
+    key: "b",
+    renderValue :(value) => {
+        // (parameter) value: {
+        //     x: number;
+        //     y: number;
+        // }
+        return `${value.x},${value.y}`;
+    }
+});
+
+
+```
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACrxkaDBAAewCDSJkosRAZRMjAaQggoVm3YdsXnAAZlAmzua82IIKjo6BIOIeXrFxBLZEEAQAaijaEOIAFABuecwFYaYuANrJIAC6AJRYvJK0dPIK0krBrLjAVHA0UGAEcLgQZGQAyu2aEKbGVeY+1hkOy+hunt6+61AJIZUR6NyFYwhJm65Q+Np64hr3+uZLJzd13M0xXUoKo+NJjM5gtEIUYnEoCJxAAiACMACYAMwwpipRwocRwhjoqAAI3EEMhcUsWLRxLiiSgCNx3WkTCJ8S8sJQqNx6TsWVy+SgohKZQgzUwvEZxIA9GLCmAUAQUDoIDYCM1SvlxDRdHisrjIelgMwCMMAAYAEkEKvK0kNslpXUa1v+YwmU1m9HmpnBuOhUHhyNRikhmKg2NxBKE2pJZP9FKgVJpkLpDNxCVheLZOoyXIFvP5+SFIvDjglUClMrlCqyyoFhILUCLkNJUHVOk1BGt0drYuJVKbLbb0aL3Xbuv1RtN5ogADpLPSxwKJyBLX3HHS7X8gA)
+
+Here, we see that the `renderData` function is typed correctly, giving us the correct narrow type for the value accessed by that key. 
+
+### ...but it doesn't really work
+
+Look what happens when we try to allow multiple columns to be processed: 
+
+```typescript 
+function processTable<TRowData extends RowData, TKey extends keyof TRowData>(row: Array<TRowData>, column: Array<ColumnData<TRowData, TKey>>) {
+
+}
+
+processTable(
+    [{
+        id: "123",
+        a: 1,
+        b: {
+            x: 1,
+            y: 2
+        }
+    }], [{
+        key: "a",
+        renderData: (value) => {
+            // (parameter) value: number | {
+            //     x: number;
+            //     y: number;
+            // }
+            return `${value}`;
+        }
+    },
+    {
+        key: "b",
+        renderData: (value) => {
+
+            // (parameter) value: number | {
+            //     x: number;
+            //     y: number;
+            // }
+            //Property 'x' does not exist on type 'number | { x: number; y: number; }'.
+            return `${value.x},${value.y}`;
+        }
+    },
+]);
+```
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACrxkaDBAAewCDSJkosRAZRMjAaQggoVm3YdsXnAAZlAmzua82IIKjo6BIOIeXrFxBLZEEAQAaijaEOIAFABuecwFYaYuANrJIAC6AJRYvJK0dPIK0krBrLjAVHA0UGAEcLgQZGRGKABGmhDGVeY+1hkOy+hunt6+61AJIZUR6NyFYwjiAIIEBCggSyco3Ez42nrXt-ckGu-65o8zFswjtuNxmjEukpRuNJtM5gtCqlHNUYnF0VAROIAEQARgATABmbEMZEYlDiXGkjFxWbiNE0jGWSnUxnoxJQfFk9HdHn1Jio7lxBI4lAkoWOdJ2LK5fJFUr5ZqYXgMtmOAD06qghTAKDuOggNgIzQV5XENF0syyUAAPkIJRjNUzzZasrIHeineyXTorQR3Wq4k7eYGoOlgMwCMMAAYAEkEpog0mjAcZIcc0lZjlVGJFUGxs3FbKlmRyZQqJXLSpVSlDUCdOr1KANRpN5Z9ftt9rrXrizKgFt9bo9Qa13oHrv9I41WvTas1AAUxpACKAoABySzrqBEOCTAdwYCrKgUKBDKAqaDrwedu2CKD9m9uqAcp-+qDSdcAOmnYcNkZjeNEy-SxMyA8svxAZNUxpOdMwUJpZCAA)
+
+
+What's going on here? 
+
+Here is a [Stack Overflow question](https://stackoverflow.com/q/64744734/1068446) that gets into the details. 
+
+The problem here, is this part: 
+
+>TKey extends keyof TRowData
+
+Let's say we got rid of that generic parameter completely, and just did this: 
+
+```
+function processTable<TRowData extends RowData>(row: Array<TRowData>, column: Array<ColumnData<TRowData, keyof TRowData>>) {
+
+}
+```
+
+This actually makes the problem worse, but helps us understand it: 
+
+```
+function processTable<TRowData extends RowData>(row: Array<TRowData>, column: Array<ColumnData<TRowData, keyof TRowData>>) {
+
+}
+
+
+processTable(
+    [{
+        id: "123",
+        a: 1,
+        b: {
+            x: 1,
+            y: 2
+        }
+    }], [{
+        key: "a",
+        renderValue: (value) => {
+            // Can also be a string!
+            // (parameter) value: string | number | {
+            //     x: number;
+            //     y: number;
+            // }
+            return `${value}`;
+        }
+    },
+]);
+```
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8oVIgC4oFavSgBfANwAoRaEhQAwnAA2zALY1U6EgBV4yNBggAPYBBpEysRIZRNjAaQggo12-cdsXnAAZlCmzha82IKKUHFQgSASHl6x8QR2RBAEAGooOhASABQAbvnMhWFmLgDaKSAAugCUWLxStHRKssrBrLjAVHA0UGAEcLgQZGTGKABGWhAm1RY+NpmOy+jcRWMIEgCCBAQoIEsRW0z4OvoHRyckmtcGFmfm6EyJIVXnKNzcLTFFN1lKNxpNpnMFkU0nEajF4giROIoAAiACMACYAMwohgwxEoCRovGI+KzCTw0mIqxEklUhFJKAY-EI7qshpMOEs+KJCQolC47lxDL2bJ5ArFMoFFqYXiU+lxAD0io0KGG+TIcCgs2gGHa9AAhELEcqoEUwChjroILYCC0pRUJPq6FAAD5QGh6HUEN1CY0I00Imker3ZJQK+KB+KMz26b3hiNQU1sxMZYDMAjDAAGABJBA6ILIswnSSm4rI8c0lMplEA)
+
+Now the possible types of `value` are _any types that can be accessed via the keys of TRowData_
+
+Essentially we're doing this: 
+
+```
+type MyRowData = {
+    id: string; 
+    a: number; 
+    b: {
+       x: number; 
+       y: number; 
+    }
+}
+
+// string | number | {
+//     x: number;
+//     y: number; 
+// }
+type PossibleValues = MyRowData["id" | "a" | "b"]; 
+```
+
+or more concretely, this: 
+
+```
+type MyRowData = {
+    id: string; 
+    a: number; 
+    b: {
+       x: number; 
+       y: number; 
+}
+
+type MyColumnData = {
+    key: "id" | "a" | "b", 
+    renderValue: (value: MyRowData["id" | "a" | "b"]) => string; 
+}
+```
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBAsiBKB7A7gEQIbHVAvFA3gFBQlQCWAJgFxQDOwATmQHYDmA3FMaejcwK4BbAEYQGnbiWE0ipOQA8+Q0eK5zSIJSLES5AX0IHCAemN1GLVlAA+UAdoY2CJswq0r2L9ZrvKdXUygDUEgoAAVEWloyYQAbCAA1dFj+CFpcWAQUDCwAbQAiSnynfPRi23zhfIBdCUIQ6DgAYUQUwWYc7DxZUgBrCB9CinKoUpHK-IAaNVIGCGYKMSSUiBoACgA3ZNSaOCQ0THQCopKykqrqgEpcAD5zJjYJPSA)
+
+This hopefully highlights the problem - we have a union type for the `key` property, and we have a union type for the `value` parameter, _but there's no relationship between the two_, nothing to enforce that when we have the `"a"` key, we want the `MyRowData["a"]` type. 
+
+What we actually want is a type that looks like this: 
+
+```typescript 
+type MyColumnData = {
+    key: "id", 
+    renderValue: (value: MyRowData["id"]) => string; 
+} |  {
+    key: "a", 
+    renderValue: (value: MyRowData["a"]) => string; 
+} |  {
+    key: "b", 
+    renderValue: (value: MyRowData["b"]) => string; 
+}
+```
+
+where the `value` parameter is `MyRowData["a"]` _only when_ the key is `"a"`. 
+
+## The Solution Approach - Indexing into a mapped type 
+
+Here, I'm going to talk through building up the whole solution step by step. 
+
+### Step 1 - Create a type for our row data: 
+
+Just like before - easy: 
+
+```typescript 
+type RowData = Record<string, unknown> & {id: string}; 
+```
+
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQQA)
+
+### Step 2 - Just the keys of the row data
+
+Let's just get the keys of the row data.
 
 ```typescript 
 type ColumnData<T extends RowData> = keyof T; // 👈  just the keys of T
@@ -88,8 +327,11 @@ type ColumnData<T extends RowData> = keyof T; // 👈  just the keys of T
 type A = ColumnData<{foo: number, id: string}>; 
 ```
 
-Now, let's create an object type that has all the keys of the row data, mapped to just type 'unknown'. 
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbGwgg4AMyhH5Aeh9RAXg3ACR2oKAArZgooYAALaBcQWw8vJT8VaABBLCgAInc4OByoAB9ckRzlcEzsjW09BxJBfLhxGl0AIwgCJhFxSVo6aW55IA)
 
+### Step 3 - A mapped type to reproduce the keys onto a new object
+
+Now, let's create an object type that has all the keys of the row data, mapped to just type 'unknown'. 
 
 Here we use a _mapped type_: 
 
@@ -105,6 +347,9 @@ type ColumnData<T extends RowData> = { // 👈 it's an object type
 type B = ColumnData<{foo: number, id: string}>; 
 ```
 
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIKgB6V1EC8G4AkdqFWAA5LYoNFBwAEYAVnjAUCoQClBQANoA0n6hbBAgcABmUEYAuuKsHFzySZVVle5evgj+ABamAG4QBCBQWZ15BUwNwM0tKNrQ8VABpZwINAEK0kq14wBCWEIKtVW5cHAl7NM0shseVSJ7ZTNHtQsraxraeg4kgtu7UDS64e1MZxKUtHRpNx5AogA)
+
+### Step 4 - A mapped type with the value types reproduced
 
 Now, let's use the actual values of the row data. 
 
@@ -119,13 +364,19 @@ type ColumnData<T extends RowData> = { // 👈 it's an object type
 type C = ColumnData<{foo: number, id: string}>; 
 ```
 
-We've effectively cloned the the row data type. 
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIKgB6V1EC8G4AkdqFWAA5LYoNFBwAEYAVnjAUCoQClBQANoA0n6hbBAgcABmUEYAuuJGaYVJFZVVFe5evgj+ABamAG4QBCBQWZ15BUwNwM0tKNrQ8VABCI1oEG0Ere2dw6O2uCFQ4dAouLgQZGQQRBudqQEK0gq142pYQpcelblwcOI0upsEsvdVIuKStHQvrULtdbhptHoHCRBE8XlA3joPkxfhJKADpNx5EA)
+
+All we've done at this point is we've cloned the the row data type. 
 
 The `[K in keyof T]` effectively acts as a for loop, introducing a new generic type K, which we use to _index_ the original T type, to "get all values accessible by this type K". 
 
-So let's create those `key` and `renderValue` properties. 
+### Step 5 - A mapped type with `key` and `renderValue` properties on it 
+
+Let's create those `key` and `renderValue` properties. 
 
 ```typescript 
+type RowData = Record<string, unknown> & {id: string}; 
+
 type ColumnData<T extends RowData> = {// 👈 it's an object type
   [K in keyof T]: {                       // 👈 for each key - declare an object type with... 
     key: K;                               // 👈 property 'key'... 
@@ -145,10 +396,13 @@ type ColumnData<T extends RowData> = {// 👈 it's an object type
 type D = ColumnData<{foo: number, id: string}>; 
 ```
 
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIID0LqIF4NwBI7UKsADktig0UHAARgBWeMBQKhAKUFAA2gDSviFsECBwAGZQRgC64oKJpWXlFaVunj45hKYouAAWUJkgUAC0UER4migE0MGhkdGx4NAIfk0AdLOKZW3iKfKVq2sV1d5QYARwkASgUP5t-rPT86UD1hAEAGoo2hDiABQAbg-MT-mpBQCUWLxXnARCsoJsfMEiNtdvtDv4rj07h8IP4ElBpAoMdU4lAkFghApqmU6nBioT3KtFlAAEQk6myclrBE3e6PF7vNlQGi6MI3f6YQHAogMomlOSMsoiMmiipU6kiekSyrMpGct7I8SSWh0fmCkFKxLi6oYnF47AabR6BwkQQk8TcnS8ghMKUSSja6TceRAAWLxXnARCsoJsfMEiNtdvtDv4rj07h8IP4ElBpAoMdU4lAkFghApqmU6nBioT3KtFlAAEQk6myclrBE3e6PF7vNlQGi6MI3f6YQHAogMomlOSMsoiMmiipU6kiekSyrMpGct7I8SSWh0fmCkFKxLi6oYnF47AabR6BwkQQk8TcnS8ghMKUSSja6TceRAA)
+
 This is looking good, but it's not _quite_ what we want. We don't want a full object, we're looking for just the types accessed by those "foo" and "id" keys. 
 
-This is where we use a second index type of the whole object itself: 
+### Step 6 - Picking of just the one type that we need from our mapped type 
 
+Now we use a second index type of the whole object itself: 
 
 ```typescript 
 type ColumnData<T extends RowData> = { // 👈 it's an object type
@@ -168,6 +422,7 @@ type ColumnData<T extends RowData> = { // 👈 it's an object type
 type E = ColumnData<{foo: number, id: string}>; 
 ```
 
+[TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQS0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIKgB6V1EC8G4AkdqFWAA5LYoNFBwAEYAVnjAUCoQClBQANoA0n6hbBAgcABmUEYAuuIuSWXlFRXuXr65hKYouAAWUFkgGQUAdN0ViWVt4qnylSOjY31JBFZEEAQAaijaEOIAFABui8zLBWmFAJRYvGtwIsOKSdIK0slteQWFY4+P1T5QAGIEcDpxTdDAcGAoJoIGsIJowlEYnFwNAALRQBBNNBQDZLWy4EJQcLQRq4CBkMgQIhY9rAX6tbK2O5GAD8Smq8SgAFEsEIFNVygMoAAiETc2TsjzlKbWWYLJarVFbcSSWh0A6YI4nIgC6rSKAAHzZHP62XE3LqcH5goqIpm80223WlvENF02IICqVpxNl0ZLOwGm0egcJEEhtt9tmTBEMsocuk3HkQA)
 
 And there we have it!
 
@@ -187,9 +442,9 @@ const rows = [
   { id: "2", x: 10, y: "abc" },
 ]
 
-// properly typed
 processColumn(rows,
   {
+    // ✅ Behaving correctly
     key: "x",
     renderValue: (value) => {
       // number
@@ -219,4 +474,9 @@ processColumn(rows,
 })
 ```
 
-For more information - see [this Stack Overflow answer.](https://stackoverflow.com/a/64753409/1068446) 
+[TypeScript Playground](https://www.typescriptlang.org/play/?ssl=61&ssc=3&pln=32&pc=1#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQS0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIKgB6V1EC8G4AkdqFWAA5LYoNFBwAEYAVnjAUCoQClBQANoA0n6hbBAgcABmUEYAuuIuSWXlFRXuXr65hKYouAAWUFkgGQUAdN0ViWVt4qnylSOjY31JBFZEEAQAaijaEOIAFABui8zLBWmFAJRYvGtwIsOKSdIK0slteQWFY4+P1T5QAGIEcDpxTdDAcGAoJoIGsIJowlEYnFwNAALRQBBNNBQDZLWy4EJQcLQRq4CBkMgQIhY9rAX6tbK2O5GAD8Smq8SgAFEsEIFNVygMoAAiETc2TsjzlKbWWYLJarVFbcSSWh0A6YI4nIgC6rSKAAHzZHP62XE3LqcH5goqIpm80223WlvENF02IICqVpxNl0ZLOwGm0egcJEEhtt9tmTBEMsocuk3HkSlyrFwwCocFCYE+eIJXt0NGMpgs01s8GQaEcK0+CDI4gAggQCCgQMZuEx8N6aOIMz6i-WDoI+qWyJ06gQmY0mit1k62eV8DQKCjLay1skm5nOm1CgLJ1pl2axZbrUs9uuoNI9lclFOZ73Wck+i5QzyAIzcphmcQATiYIH1v00miNR4YN5+GIPIAExPlAL5QPeAAMH76ig4S4Ny-4KIUSgpnAaZkG2NAlogZAAUk3blNUgCg5FAABCEBImscpQPg1YxJoIATBSn48mYT6sduFoSlAe5bOOxFVB4do6A6rFJFKECHhcVwngoGFYTheFloRE5lC8gDiOwUMIAMq4NQYCxBw+E-NAbRQEQcD4jQASxOYVAUKx7hGDCUABNyABe3IBH4ticLEKAElQdA0AhwJxHA0KqJ5fKahxyFatyIC+Z0KwgQAzCBIEnpyeo8j56mTNMO58QJEBCZJbiiUGBDVdJslHvJ6Gpvi2GbnoqkETerFctynHFVAPHitK-HSVVlTabpkAGUZJmcGWCJIrEZLQNJMXQE55wiTN0ABGJDp+dtgVQMFZCheF4SRf8m0ebK9ABOlWU5XlFTArE0kgWGUh0POlrRuUlzHkAA)
+
+
+
+
+
