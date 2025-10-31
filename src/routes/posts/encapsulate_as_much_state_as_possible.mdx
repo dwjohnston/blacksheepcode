@@ -1,0 +1,191 @@
+---
+meta:
+  title: Encapsulate as much state as possible in your component
+  description: A common pattern I see is passing every bit of a component's state in as a prop. This just puts the responsibility of that component's actual useful logic on to the parent. 
+  dateCreated: 2025-10-31
+  image: "autocomplete"
+
+tags: 
+  - "react"
+  - "testing"
+
+---
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+import { SpecialButtonDemo } from "@/demos/encapsulate-state/SpecialButtonDemo";
+import { AutocompleteDemo } from "@/demos/encapsulate-state/AutocompleteDemo";
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+import { DemoFrame } from "@/components/DemoFrame/DemoFrame";
+
+Let's say we have a nice simple component like this: 
+
+<DemoFrame description={<p>Click the button to see it transition from pending to loading to success.</p>}>
+  <SpecialButtonDemo/>
+</DemoFrame>
+
+
+
+You click the button, it transitions to a loading state, then it transitions to either a success or error state. 
+
+What I commonly see, is the component will be implemented with a interface like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.tsx#L4-L7"/>
+
+<details>
+<summary>Implementation</summary>
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6e86372808d2771b8a6d13d8b70c68efc7fc7b56/src/lib/SpecialButton/SpecialButton.tsx#L9-L16"/>
+</details>
+
+Whereby every bit of state that component could be in, is controlled by the parent and passed in as props.
+
+## Interfaces like this are a mistake
+
+There's a sense that components with an interface like this would be easy to test, we could write something like: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.test.tsx#L7-L34"/>
+
+It might be desirable to to write examples like this for Storybook, where we _just_ want to see the component as it is loading. 
+
+But these tests do not test one of the key aspects of what we are interested in here - the state transitions. 
+
+If we did want to test the state transitions, we could do it one of two ways: 
+
+### 1. Create a wrapper component to contain the state in 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/08b640dfa990175a91c9471352724eb8176593c4/src/lib/SpecialButton/SpecialButton.test.tsx#L96-L127"/>
+
+Here, we are getting a good demonstration of 'tests are test of how usable your code is' - that we're having to create a bit of external state and manage its transitions in the test, is _also what every consumer of our component is going to have to do_. 
+
+### 2. Change the props via `rerender`
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton.test.tsx#L129-L156"/>
+
+This is no test at all. We're simply stipulating that the props changed accurately, there's no guarantee that our parent component will in fact make this change correctly. 
+
+What this kind of interface really does, is it _makes the parent responsible for the logic of the state transition_ from pending to loading to error/success.  
+
+Remember, the above example is a _very simple_ component. An Autocomplete component, which we will look at later, will contain state about what text the user has entered, whether it is loading, are there results, and so forth. 
+
+## The better interface - one that encapsulates the state transitions internally. 
+
+If instead we create an interface like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/6fe3dbbf3dba880579edf74541386e67fa3693c2/src/lib/SpecialButton/SpecialButton2.tsx#L5-L7"/>
+
+Note the difference being that this `onClick` handler returns a `Promise<{success: boolean}>`.
+
+<details>
+<summary>Implementation</summary>
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/blacksheepcode/blob/c703f4fd15558d863c1a051d23c96d252f6a51fc/src/demos/encapsulate-state/SpecialButton2.tsx#L11-L30"/>
+</details>
+
+Now we can write our tests like this:
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/e7342740a23b935132e399021ae535b3e0e0e7ff/src/lib/SpecialButton/SpecialButton2.test.tsx#L7-L39"/>
+
+This is much nicer!
+
+Our test now resembles how we're going to use the component in practise, and it's very straight forward what's happening. 
+
+## There's nothing say that you couldn't do both
+
+Technically what we could do is do something like expose these components with less functionality as `SpecialButtonStateless` and then use this component in our `SpecialButton` component that then provides the the functionality. 
+
+I think this would be of limited use - but might be helpful in a larger team with a dedicated design system, and wanting to see the component state statically. 
+I would argue that the functioning `SpecialButton` component that is the important for actually building the application.  
+
+## Why is this pattern so common? 
+
+I suspect a big part of the reason that this pattern is so prevalent, is because of tools like Tanstack Query, which provide an interface that, to simplify, looks like this: 
+
+```typescript
+type LoadingResult<T> = {
+  data: T; 
+  state: "success"
+}| {
+  data: null;
+  state: "pending" | "error" | "loading" 
+}
+```
+
+that is, they're not providing async functions as their primary means of interface. 
+
+When developers see that their means for fetching data looks like this, then they're going to tend to reproduce that interface onto the components they're creating. 
+
+RTKQ does helpfully provide a [useLazyQuery](https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#uselazyquery) hook which lends itself more to the style that I advocate. 
+
+You can see [this discussion on TanStack's Github](https://github.com/TanStack/query/discussions/1205) the basic answer to why a lazy/imperative function is not provided, is because it would be trivial for someone to implement themselves.
+
+Here is how we extract such a lazy query from TanStack - it really is not well advertised: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/82a777fe054272e69432cfb0efc1296c961a4099/src/components/Demo.tsx#L55-L60"/>
+
+We use TanStack Query's [`queryClient.ensureQueryData`](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientensurequerydata) which is essentially a lazy query that will return the data if it already cached.  
+
+## This isn't an argument against state management tools like TanStack Query
+
+This isn't at all to say that tools like Tanstack are bad. Tools like Tanstack are very useful in that they provide query deduplication and caching.
+
+However, async functions as a particular example, are often the right abstraction to represent 'user does a thing, it loads for a bit, and then the state changes'. 
+
+## A more complex example - Autocomplete
+
+Here we have an Autocomplete component:
+
+<DemoFrame description={<><p>Enter some search terms to see the behaviour of the Autocomplete component</p><p>
+  Hint: Use the terms 'apple', 'cherry' or 'grape'</p></>}>
+  <AutocompleteDemo/>
+</DemoFrame>
+
+Importantly, an autocomplete is a _non-trivial_ component. Done well, an autocomplete needs to handle: 
+
+- Debouncing the search - so each keystroke doesn't trigger a new API request. 
+- Cancelling previous requests - we don't want a situtation where a slower earlier request clobbers the the latest request. 
+- Pagination - if the API response is paginated and the user scrolls the bottom of the list, we need to load more. 
+
+The above example _does not_ implement these behaviours - <TextHighlight comment={<p>
+  Also, I didn't want to spend too much time on this.
+</p>}>this is an intentional decision - it represents the realistic evolution of a codebase as functionality is added or extended.</TextHighlight>
+
+Keep this in mind. 
+
+A naive interface for this component might look like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c2fb4af23859ed59d1701b047215a83e481356f2/src/lib/Autocomplete_A/Autocomplete.tsx#L4-L14"/>
+
+And then we could use this in our application like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/e7342740a23b935132e399021ae535b3e0e0e7ff/src/lib/Autocomplete_A/Autocomplete.stories.tsx#L63-L110"/>
+
+The consuming component needs to manage _three_ pieces of state to make this work, and needs to implement all of the loading logic. 
+
+Now imagine if you had a form that had three of these Autocompletes!  <TextHighlight comment={<p>In fairness, you would probably use some kind of higher-order function to provide this.</p>}>Imagine if you were also handling debouncing, cancellation and pagination logic!</TextHighlight> 
+
+Chances are, the developer will be <TextHighlight comment={<p>See <a href="./philosophy_assume_the_next_developer_will_copy_paste">Assume the next developer will copy paste what they see you do.</a></p>}>copy-pasting</TextHighlight> what they see, and copy pasting is always prone to copy paste errors. 
+
+A better interface looks like this: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.tsx#L15-L28"/>
+
+The use of it is _much_ simpler: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.stories.tsx#L110-L121"/>
+
+And writing tests make sense: 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/example-react-autocomplete/blob/c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a/src/lib/Autocomplete_B/Autocomplete.test.tsx#L202-L238"/>
+
+Importantly, coming back to the debouncing, <TextHighlight comment={<p>
+  Cancelling logic will require changing the component interface, such that the searchFn returns some kind of <code>AbortablePromise</code> instead of a regular <code>Promise</code>.
+</p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapsulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
+
+Now you might think that that <TextHighlight comment={<><p>
+  Not to mention that this implementation doesn't allow for an initially selected value - we would need to add an `initialValue` and an async function `fetchValueById` props.</p><p>The thinking here is that we shouldn't need a full `T` object to provide as the initial value.  Often when a page or form loads - we just have the ID of the thing (a userId, a todoId, etc).</p><p>
+  Rather than the parent component loading the thing, and _then_ showing the autocomplete, the parent component simply provides an async function in order for the Autocomplete to fetch it itself.</p>
+</>}>`selectedValueDisplayStringFn` stuff</TextHighlight> doesn't really look like we're _simplifying_ the interface - but we are. 
+
+The component interface is _forcing_ the developer handle the transition from 'having a search term entered and selecting an item' to 'an item is selected and something is displayed in the search box', and it does this does this in a manner that can't forgotten (you'll get a type error). 
+
+The complexity of the interface comes from the inherrent complexity of the problem space - and as much as possible, the component has already done the thinking for you as a developer - and it's telling you 'these are the decision you need to make - what should be displayed when an item is selected?'. 
