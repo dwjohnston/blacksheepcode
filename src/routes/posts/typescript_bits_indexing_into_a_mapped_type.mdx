@@ -17,7 +17,7 @@ Let's say we're trying to create a component that represents some table data, we
 
 ```typescript
 
-    createTable([
+createTable([
   {
     id: "1", 
     name: "bob", 
@@ -398,12 +398,11 @@ type D = ColumnData<{foo: number, id: string}>;
 
 [TypeScript Playground](https://www.typescriptlang.org/play/?#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQC0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIID0LqIF4NwBI7UKsADktig0UHAARgBWeMBQKhAKUFAA2gDSviFsECBwAGZQRgC64oKJpWXlFaVunj45hKYouAAWUJkgUAC0UER4migE0MGhkdGx4NAIfk0AdLOKZW3iKfKVq2sV1d5QYARwkASgUP5t-rPT86UD1hAEAGoo2hDiABQAbg-MT-mpBQCUWLxXnARCsoJsfMEiNtdvtDv4rj07h8IP4ElBpAoMdU4lAkFghApqmU6nBioT3KtFlAAEQk6myclrBE3e6PF7vNlQGi6MI3f6YQHAogMomlOSMsoiMmiipU6kiekSyrMpGct7I8SSWh0fmCkFKxLi6oYnF47AabR6BwkQQk8TcnS8ghMKUSSja6TceRAAWLxXnARCsoJsfMEiNtdvtDv4rj07h8IP4ElBpAoMdU4lAkFghApqmU6nBioT3KtFlAAEQk6myclrBE3e6PF7vNlQGi6MI3f6YQHAogMomlOSMsoiMmiipU6kiekSyrMpGct7I8SSWh0fmCkFKxLi6oYnF47AabR6BwkQQk8TcnS8ghMKUSSja6TceRAA)
 
-### Step 6 - Picking of just the one type that we need from our mapped type 
-
 This is looking good, but it's not _quite_ what we want. We don't want a full object, we're looking for just the types accessed by those "foo" and "id" keys. 
 
-This is where we use a second index type of the whole object itself: 
+### Step 6 - Picking of just the one type that we need from our mapped type 
 
+Now we use a second index type of the whole object itself: 
 
 ```typescript 
 type ColumnData<T extends RowData> = { // 👈 it's an object type
@@ -476,5 +475,8 @@ processColumn(rows,
 ```
 
 [TypeScript Playground](https://www.typescriptlang.org/play/?ssl=61&ssc=3&pln=32&pc=1#code/C4TwDgpgBASg9gdwCIENgqgXlhAxnAJwBMAeAZ2AIEsA7AcwBooBXGgaxsRoD4oAyKAG8qRAFxQK1egF8A3FABQS0JCgBhOABtmAWxqp0JACpQIAD2AQaRMrEQGUvbIKgB6V1EC8G4AkdqFWAA5LYoNFBwAEYAVnjAUCoQClBQANoA0n6hbBAgcABmUEYAuuIuSWXlFRXuXr65hKYouAAWUFkgGQUAdN0ViWVt4qnylSOjY31JBFZEEAQAaijaEOIAFABui8zLBWmFAJRYvGtwIsOKSdIK0slteQWFY4+P1T5QAGIEcDpxTdDAcGAoJoIGsIJowlEYnFwNAALRQBBNNBQDZLWy4EJQcLQRq4CBkMgQIhY9rAX6tbK2O5GAD8Smq8SgAFEsEIFNVygMoAAiETc2TsjzlKbWWYLJarVFbcSSWh0A6YI4nIgC6rSKAAHzZHP62XE3LqcH5goqIpm80223WlvENF02IICqVpxNl0ZLOwGm0egcJEEhtt9tmTBEMsocuk3HkSlyrFwwCocFCYE+eIJXt0NGMpgs01s8GQaEcK0+CDI4gAggQCCgQMZuEx8N6aOIMz6i-WDoI+qWyJ06gQmY0mit1k62eV8DQKCjLay1skm5nOm1CgLJ1pl2axZbrUs9uuoNI9lclFOZ73Wck+i5QzyAIzcphmcQATiYIH1v00miNR4YN5+GIPIAExPlAL5QPeAAMH76ig4S4Ny-4KIUSgpnAaZkG2NAlogZAAUk3blNUgCg5FAABCEBImscpQPg1YxJoIATBSn48mYT6sduFoSlAe5bOOxFVB4do6A6rFJFKECHhcVwngoGFYTheFloRE5lC8gDiOwUMIAMq4NQYCxBw+E-NAbRQEQcD4jQASxOYVAUKx7hGDCUABNyABe3IBH4ticLEKAElQdA0AhwJxHA0KqJ5fKahxyFatyIC+Z0KwgQAzCBIEnpyeo8j56mTNMO58QJEBCZJbiiUGBDVdJslHvJ6Gpvi2GbnoqkETerFctynHFVAPHitK-HSVVlTabpkAGUZJmcGWCJIrEZLQNJMXQE55wiTN0ABGJDp+dtgVQMFZCheF4SRf8m0ebK9ABOlWU5XlFTArE0kgWGUh0POlrRuUlzHkAA)
+
+
+
 
 
