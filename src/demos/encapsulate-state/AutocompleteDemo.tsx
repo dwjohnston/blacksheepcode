@@ -64,7 +64,7 @@ const searchFn = async (searchTerm: string, pageNumber: number) => {
     }
 
     const filteredItems = mockItems.filter(item =>
-        (`item.name ${item.description}`).toLowerCase().includes(searchTerm.toLowerCase())
+        (`${item.name} ${item.description}`).toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return {
