@@ -182,14 +182,8 @@ Importantly, coming back to the debouncing, <TextHighlight comment={<p>
 </p>}>cancelling</TextHighlight>, pagination logic, all of that is _encapsulated_, hidden away inside, the component - the consumer does not need to think about, it's all taken care of for them. 
 
 Now you might think that that <TextHighlight comment={<><p>
-  Not to mention that this implementation doesn't allow for an initially selected value - we would need to add an `initialValue` and an async function `fetchValueById` props.
-</p>
-<p>
-  The thinking here is that we shouldn't need a full `T` object to provide as the initial value.  Often when a page or form loads - we just have the ID of the thing (a userId, a todoId, etc).  
-</p>
-<p>
-  Rather than the parent component loading the thing, and _then_ showing the autocomplete, the parent component simply provides an async function in order for the Autocomplete to fetch it itself.
-</p>
+  Not to mention that this implementation doesn't allow for an initially selected value - we would need to add an `initialValue` and an async function `fetchValueById` props.</p><p>The thinking here is that we shouldn't need a full `T` object to provide as the initial value.  Often when a page or form loads - we just have the ID of the thing (a userId, a todoId, etc).</p><p>
+  Rather than the parent component loading the thing, and _then_ showing the autocomplete, the parent component simply provides an async function in order for the Autocomplete to fetch it itself.</p>
 </>}>`selectedValueDisplayStringFn` stuff</TextHighlight> doesn't really look like we're _simplifying_ the interface - but we are. 
 
 The component interface is _forcing_ the developer handle the transition from 'having a search term entered and selecting an item' to 'an item is selected and something is displayed in the search box', and it does this does this in a manner that can't forgotten (you'll get a type error). 
