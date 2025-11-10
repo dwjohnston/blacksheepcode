@@ -71,7 +71,27 @@ pre code {
   display: block;
   overflow-x: auto;
   white-space: pre-wrap !important;
+  /* max-width: calc(100% - 150px); */
 }
+
+/* .rgp-base {
+  max-width: 60%;
+} */
+
+.rgp-base {
+  pre {
+    /**
+      https://stackoverflow.com/a/73869778/1068446
+      This seemed to do it for me. 
+    */
+    width: 0 !important;
+    min-width: calc(100% - 2em) !important;
+  }
+}
+
+/* .link-wrapper {
+  max-width: 300px;
+} */
 
 .react-github-permalink .link-wrapper a {
   word-break: break-word;
