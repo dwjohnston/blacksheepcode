@@ -73,6 +73,17 @@ pre code {
   white-space: pre-wrap !important;
 }
 
+.rgp-base {
+  pre {
+    /**
+      https://stackoverflow.com/a/73869778/1068446
+      This seemed to do it for me. 
+    */
+    width: 0 !important;
+    min-width: calc(100% - 2em) !important;
+  }
+}
+
 .react-github-permalink .link-wrapper a {
   word-break: break-word;
 }
