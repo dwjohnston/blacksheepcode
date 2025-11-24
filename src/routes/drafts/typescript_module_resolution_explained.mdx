@@ -125,6 +125,8 @@ https://nodejs.org/api/esm.html#mandatory-file-extensions
 
 This is possibly the first trip up. As web developers we've been using bundlers for so long, we've just become used to dropping the file extensions - but when using `import` it is always required. 
 
+We were using bundlers _before_ ESM modules were supported by Node - and so when it comes to running ESM in Node directly, all of a sudden there are these new constraints.
+
 ### `.cjs` and `.mjs` files determine accepted module syntax. 
 
 The file extensions `.cjs` (for CJS modules)  and `.mjs` (for ESM modules) _are not mere convention_. 
@@ -270,84 +272,106 @@ node echo.js
 We get: 
 
 ```
+(node:72515) Warning: Failed to load the ES module: /Users/davidjohnston/git-workspace/module-play/02_no_package_json copy 2/echo.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+/Users/davidjohnston/git-workspace/module-play/02_no_package_json copy 2/echo.js:1
+export default () => {};
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+```
+
+
+### CJS and ESM Modules are generally interoperable
+
+Take an example where we do not have a package.json and we have files of the following format:
+
+| Function Name | Module Format | Extension |
+| ------------- | ------------- | --------- |
+| f1            | ESM           | .js       |
+| f2            | ESM           | .mjs      |
+| f3            | CJS           | .js       |
+| f4            | CJS           | .mjs      |
+
+Now we run our script 
+
+```
+//main_esm.js
+import { f1 } from "./f1_esm.js";
+import { f2 } from "./f2_esm.mjs";
+import { f3 } from "./f3_cjs.js";
+import { f4 } from "./f4_cjs.cjs";
+
+f1();
+f2();
+f3();
+f4();
 
 ```
 
+```
+node main_esm.js
+```
+
+This runs fine. 
+
+As does an equivilent CJS script. 
+
+In the absence of otherwise being explicitly told via `type` property in the package json - Node inspects the format of the modules being imported and treats them accordingly. 
+
+
+On the other hand, if we are in an environment where we have `"type": "module"` in our `package.json`, Node will treat the `.js` files _only_ as ESM modules and the import of `f3_cjs.js` will fail:
+
+```
+node 
+```
+
+```
+import { f3 } from "./f3_cjs.js";
+         ^^
+SyntaxError: The requested module './f3_cjs.js' does not provide an export named 'f3'
+```
+
+We get a similar - and slightly more helpful error when we try run the equivilent CJS script
+
+```
+exports.f3 = () => {
+^
+
+ReferenceError: exports is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and '/Users/davidjohnston/git-workspace/module-play/01_type_module/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+```
+
+
+
+
+### Dyanmic imports are allowed in CJS modules 
+
+### Limits of ESM and CJS interoperability 
+
+The main constraint on ESM and CJS interopability is that CJS modules can not import ESM modules that contain a top level `await`
+
+> require() only supports loading ECMAScript modules that meet the following requirements:
+
+> The module is fully synchronous (contains no top-level await); and
 
 https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require
 
 
+## Summarising 
+
+Both CJS and ESM are fully valid in Node. 
+
+`.cjs` files will always be treated as CJS modules and `.mjs` files will always be treated as ESM modules.
+
+ESM modules always need to specify file extensions for relative imports. 
+
+CJS modules can omit file extensions and Node will attempt to find files and index files 
+
+Where some confusion can arise is with `.js` files - when it depends on whether Node has been explicitly instructed what module format to use. 
+
+It might be a good convention to ban `.js` files from your codebase - remove any ambiguity. 
 
 
 
-
-
-
-This is an attempt at explaining it. 
-
-[TypeScript has a good write up here.](https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution)
-
->With or without modules involved, the compiler needs to know about the code’s intended runtime environment—what globals are available, for example. 
-
-1. There maybe new(ish) syntax like optional chaining (`foo?.bar`) or constructs (eg. `Promise` has 'only' had widespread support since 2015). 
-2. Module syntax itself needs to be understood by the runtime executing it - eg. these days browsers can understand `import X from "./x"` syntax - but <TextHighlight comment={<p>https://nodejs.org/api/packages.html#determining-module-system</p>}>Node will only respect this format within certain contexts.</TextHighlight>. 
-
-TypeScript uses the term 'host' - 
-
-> When the output code (whether produced by tsc or a third-party transpiler) is run directly in a runtime like Node.js, the runtime is the host.
-
-e.g. You compile some code with `tsc` and then run the outputted file with `node`. 
-
-> When there is no “output code” because a runtime consumes TypeScript files directly, the runtime is still the host.
-
-e.g. You run some code directly with [`tsx`](https://www.npmjs.com/package/tsx).
-
-> When a bundler consumes TypeScript inputs or outputs and produces a bundle, the bundler is the host, because it looked at the original set of imports/requires, looked up what files they referenced, and produced a new file or set of files where the original imports and requires are erased or transformed beyond recognition. (That bundle itself might comprise modules, and the runtime that runs it will be its host, but TypeScript doesn’t know about anything that happens post-bundler.)
-
-Hmmm. 
-
->When loading modules in a web browser, the behaviors TypeScript needs to model are actually split between the web server and the module system running in the browser. The browser’s JavaScript engine (or a script-based module-loading framework like RequireJS) controls what module formats are accepted, while the web server decides what file to send when one module triggers a request to load another.
-
-Hmmm. 
-
-
-
-## The `module` option 
-
-https://www.typescriptlang.org/tsconfig/#module
-
-This just changes the _outputted_ module format. 
-
-One important thing to note here, is that while Node can understand ESM modules - it needs to be done right: 
-
-- Files need to be named `.cjs` or `.mjs`
-
-or: 
-
-- Package.json needs to have `type: "module"`
-
-TIL: If compiling code with one of the "node" module formats - TypeScript is still smart enough to compile ESM style modules - if they have file extensions `.mts` or `.cts`. 
-
-
->CommonJS isn’t part of the ECMAScript specification, so runtimes, bundlers, and transpilers have been free to make up their own answers to these questions since ESM was standardized in 2015
-
-
-
-
-## `moduleResolution`
-
-Essentially 'how does TypeScript find the file you are talking about?'. 
-
-The ones we need to care about are 
-
-- Node16 (note that nodenext is identical to node16)
-- Bundler
-
-
-
-Node16 - 
-
-> In Node.js, module specifiers in import statements and dynamic import() calls are not allowed to omit file extensions or /index.js suffixes, while module specifiers in require calls are
-
-Bundler - 
 
