@@ -1,0 +1,53 @@
+---
+meta:
+  title: Beyond an API and documentation - the artifacts a service should provide
+  description: If you're lucky, the service you're consuming might provide an API spec and a client SDK. I argue they could provide so much more. 
+  dateCreated: 2025-04-01
+---
+
+I'm a big fan of service boundaries. 
+
+Whether we're consuming a third party service, say Stripe, which we have absolutely no control over, or an internal service being managed by others in the organisation we're working in, services boundaries allow us draw clear lines in the overall application, allowing us to compartmentalise our mental model. 
+
+A popular form of service boundary is a REST API defined by an OpenAPI spec. For this post I'm going to assume a service of this type, but other service formats could be a a GraphQL API, an RPC style API or simply a client SDK. 
+
+A service will typically come with API documentation, telling us the shape of request and response payloads. This documentation can be generated from the OpenAPI spec. Documentation tools like Stoplight.io can provide interactive documentation - that allows the developer to make real API requests as they read the documentation. 
+
+Services may also publish their OpenAPI spec, so you as the developer can make use of it in your own tooling. 
+
+Unfortunately, this is where services often stop, and I think they could do so much more. 
+
+These are the things an OpenAPI based service could provide, along side the API itself and the documentation. 
+
+The thesis here is that service providers not only should adhere to the service contract, they should also be considering how their clients are going to testing their application, as it relates to interactions with their service. 
+
+
+## A Postman collection
+
+Many services do provide this. 
+
+A Postman collection is going to make it a lot easier exploring how to use the application. 
+
+## A Docker image for running the application in a test mode. 
+
+The idea here is 
+
+
+## For component library - test accessor functions
+
+This relates not to REST APIs, but component libraries. 
+
+Say you have a component library that is providing a payment details form. 
+
+If a user of the library is then trying to interact with this form in a test, this can be quite a tedious task. 
+
+```js
+//Testing library:
+userEvent.write(screen.getByRole("textbox", {name: "Name"}), "Joe Bloggs")
+userEvent.write(screen.getByRole("textbox", {name: "Credit Card Number"}), "1234 1234 1234 1234")
+// and several more forms
+```
+
+Interacting with components like color pickers, dropdowns, items that select by clicking inside a tooltip, can all be similarly tedious, for the person who is just trying to add and item to a cart, or submit an order submission form etc. 
+
+Service providers can help by providing convenience functions for use in the tests.
