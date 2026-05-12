@@ -14,7 +14,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -34,7 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "jest.config.js",
-    "src/routes/drafts/testing_patterns_changing_a_leaf_breaks_the_root.mdx"
+    "src/routes/drafts/testing_patterns_changing_a_leaf_breaks_the_root.mdx",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
