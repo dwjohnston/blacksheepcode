@@ -1,0 +1,34 @@
+---
+meta:
+  title:  Human comprehension is still the bottleneck
+  description:
+  dateCreated: 2026-05-10
+  image: mitm
+
+tags: 
+  - "ai"
+---
+
+I've been using AI a lot more recently, and I genuinely think it has made me a better developer. 
+
+It has made me realise how much time I have been spending in the past just getting syntax right, or just doing the mechanical parts of coding, or the 'pretty-simple-but-still-requiring-corncerted-thinking' mathsy parts of coding. 
+
+AI gets that stuff done that much faster, that it allows me to be thinking about the higher level patterns, and checking that _they_ are right. 
+
+It means that I'm spending more time creating rules that enforce the patterns, than simply following the patterns myself. 
+
+It allows me to discover (via asking AI for suggestions) established solutions to a problem I'm facing, and then experiment with them, without fully understanding them, to see if they fit my usecase. 
+
+For example: my side project is a geometric art application. I have a facet that takes a series of points, and connects them via a line. But the low granularity of the points means we get jagged lines. AI was able to explain to me what bezier curves are (something I've heard of but not known what they are), but also suggested a Catmull-Rom Spline for smoothing, which, although it's going to use a bezier curve under the hood, works for my usecase, because I don't need to determine the bezier anchors myself. 
+
+It's worth mentioning that there's possibly a bit of Dunning-Kruger at play here. 
+
+For example, I'm an experienced React developer, I know that AI isn't actually that good at writing React code, for example it tends to abuse `useEffect` a bit and it can unnecesserily make components stateful. Some of this might just be my personal preference. I have experience enough to recognise these anti-patterns and curtail them. 
+
+Whereas, where I now see AI as allowing me to learn in these other areas, it's possible that I have just enough knowledge to make think that I/it is going a good job of it, and not enough experience to recognise some well established pitfalls. 
+
+All this to say that - while AI helps move the developer into a space where they're thinking about the things that actually matter, and AI helps distill information to just what the developer needs to be informed about a thing (To be clear, I mean informing developers about well established software engineering practices. At this point I would not trust an AI to tell me with a great level of accuracy the nuances of how a given codebase works.)
+
+However - the limiting factor is still whether the human can understand what is happening. 
+
+Unless you are YOLOing it and creating a codebase that is fully not read by humans at all, (which isn't _necessarily_ the craziest idea, good code is easy to delete, throw a bunch of test cases and an interface spec at an AI and have it create a microservice that you can just delete if it not longer working)
