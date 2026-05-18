@@ -7,6 +7,10 @@ const nextConfig = {
       compilationMode: 'annotation',
     },
   },
+  serverExternalPackages: ['require-in-the-middle', 'import-in-the-middle'],
+
+
+
 
   // Ignores the opentelemetry warning
   // see: https://github.com/open-telemetry/opentelemetry-js/issues/4173
