@@ -7,7 +7,7 @@ const nextConfig = {
       compilationMode: 'annotation',
     },
   },
-  serverExternalPackages: ['require-in-the-middle', 'import-in-the-middle'],
+  serverExternalPackages: ['require-in-the-middle', 'import-in-the-middle', '@opentelemetry/instrumentation'],
 
 
 
