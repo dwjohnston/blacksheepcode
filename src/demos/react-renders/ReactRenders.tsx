@@ -29,6 +29,7 @@ export function ReactRenders1() {
   return (
     <MyProvider>
       <button
+        type="button"
         onClick={() => {
           setValue(`${Math.random()}`);
         }}
@@ -56,7 +57,7 @@ function StateChanger() {
     <div className="state-changer">
       <strong>State Changer</strong>
 
-      <button onClick={() => setValue(`${Math.random()}`)}>Change state</button>
+      <button type="button" onClick={() => setValue(`${Math.random()}`)}>Change state</button>
       <RenderTracker />
     </div>
   );

@@ -37,10 +37,11 @@ export function UserProfile3(props: UserProfile3Props) {
       <p>Name: {user?.name}</p>
       <p>Age: {user?.age}</p>
       <p>Server cookie: {serverCookie}</p>
-      <button onClick={handleUpdateUser}>Update User</button>
-      <button onClick={handleDeleteUser}>Delete User</button>
+      <button type="button" onClick={handleUpdateUser}>Update User</button>
+      <button type="button" onClick={handleDeleteUser}>Delete User</button>
 
       <button
+        type="button"
         onClick={() => {
           fetch("/demos/responsive-cookies/req1")
             .then((v) => v.json())

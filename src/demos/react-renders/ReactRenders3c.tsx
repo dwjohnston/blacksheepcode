@@ -11,6 +11,7 @@ function ChildrenStyleOne() {
       <strong>ChildrenStyleOne</strong>
       <p>RenderTracker is directly rendered</p>
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}
@@ -30,6 +31,7 @@ function ChildrenStyleTwo(props: React.PropsWithChildren) {
       <strong>ChildrenStyleTwo</strong>
       <p>RenderTracker is rendered as props.children</p>
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}

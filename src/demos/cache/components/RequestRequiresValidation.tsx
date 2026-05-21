@@ -11,6 +11,7 @@ export function RequestRequiresValidation(props: {
       <div>data: {data}</div>
 
       <button
+        type="button"
         onClick={() => {
           fetch(`/demos/cache/${props.endpoint}`, {
             cache: "no-store",
@@ -25,6 +26,7 @@ export function RequestRequiresValidation(props: {
       </button>
 
       <button
+        type="button"
         onClick={() => {
           fetch(`/demos/cache/${props.endpoint}`)
             .then((v) => v.json())

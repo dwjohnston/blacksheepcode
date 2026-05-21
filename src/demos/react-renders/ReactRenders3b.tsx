@@ -67,6 +67,7 @@ export function ChildrenStyleOne(props) {
     <div className="some-parent-component">
       <strong>ChildrenStyleOne</strong>
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}
@@ -90,6 +91,7 @@ export function ChildrenStyleTwo(props: React.PropsWithChildren) {
     <div className="some-parent-component">
       <strong>ChildrenStyleTwo</strong>
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}
@@ -108,6 +110,7 @@ function Shell(props: PropsWithChildren) {
   return (
     <div>
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}
@@ -125,6 +128,7 @@ export function ReactRenders3() {
   return (
     <div className="render-tracker-demo">
       <button
+        type="button"
         onClick={() => {
           setValue((prev) => prev + 1);
         }}
@@ -132,6 +136,7 @@ export function ReactRenders3() {
         Increase count: {value}
       </button>
       <button
+        type="button"
         onClick={() => {
           console.log(style1, style2);
 

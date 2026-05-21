@@ -55,12 +55,12 @@ export function useConfirmationModal(
       {typeof cancelButton === "function" ? (
         cancelButton(onCancel)
       ) : (
-        <button onClick={onCancel}>{cancelButton}</button>
+        <button type="button" onClick={onCancel}>{cancelButton}</button>
       )}
       {typeof confirmButton === "function" ? (
         confirmButton(onConfirm)
       ) : (
-        <button onClick={onConfirm}>{confirmButton}</button>
+        <button type="button" onClick={onConfirm}>{confirmButton}</button>
       )}
     </dialog>
   );

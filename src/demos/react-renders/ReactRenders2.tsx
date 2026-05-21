@@ -38,6 +38,7 @@ export function ReactRenders2() {
   return (
     <MyProvider>
       <button
+        type="button"
         className="global-render-button"
         onClick={() => {
           setValue(`${Math.random()}`);
@@ -66,7 +67,7 @@ function StateChanger() {
     <div className="state-changer">
       <strong>State Changer</strong>
 
-      <button onClick={() => setValue(`${Math.random()}`)}>Change state</button>
+      <button type="button" onClick={() => setValue(`${Math.random()}`)}>Change state</button>
       <RenderTracker />
     </div>
   );
@@ -89,6 +90,7 @@ function FooComponent() {
     <div className="foo-component">
       <strong>Foo Component</strong>
       <button
+        type="button"
         onClick={() => {
           // This is Copilots suggestion lol
           const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;

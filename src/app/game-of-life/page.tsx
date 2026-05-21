@@ -136,10 +136,10 @@ export const GameOfLife = (props: GameOfLifeProps) => {
         performance optimisation.
       </p>
       <div>
-        <button onClick={handleStart}>
+        <button type="button" onClick={handleStart}>
           {isRunning ? "Stop" : "Start Game!"}
         </button>
-        <button onClick={handleReset}>Reset</button>
+        <button type="button" onClick={handleReset}>Reset</button>
       </div>
       <div>
         {map.map((row, rowIndex) => {

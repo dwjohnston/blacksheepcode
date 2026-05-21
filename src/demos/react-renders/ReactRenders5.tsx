@@ -9,6 +9,7 @@ function ChildrenStyleOne() {
     <div className="some-parent-component double-wide">
       <strong>ChildrenStyleOne</strong>
       <button
+        type="button"
         onClick={() => {
           setIsLeft((prev) => !prev);
         }}
@@ -31,6 +32,7 @@ function ChildrenStyleTwo(props: React.PropsWithChildren) {
     <div className="some-parent-component double-wide">
       <strong>ChildrenStyleTwo</strong>
       <button
+        type="button"
         onClick={() => {
           setIsLeft((prev) => !prev);
         }}
