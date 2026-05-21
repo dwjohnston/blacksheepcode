@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { compileMDXFiles } from "./transformMdx";
 const inputDir = path.join("src", "routes");
 const outputDir = path.join("src", "generated", "mdx");

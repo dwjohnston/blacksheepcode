@@ -49,7 +49,7 @@ const PostComments = () => {
 
   return (
     <>
-      <div ref={commentBox} className="comments" id="comments" tabIndex={0} />
+      <div ref={commentBox} className="comments" id="comments" />
     </>
   );
 };

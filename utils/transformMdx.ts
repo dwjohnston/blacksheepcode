@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
@@ -9,11 +9,10 @@ import { frontMatterSchema } from "./frontmatterTypings";
 function extractFrontmatter(str: string) {
   const frontmatterRegex = /export const frontmatter = ({[\s\S]*?});/;
   const match = str.match(frontmatterRegex);
-  if (match && match[1]) {
+  if (match?.[1]) {
     return match[1];
-  } else {
-    return null;
   }
+  return null;
 }
 
 export type WriteFileFn = (path: string, data: string) => Promise<void>;

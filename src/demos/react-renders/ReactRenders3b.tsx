@@ -50,7 +50,7 @@ export function RenderTracker(props) {
         <div
           className="render-tracking-dot"
           style={{ top: `${randY}%`, left: `${randX}%` }}
-        ></div>
+        />
       </div>
     </div>
   );

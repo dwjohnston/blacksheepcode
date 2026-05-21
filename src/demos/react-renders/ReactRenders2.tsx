@@ -97,7 +97,7 @@ function FooComponent() {
       >
         Randomize color
       </button>
-      <div className="color-display" style={{ backgroundColor: color }}></div>
+      <div className="color-display" style={{ backgroundColor: color }} />
       <RenderTracker />
     </div>
   );

@@ -8,7 +8,7 @@ export const RaiseAnIssue = (props: RaiseAnIssueProps) => {
       <hr />
       <p>
         Found a bug?{" "}
-        <a href={`https://github.com/dwjohnston/blacksheepcode/issues`}>
+        <a href={"https://github.com/dwjohnston/blacksheepcode/issues"}>
           Raise an issue here
         </a>
       </p>

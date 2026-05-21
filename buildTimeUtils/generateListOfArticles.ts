@@ -4,33 +4,32 @@ const PATH_TO_ARTICLES_COMPONENT = "app/generated/ListOfArticles.tsx";
 const PATH_TO_BLOG_POSTS = "app/routes/posts";
 
 async function generateListOfArticles() {
-  try {
-    const files = await readdir(PATH_TO_BLOG_POSTS);
+  const files = await readdir(PATH_TO_BLOG_POSTS);
 
-    await writeFile(
-      PATH_TO_ARTICLES_COMPONENT,
-      `
+  await writeFile(
+    PATH_TO_ARTICLES_COMPONENT,
+    `
         export const ListOfArticles = () => {
 
 
 
             return <ul>`
-    );
+  );
 
-    for (const file of files) {
-      if (!file.endsWith(".mdx")) {
-        console.warn(`Found a non-mdx file in ${PATH_TO_BLOG_POSTS}: ${file}`);
-      }
+  for (const file of files) {
+    if (!file.endsWith(".mdx")) {
+      console.warn(`Found a non-mdx file in ${PATH_TO_BLOG_POSTS}: ${file}`);
+    }
 
-      // TODO proper handling of illegal characters
-      else if (file.includes(" ")) {
-        console.warn(`Found a space in file: ${file}`);
-      } else {
-        const fileName = file.split(".mdx")[0];
+    // TODO proper handling of illegal characters
+    else if (file.includes(" ")) {
+      console.warn(`Found a space in file: ${file}`);
+    } else {
+      const fileName = file.split(".mdx")[0];
 
-        await appendFile(
-          PATH_TO_ARTICLES_COMPONENT,
-          `
+      await appendFile(
+        PATH_TO_ARTICLES_COMPONENT,
+        `
                 <li>
                 <a
                     href="/posts/${fileName}"
@@ -38,20 +37,17 @@ async function generateListOfArticles() {
                     ${fileName}        </a>
             </li>
                 `
-        );
-      }
+      );
     }
+  }
 
-    appendFile(
-      PATH_TO_ARTICLES_COMPONENT,
-      `
+  appendFile(
+    PATH_TO_ARTICLES_COMPONENT,
+    `
         </ul>
     }
     `
-    );
-  } catch (err) {
-    throw err;
-  }
+  );
 }
 
 generateListOfArticles().then(() => {

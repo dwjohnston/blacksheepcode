@@ -7,10 +7,10 @@ export function getSitemaps(rootUrl = "https://blacksheepcode.com"): string {
   const metadataArray = Object.values(allMetadata);
   metadataArray.forEach((json: any) => {
     try {
-      xml += `  <url>\n`;
+      xml += "  <url>\n";
       xml += `    <loc>${rootUrl}/${json.slug}</loc>\n`;
       xml += `    <lastmod>${new Date(json.frontmatter.meta.dateCreated).toISOString()}</lastmod>\n`;
-      xml += `  </url>\n`;
+      xml += "  </url>\n";
     } catch (err) {
       throw new Error(`Error generating sitemap for file: ${json.slug}
  message: ${err instanceof Error ? err.message : "(Unknown error)"}
@@ -18,6 +18,6 @@ export function getSitemaps(rootUrl = "https://blacksheepcode.com"): string {
  `);
     }
   });
-  xml += `</urlset>`;
+  xml += "</urlset>";
   return xml;
 }

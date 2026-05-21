@@ -2,7 +2,7 @@
  * Generated using ChatGPT
  */
 
-import { exec } from "child_process";
+import { exec } from "node:child_process";
 
 /**
  *

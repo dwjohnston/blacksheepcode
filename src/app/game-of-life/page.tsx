@@ -154,7 +154,7 @@ export const GameOfLife = (props: GameOfLifeProps) => {
                     onClick={() => {
                       handleCellClick(rowIndex, cellIndex);
                     }}
-                  ></div>
+                  />
                 );
               })}
             </div>

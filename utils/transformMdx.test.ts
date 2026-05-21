@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, vitest } from "vitest";
 
-import path from "path";
+import path from "node:path";
 import { WriteFileFn, compileMDXFiles } from "./transformMdx";
 
 describe(compileMDXFiles, () => {

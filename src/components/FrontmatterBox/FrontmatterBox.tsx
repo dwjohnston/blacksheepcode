@@ -60,10 +60,7 @@ function NextBox(props: FrontmatterBoxProps) {
 
   const nextInSeries = part; // nb. the series are 1 indexed, but the array here is 0 indexed.
 
-  if (
-    props.frontmatter?.seriesFrontmatter &&
-    props.frontmatter.seriesFrontmatter[nextInSeries]
-  ) {
+  if (props.frontmatter?.seriesFrontmatter?.[nextInSeries]) {
     const nextPost = props.frontmatter.seriesFrontmatter[nextInSeries];
 
     return (

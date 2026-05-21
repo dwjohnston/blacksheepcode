@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import fsAsync from "node:fs/promises";
+import path from "node:path";
 import fm from "front-matter";
-import fsAsync from "fs/promises";
 import { type FrontMatter, frontMatterSchema } from "./frontmatterTypings";
 import { getFileGitTimestamps } from "./getFileGitTimestamps";
 
@@ -72,9 +72,8 @@ export async function extractFrontMatter(
       }
 
       return segments as [string, string];
-    } else {
-      throw new Error("String format is not as expected");
     }
+    throw new Error("String format is not as expected");
   }
 
   async function processFile(inputString: string) {
@@ -118,7 +117,7 @@ export async function extractFrontMatter(
 
     const basePath = await generateSubfolder(subPath);
     await writeFrontmatterFile(
-      path.join(basePath, fileName + ".json"),
+      path.join(basePath, `${fileName}.json`),
       `${subPath}/${fileName}`,
       fmContent
     );

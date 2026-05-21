@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { extractFrontMatter } from "./extractFrontMatter";
 
 const folderPath = path.join(process.cwd(), "src", "routes"); // Update the path accordingly

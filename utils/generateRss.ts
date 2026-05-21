@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import { getRss } from "./getRss";
 const xml = getRss();
 
