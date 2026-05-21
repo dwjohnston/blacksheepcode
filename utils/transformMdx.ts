@@ -1,10 +1,10 @@
-import fs from "fs-extra";
 import path from "path";
-import remarkFrontmatter from "remark-frontmatter";
+import fs from "fs-extra";
 import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
+import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { frontMatterSchema } from "./frontmatterTypings";
-import rehypeSlug from "rehype-slug";
 
 function extractFrontmatter(str: string) {
   const frontmatterRegex = /export const frontmatter = ({[\s\S]*?});/;

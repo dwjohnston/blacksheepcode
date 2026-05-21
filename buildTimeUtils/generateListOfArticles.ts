@@ -1,60 +1,59 @@
-import { readdir, writeFile, appendFile} from 'node:fs/promises';
+import { appendFile, readdir, writeFile } from "node:fs/promises";
 
-const PATH_TO_ARTICLES_COMPONENT = "app/generated/ListOfArticles.tsx"; 
-const PATH_TO_BLOG_POSTS = "app/routes/posts"
+const PATH_TO_ARTICLES_COMPONENT = "app/generated/ListOfArticles.tsx";
+const PATH_TO_BLOG_POSTS = "app/routes/posts";
 
 async function generateListOfArticles() {
-    try {
-        const files = await readdir(PATH_TO_BLOG_POSTS);
+  try {
+    const files = await readdir(PATH_TO_BLOG_POSTS);
 
-
-        await writeFile(PATH_TO_ARTICLES_COMPONENT, `
+    await writeFile(
+      PATH_TO_ARTICLES_COMPONENT,
+      `
         export const ListOfArticles = () => {
 
 
 
-            return <ul>`);
+            return <ul>`
+    );
 
-        for (const file of files) {
+    for (const file of files) {
+      if (!file.endsWith(".mdx")) {
+        console.warn(`Found a non-mdx file in ${PATH_TO_BLOG_POSTS}: ${file}`);
+      }
 
-            if (!file.endsWith(".mdx")){
-                console.warn(`Found a non-mdx file in ${PATH_TO_BLOG_POSTS}: ${file}`)
-            }
+      // TODO proper handling of illegal characters
+      else if (file.includes(" ")) {
+        console.warn(`Found a space in file: ${file}`);
+      } else {
+        const fileName = file.split(".mdx")[0];
 
-
-            // TODO proper handling of illegal characters
-            else if (file.includes(' ')) {
-                console.warn(`Found a space in file: ${file}`)
-            }
-
-
-            else {
-                const fileName = file.split('.mdx')[0]; 
-
-                await appendFile(PATH_TO_ARTICLES_COMPONENT,  `
+        await appendFile(
+          PATH_TO_ARTICLES_COMPONENT,
+          `
                 <li>
                 <a
                     href="/posts/${fileName}"
                 >
                     ${fileName}        </a>
             </li>
-                `)
-            }
+                `
+        );
+      }
+    }
 
-           
-        }
-
-        appendFile(PATH_TO_ARTICLES_COMPONENT, `
+    appendFile(
+      PATH_TO_ARTICLES_COMPONENT,
+      `
         </ul>
     }
-    `)
-
-
-    } catch (err) {
-        throw err; 
-      }
+    `
+    );
+  } catch (err) {
+    throw err;
+  }
 }
 
 generateListOfArticles().then(() => {
-    console.info(`Successfully generated ${PATH_TO_ARTICLES_COMPONENT}`)
-})
+  console.info(`Successfully generated ${PATH_TO_ARTICLES_COMPONENT}`);
+});

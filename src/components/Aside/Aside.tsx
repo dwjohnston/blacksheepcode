@@ -1,17 +1,14 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
-type AsideProps = PropsWithChildren<{
-    
-}>
-
+type AsideProps = PropsWithChildren<{}>;
 
 export function Aside(props: AsideProps) {
+  return (
+    <figure className="aside">
+      <div className="triangle"></div>
+      <div className="triangle-drop-shadow"></div>
 
-
-    return <figure className="aside">
-        <div className="triangle"></div>
-        <div className="triangle-drop-shadow"></div>
-
-        {props.children}
+      {props.children}
     </figure>
+  );
 }
