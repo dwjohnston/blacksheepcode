@@ -13,7 +13,7 @@ You prompt the agent and observe its reasoning response. You can interdict when 
 
 You manually approve each step, so see in a linear order what is happening. 
 
-Problem: often a lot of the commands it wants to run run aren't particularly informative to you. (eg. various grep commands)
+Problem: often a lot of the commands it wants to run aren't particularly informative to you. (eg. various grep commands)
 
 3. Live monitoring a single agent in your IDE/CLI - with automatic edits
 
@@ -28,9 +28,9 @@ As above, but this time the root agent is spawning sub agents.
 
 For me - this is where things really start breaking down. It's hard to visualise what the subagents are doing, it becomes hard to interdict. 
 
-It's worth mentioning that whle it might be reasonable to want to visualise what subagents are doing when there are 2-5 agents, it's conceivable that some workflows might involve spawning hundreds of agents, at which point interdicting live would never be a possiblity, so any visualisation you had would be more catered around a 'after the fact' forensic accounting. 
+It's worth mentioning that while it might be reasonable to want to visualise what subagents are doing when there are 2-5 agents, it's conceivable that some workflows might involve spawning hundreds of agents, at which point interdicting live would never be a possibility, so any visualisation you had would be more catered around a 'after the fact' forensic accounting. 
 
-Workflow ends up being the same - once it is has done its work, we view the proposed changes in the git diff. 
+Workflow ends up being the same - once it has done its work, we view the proposed changes in the git diff. 
 
 5. Set and review later tasks
 
@@ -47,7 +47,7 @@ Aside: I'm currently operating on the assumption that, even if we're not at all 
 Big problems I have here: 
 
 - Lack of visibility of how much the pull request cost me. 
-- Lack of seeing the the reasoning chains - so I can optimise the prompts. 
+- Lack of seeing the reasoning chains - so I can optimise the prompts. 
 
 6. Functional verification only
 
