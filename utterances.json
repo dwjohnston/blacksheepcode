@@ -1,5 +1,3 @@
 {
-    "origins": [
-      "http://localhost", "https://blacksheepcode.com"
-    ]
+  "origins": ["http://localhost", "https://blacksheepcode.com"]
 }

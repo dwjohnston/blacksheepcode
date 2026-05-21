@@ -1,8 +1,8 @@
 .render-tracker-demo {
-    display: flex;
-    gap: 1rem;
-    flex-flow: row wrap;
-    justify-content: center;
+  display: flex;
+  gap: 1rem;
+  flex-flow: row wrap;
+  justify-content: center;
 }
 
 .state-changer,
@@ -10,105 +10,95 @@
 .some-unrelated-component,
 .foo-component,
 .some-parent-component {
+  border: dotted 1px black;
+  padding: 0.5em;
 
+  display: flex;
+  flex-flow: column nowrap;
 
-    border: dotted 1px black;
-    padding: 0.5em;
+  &.double-wide {
+    width: 300px;
+  }
 
+  .left-right {
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row nowrap;
+    gap: 1em;
 
-
-    &.double-wide {
-        width: 300px;
+    > * {
+      border: solid 1px white;
+      flex: 1 1 50%;
     }
-
-    .left-right {
-        display: flex;
-        flex-flow: row nowrap;
-        gap: 1em;
-
-        >* {
-            border: solid 1px white;
-            flex: 1 1 50%;
-        }
-    }
+  }
 }
 
-
 .render-tracker {
-    background-color: var(--color-info-secondary);
+  background-color: var(--color-info-secondary);
 
-    width: 100px;
-    height: 100px;
-    display: flex;
-    flex-flow: column nowrap;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-flow: column nowrap;
 
-    strong {
-        font-size: 0.5em;
-        display: block;
-        margin: 0;
-    }
+  strong {
+    font-size: 0.5em;
+    display: block;
+    margin: 0;
+  }
 
-    .mount-value {
-        font-size: 0.5em;
-        margin: 0;
-    }
+  .mount-value {
+    font-size: 0.5em;
+    margin: 0;
+  }
 
-    .tracking-dot-container {
-        position: relative;
-        flex: 1 0 auto;
-        margin: 0.25em;
-        border: dashed 1px grey;
-
-    }
+  .tracking-dot-container {
+    position: relative;
+    flex: 1 0 auto;
+    margin: 0.25em;
+    border: dashed 1px grey;
+  }
 }
 
 .global-render-button {
-    margin: 0.5em;
-    margin-left: auto;
-    display: block;
+  margin: 0.5em;
+  margin-left: auto;
+  display: block;
 }
 
 .render-tracking-dot {
-    width: 10px;
-    height: 10px;
-    position: absolute;
-    background-color: red;
-    border-radius: 10px;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  background-color: red;
+  border-radius: 10px;
 }
 
 .color-display {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
 }
 
-
-
 main {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: flex-start;
-    margin: 0 auto;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 auto;
 
-
-    width: 800px;
+  width: 800px;
 }
 
 details {
-    margin: 1em;
+  margin: 1em;
 }
 
 .side-by-side {
-    display: flex;
-    justify-content: space-around;
-    gap: 1em;
-    flex-flow: row wrap;
+  display: flex;
+  justify-content: space-around;
+  gap: 1em;
+  flex-flow: row wrap;
 
-    &>* {
-        flex: 0 0 250px;
-    }
-
-
+  & > * {
+    flex: 0 0 250px;
+  }
 }
