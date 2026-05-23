@@ -1,0 +1,39 @@
+---
+meta:
+  title: Agentic AI - yak shaving on steroids
+  description: The prospect of having agentic AI do all the real work means that we now focus on tuning the AI, not delivering the work.
+  dateCreated: 2026-05-23
+  image: "yak_shaving"
+
+tags: 
+  - "ai"
+  
+---
+import yak_shaving from "@/assets/yak_shaving.jpeg";
+
+I've been playing around with agentic AI for a side project recently, and I can absolutely see a world where the workflow is like this: 
+
+1. I have an iterative session with an AI to define a feature - the outcome of this is an AI generated brief
+2. The AI goes off and implements the feature, unsupervised, the outcome of this is a pull request. 
+3. I review the pull request - what I'm looking for is a cursory look over the code to check that the patterns are holding, and brief manual verification that the feature is working. 
+
+_This is not my current workflow_ - that step 2. I have to supervise - because the AI goes off into rabbit holes and burns all my tokens and creates some messes. 
+
+But this workflow seems tantalisingly in reach - whether that's all a fugazi is a different story. 
+
+I have limited time. I work a full time job, and I have a four-year old and two four-month old babies, and I need to exercise. So with my side project, of which I'm about 40 hours in, I could spend my limited time chipping away at building new features, or I could spend it: 
+
+- Optimising my prompts
+- Adding lint rules and other guard rail test scripts
+- Adding generation scripts
+
+All in the hope that at the end of it, in some future world - creating this application will be a delightful breeze - I'll be able to informally have a chat session with an AI, creating a list of features I want to see, and then come back the next night to review and merge the code it has created. 
+
+<img src ={yak_shaving.src} alt="ai generated image. A man is scoffing some pills while holding some shears. In the background are some yaks. The man is saying 'gonna go shave me some yaks'" className="blog-image" style={{height: 400, display: "block", margin: "40px auto"}}/>
+
+
+This feels like yak-shaving. Perhaps this is another bit of software engineering wisdom that is disrupted by AI. 
+
+The AI maximalist might argue that - 'This isn't yak shaving - this is what the job is now, you're not building products, you're building a factory that builds products'. 
+
+This might be a case for a project at a high level of AI maturity - but for everything else there needs to be an appreciation that agnetic AI workflows will not be a free lunch.
