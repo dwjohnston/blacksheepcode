@@ -21,7 +21,7 @@ If your prompt gives enough context to the LLM that it comes to an answer _witho
 
 2. **If a solution can be got to with less tokens, it's probably the better one**
 
-The observation I'll make here is that sometimes the LLM gets into a state where it goes around and round in circles in a reasoning chain, eventually it'll stop but it often it won't be the answer you need. 
+The observation I'll make here is that sometimes the LLM gets into a state where it goes around in circles in a reasoning chain, eventually it'll stop but often it won't be the answer you need. 
 
 I propose a cludgy aphorism here - 'If an LLM hasn't come to a solution by 80K tokens (or whatever number), chances are it's going to use another 200K tokens to get there, and chances are, that solution isn't going to be a good one'. 
 
@@ -54,7 +54,7 @@ Even better, a hook could be used.
 
 2. Make use of codemods
 
-Let's say you you have some code that looks like this: 
+Let's say you have some code that looks like this: 
 
 ```javascript
 function foo() {
@@ -73,9 +73,9 @@ async function foo() {
 }
 ```
 
-This is a complicated task that, that will likely have cascades beyond just the initial file being changed. 
+This is a complicated task that will likely have cascades beyond just the initial file being changed. 
 
 Don't just have AI come up with a plan and execute it. Have the AI create codemods - test those codemods, and execute that instead. 
 
-A big advantage of codemods is that once they're written - they're repeatable. Chances, this change when merged will create all sorts of merge conflicts. The codemod can be used to transform the incompatable branch before doing the merge. 
+A big advantage of codemods is that once they're written - they're repeatable. Chances are, this change when merged will create all sorts of merge conflicts. The codemod can be used to transform the incompatable branch before doing the merge. 
 

@@ -22,9 +22,9 @@ See also: https://softwareengineering.stackexchange.com/questions/459194/is-ther
 
 Where I think this is most relevant when considering the time it takes for developer tooling to run - think running tests, linting either locally or in a build server. 
 
-It can be tempting to say 'well what does it matter if the tests take fifteen minutes/two minutes/30 seconds to run - you'll waste more time waiting for the elevator/making coffee/participating the the company ping pong tournament.'
+It can be tempting to say 'well what does it matter if the tests take fifteen minutes/two minutes/30 seconds to run - you'll waste more time waiting for the elevator/making coffee/participating in the company ping pong tournament.'
 
-But the point isn't the actual time spent, the point is that wait completely changes the way you do your work. 
+But the point isn't the actual time spent, the point is that the wait completely changes the way you do your work. 
 
 ## Practical suggestions 
 
@@ -35,4 +35,4 @@ But the point isn't the actual time spent, the point is that wait completely cha
 - You can use tools like `lint-staged` to only run checks on a subset of files, but the problem with this is that your change might have broken something downstream from the file you are working on. 
     - Instead monorepo tools like NX and Turborepo have tooling to run commands only affected packages. If you make a change to package A and package B depends on it, then the tooling will run tests against both packages. 
     - There is similar tooling in the test runners. Bun has [`bun test --changed`](https://bun.com/blog/bun-v1.3.13#bun-test-changed) which works by using the import graph to determine which modules have changed. Be aware that if you were doing something with dynamic imports or file operations these might escape detection. 
-    - [Vitest has also has a `--changed` flag.](https://vitest.dev/guide/cli.html#changed)
+    - [Vitest also has a `--changed` flag.](https://vitest.dev/guide/cli.html#changed)
