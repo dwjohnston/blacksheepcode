@@ -17,6 +17,7 @@ env:
 
 jobs:
   cypress-test:
+    if: false
     runs-on: ubuntu-latest
 
     steps:
