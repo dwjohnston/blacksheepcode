@@ -1,0 +1,82 @@
+---
+meta:
+  title: Reasons to be a token miser 
+  description: There is a school of thought that says 'Just throw money at the problem' - here's why you should be constantly optimising your token usage.
+  dateCreated: 2026-05-27
+
+
+tags:  
+    - "ai"
+
+---
+
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+
+1. **Less tokens = faster results**
+
+<TextHighlight comment={<p>See: <a href="./the_time_a_task_takes_changes_your_workflow">The time required to wait for a job to complete - changes the workflow for how you do it</a></p>}>There's a big difference between a workflow that takes a day to complete vs ten minutes to complete, vs one minute to complete, vs ten seconds to complete, vs a second to complete. </TextHighlight>
+
+If your prompt gives enough context to the LLM that it comes to an answer _without_ having to produce its own lengthy reasoning chains, then you'll get the answer quicker and stay focused on the task at hand. 
+
+
+2. **If a solution can be got to with less tokens, it's probably the better one**
+
+The observation I'll make here is that sometimes the LLM gets into a state where it goes around in circles in a reasoning chain, eventually it'll stop and often the solution won't be a good one.
+
+I propose a cludgy aphorism here - 'If an LLM hasn't come to a solution by 80K tokens (or whatever number), chances are it's going to use another 200K tokens to get there, and chances are, that solution isn't going to be a good one'. 
+
+3. **Positions yourself to avoid a rugpull**
+
+In many cases you can get away with just throwing a large model at a problem, coming back in an hour or so, and there will be _some kind_ of working solution. 
+
+However, remember that currently AI use is subsidised by the AI providers - in some future such case it would be good to be able to move to a cheaper and/or self hosted provider.
+
+
+## Practical Suggestions
+
+1. **Make use of code generators**
+
+For any coding work that is strictly derivative - that is - the content of the code can be trivially determined programatically - don't get AI to do this work, relegate that work to scripts.
+
+Instead of giving your LLM the instruction: 
+
+```
+After creating the node in folder `src/nodes/`, add that node to the registry in `src/nodeRegistry.ts`
+```
+
+Give it the instruction: 
+
+```
+After creating the node in folder `src/nodes/` run `bun generateNodeRegistry`
+```
+
+Even better, a hook could be used. 
+
+2. **Make use of codemods**
+
+Let's say you have some code that looks like this: 
+
+```javascript
+function foo() {
+
+    return doX(); 
+}
+```
+
+And you are conducting a refactor where you now use `doX2()` which is an async function 
+
+```javascript 
+//👇
+async function foo() {
+
+    return doX2(); 
+}
+```
+
+This is a complicated task that will likely have cascades beyond just the initial file being changed. 
+
+Don't just have AI come up with a plan and execute it. Have the AI create codemods - test those codemods, and execute that instead. 
+
+A big advantage of codemods is that once they're written - they're repeatable. Chances are, this change when merged will create all sorts of merge conflicts. The codemod can be used to transform the incompatable branch before doing the merge. 
+
