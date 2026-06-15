@@ -1,43 +1,43 @@
 ---
 meta:
-  title: I am the title
+  title: Levels of trust in AI 
   description: I am the description
   dateCreated: 2022-11-28
 ---
 
-1. Web based chat session. 
+### 1. Web based chat session. 
 
 Get immediate results. 
 
 This tends to be the best performance you can get with an AI, but it's not practical to be constantly copy pasting code between your IDE and a web based chat session. 
 
 
-2. Live monitoring a single agent in your IDE/CLI - with manual approvals
+### 2. Live monitoring a single agent in your IDE/CLI - with manual approvals
 
-You prompt the agent and observe its reasoning response. You can interdict when the agent seems to be going down the wrong path. 
+You prompt the agent and observe its reasoning response. You can intervene when the agent seems to be going down the wrong path. 
 
 You manually approve each step, so see in a linear order what is happening. 
 
-Problem: often a lot of the commands it wants to run aren't particularly informative to you. (eg. various grep commands)
+**Problem: **often a lot of the commands it wants to run aren't particularly informative to you. (eg. various grep commands)
 
-3. Live monitoring a single agent in your IDE/CLI - with automatic edits
+### 3. Live monitoring a single agent in your IDE/CLI - with automatic edits
 
 As above, but with automatic edits on, you sit there observing its reasoning chain, as well as the changes it is making. You can interdict when it starts going wrong. 
 
-Not really a problem: It becomes hard to visualise the changes it wants to make. Not really a problem, because actually I find the git diff tool in my IDE works fine. 
+**Not really a problem:** It becomes hard to visualise the changes it wants to make. Not really a problem, because actually I find the git diff tool in my IDE works fine. 
 
 
-4. Live monitoring a multi agent session. 
+### 4. Live monitoring a multi agent session. 
 
 As above, but this time the root agent is spawning sub agents. 
 
-For me - this is where things really start breaking down. It's hard to visualise what the subagents are doing, it becomes hard to interdict. 
+For me - this is where things really start breaking down. It's hard to visualise what the subagents are doing, it becomes hard to intervene.
 
-It's worth mentioning that while it might be reasonable to want to visualise what subagents are doing when there are 2-5 agents, it's conceivable that some workflows might involve spawning hundreds of agents, at which point interdicting live would never be a possibility, so any visualisation you had would be more catered around a 'after the fact' forensic accounting. 
+It's worth mentioning that while it might be reasonable to want to visualise what subagents are doing when there are 2-5 agents, it's conceivable that some workflows might involve spawning hundreds of agents, at which point intervening live would never be a possibility, so any visualisation you had would be more catered around a 'after the fact' forensic accounting. 
 
 Workflow ends up being the same - once it has done its work, we view the proposed changes in the git diff. 
 
-5. Set and review later tasks
+### 5. Set and review later tasks
 
 eg. Assigning AI to a Github issue, and having it create a pull request. 
 
@@ -49,12 +49,12 @@ The problem here is that the AI might come up with the right answer, but spends 
 
 Aside: I'm currently operating on the assumption that, even if we're not at all concerned about cost, if an agent is needlessly spending tokens, it's a non-scalable problem. It suggests inefficiencies in the prompting - which, as the codebase grows that same AI will not be able come to the correct solution. 
 
-Big problems I have here: 
+**Big problems I have here:** 
 
 - Lack of visibility of how much the pull request cost me. 
 - Lack of seeing the reasoning chains - so I can optimise the prompts. 
 
-6. Functional verification only
+### 6. Functional verification only
 
 Here, we assign tasks and if it looks like it works, then we merge it, without reading any of the code. 
 
@@ -64,7 +64,7 @@ For my geometric art project, that might be looking at the preview deploy - seei
 
 If the product was some code library, it might involve looking at the tests that were created with it, and reading them to see that they make sense, and generally giving the tool a go. 
 
-7. AI managed feature ideation and delivery. 
+### 7. AI managed feature ideation and delivery. 
 
 In this world, we give a tool like OpenClaw full reign to decide what features should be built and when to merge them. 
 
