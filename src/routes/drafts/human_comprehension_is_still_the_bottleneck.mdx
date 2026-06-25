@@ -11,7 +11,7 @@ tags:
 
 I've been using AI a lot more recently, and I genuinely think it has made me a better developer. 
 
-It has made me realise how much time I have been spending in the past just getting syntax right, or just doing the mechanical parts of coding, or the 'pretty-simple-but-still-requiring-corncerted-thinking' mathsy parts of coding. 
+It has made me realise how much time I have been spending in the past just getting syntax right, or just doing the mechanical parts of coding, or the 'pretty-simple-but-still-requiring-corncerted-thinking' mathsy or algorithmic parts of coding. 
 
 AI gets that stuff done that much faster, that it allows me to be thinking about the higher level patterns, and checking that _they_ are right. 
 
@@ -19,16 +19,70 @@ It means that I'm spending more time creating rules that enforce the patterns, t
 
 It allows me to discover (via asking AI for suggestions) established solutions to a problem I'm facing, and then experiment with them, without fully understanding them, to see if they fit my usecase. 
 
-For example: my side project is a geometric art application. I have a facet that takes a series of points, and connects them via a line. But the low granularity of the points means we get jagged lines. AI was able to explain to me what bezier curves are (something I've heard of but not known what they are), but also suggested a Catmull-Rom Spline for smoothing, which, although it's going to use a bezier curve under the hood, works for my usecase, because I don't need to determine the bezier anchors myself. 
+For example: my side project is a geometric art application. I have a facet that takes a series of points, and connects them via a line. But the low granularity of the points means we get jagged lines. AI was able to explain to me what bezier curves are (something I've heard of but not known what they are), but also suggested a Catmull-Rom spline for smoothing, which, although it's going to use a bezier curve under the hood, works for my usecase, because I don't need to determine the bezier anchors myself. 
 
 It's worth mentioning that there's possibly a bit of Dunning-Kruger at play here. 
 
 For example, I'm an experienced React developer, I know that AI isn't actually that good at writing React code, for example it tends to abuse `useEffect` a bit and it can unnecesserily make components stateful. Some of this might just be my personal preference. I have experience enough to recognise these anti-patterns and curtail them. 
 
-Whereas, where I now see AI as allowing me to learn in these other areas, it's possible that I have just enough knowledge to make think that I/it is going a good job of it, and not enough experience to recognise some well established pitfalls. 
+Whereas, where I now see AI as allowing me to learn in these other areas, it's possible that I have just enough knowledge to make think that I/it is doing a good job of it, and not enough experience for me to recognise some well established pitfalls. 
 
-All this to say that - while AI helps move the developer into a space where they're thinking about the things that actually matter, and AI helps distill information to just what the developer needs to be informed about a thing (To be clear, I mean informing developers about well established software engineering practices. At this point I would not trust an AI to tell me with a great level of accuracy the nuances of how a given codebase works.)
+All this to say that - while AI helps move the developer into a space where they're thinking about the things that actually matter, and AI helps distill information to just what the developer needs to be informed about a thing.  (To be clear, I mean informing developers about well established software engineering practices. At this point I would not trust an AI to tell me with a great level of accuracy the nuances of how a given codebase works.)
 
 However - the limiting factor is still whether the human can understand what is happening. 
 
-Unless you are YOLOing it and creating a codebase that is fully not read by humans at all, (which isn't _necessarily_ the craziest idea, good code is easy to delete, throw a bunch of test cases and an interface spec at an AI and have it create a microservice that you can just delete if it not longer working)
+Unless you are YOLOing it and creating a codebase that is not read by humans at all, 
+
+
+## So lets talk about code that has never been read by humans. 
+
+First, let me be very clear - there absolutely is a time and place to do this. 
+
+Creating throwaway prototypes is one such use case, where either myself, to test whether a concept is possible, or a non-coding product manager type to create a proof of concept of whatever idea they want to build. 
+
+I have found AI tends to be pretty good at these early stages, and its as the codebase grows that things would run into the mud. The exact same problem exists for purely humans developing a codebase.
+
+But beyond throwaway prototypes, it's plausible to have sections of the application that have never been read by humans. I can give several examples from my geometric art application. 
+
+- AlgorithmBuilder typings
+- Mathsy parts of node implementations
+- The entire graph view (though this falls more into the 'throwaway prototype' category of unread code)
+
+But the key thing to highlight here is that _how these things are used_ is understood. 
+
+We might not have read the implementation - but we've read and understood the tests. 
+
+This strategy of 'encapsulate the implementation and expose the interface' ('don't worry about understanding the implentation, just understand what it meant to do') can exist at any level, whether you understand the function signature, but not the implementation, or it's an entire microservice whose REST interface you understand. 
+
+### Could it be an entire application?
+
+There's that video that went viral about Fable one-shotting a horror video game. Set aside my skepticism about the authenticity of it (ie. if the initial prompt has been carefully tailored and had multiple attempts to get right in order to 'one-shot', it's not exactly a true one shot), I think a video game of this genre, or any entertainment media really, can fall into the category of an application that doens't need to be _understood_ by the human, because its an experiential thing. 
+
+Maybe the experience _sucks_ but of course with any of these entertainment mediums, what's good is pretty subjective. 
+
+What I'm getting at here is, imagine a world where we can ask the AI to generate a game like _Goat Simulator_ - and it goes off and does it, the code compiles, the game doesn't crash, we never read a single line of code. 
+
+I think this is most realistic scenario for 'an application that humans don't need to understand'. 
+
+
+_If on the other hand_ the game was something like _Civilisation_ or _Europa Universallis_ - these are games that 'the human needs to understand' - the game has rules and we need to make sure the rules are being applied consistently, otherwise that's not fun. 
+
+## An experiment - designing a video game
+
+I started an experiement where I was going to create a video game, I've never created a video game before, and basically trust the AI to do the coding right. 
+
+The game was going to be a like third-person WASD Factorio like game where you could be a gold miner initially panning for gold, moving up to blasting and tunnel building, or maybe you run a general store, or maybe you're a railway builder. 
+
+So I started doing ideation sessions with the AI, just creating markdown files, planning out interactions, and what the game objects that the player could build etc.
+
+I got about an hour and a half into this, before I realised 'this is a lot of work' - before even a single line of code has been written. 
+
+So AI _isn't_ going to be able to build me this game in a weekend. It might be able to build _a_ game, but it won't be the one that is my head. 
+
+It's possible that in some future, it _will_ be able. The AI has enough understanding of what's in my head, whether that's because of a brain implant, or just because it knows enough about human psychology generally, that with a limited prompt and short back and forth it can infer just what makes me tick. 
+
+There's also the possibility of the future of games and applications generally being tailored to the individual user. Particularly with a single player game, you can imagine an in-game prompting window where the player can say 'this is good, but it would be cool if I could fly/occasionally monsters were waiting around the corner/the view was first person only' and the game is adjusted for them. Easy to see how this would work for single player games, multiplayer is less clear. 
+
+
+## The bottleneck is still human comprehension 
+
