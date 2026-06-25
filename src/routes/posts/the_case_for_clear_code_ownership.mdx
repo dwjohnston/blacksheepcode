@@ -73,7 +73,7 @@ I've worked in both and seen them both be painful to work with.
 #### Multirepos 
 
 
-Multi repo setups very naturally lend themself to their code ownership structure. The people who have permission to approve PRs in that repo are the owners, anyone else _can_ raise pull requests, but nothing gets through without 
+Multi repo setups very naturally lend themself to their code ownership structure. The people who have permission to approve PRs in that repo are the owners, anyone else _can_ raise pull requests, but nothing gets through without the owner's approval. 
 
 Multi repos become tedious to work with when you need to 'make change in repo X, now make requisite corresponding change in repo Y'. 
 
@@ -89,4 +89,10 @@ Each package in the monorepo _should_ stand in its own right. They should be abl
 If some kind of enforcement of dependency versions and tooling is required, then this is a capability that needs to be instilled into each team, it's not something that should become the responsibility of 'the platform team' that is responsible for common tooling to uplift. 
 
 
+### Common patterns and tooling 
 
+It may be that there are common tools or code styles that are to be enforced in the organisation. 
+
+I think the way to view this, is that providing training, documentation, guidance, tooling etc for whatever pattern this is, is a _service_ that one team provides everyone else. 
+
+To give an analogy - Microsoft produces the tool TypeScript. A small start up might use TypeScript. It is not Microsoft's responsibility to maintain the start up's TypeScript configuration, or to enforce that people are using it correctly. However, they might provide training and whatever other tools to help people use the tool effectively.  
