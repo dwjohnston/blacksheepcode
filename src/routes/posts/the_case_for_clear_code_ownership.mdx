@@ -9,19 +9,19 @@ tags:
   
 ---
 
-In some organisations I've worked in, there has been a problem with code ownership, where you have dozens of developers working in a monorepo, but there's not clear owner of each part of code. 
+In some organisations I've worked in, there has been a problem with code ownership, where you have dozens of developers working in a monorepo, but there's no clear owner of each part of code. 
 
-## The kinds of problems I see when there a lack of clear code ownership
+## The kinds of problems I see when there is a lack of clear code ownership
 
 - [Diffusion of responsibility](https://en.wikipedia.org/wiki/Diffusion_of_responsibility) - ‘if everyone owns a thing, nobody owns a thing’
-- A given developer can not reasonably be expected to have an indepth knowledge of the entire application of such size. Better to constrain where their focus is and allow them to develop a deep expertise. 
+- A given developer can not reasonably be expected to have an in-depth knowledge of the entire application of such size. Better to constrain where their focus is and allow them to develop a deep expertise. 
 - There may not be a clear point person to go to understand how a particular part of the application works. 
 - Developers do not have the incentive to produce high quality work if:
    - This is the only time they are touching it
    - They think someone else is going to come along and mess it up anyway. 
-- Code reviews are not given the right consideration  when it comes from someone outside of the their feature group
+- Code reviews are not given the right consideration when it comes from someone outside of their feature group
   - Pull requests can either be LGTM-approved without real consideration, or simply given no attention at all. 
-- tug-o-wars happening in the code base. In any large team, people are going to disagree about approaches, getting consensus on on every issue for every person is simply impractical. What can happen is that where two developers disagree it can be a matter of ‘who can get their approach merged first’ that wins the day. 
+- tug-o-wars happening in the code base. In any large team, people are going to disagree about approaches, getting consensus on every issue for every person is simply impractical. What can happen is that where two developers disagree it can be a matter of ‘who can get their approach merged first’ that wins the day. 
 - A lot of time is spent trying to get consensus on or socialise every technical decision. This is an N*M kind of problem, as the codebase grows, there are more technical decisions to be made, and there are more people to communicate each of those decisions to. You can try sort those decisions out in One Big Meeting™, but you’re not going to have the time to give anything other than a very surface level consideration if you’re trying to resolve every issue. 
 
 
@@ -38,10 +38,10 @@ Let’s start with the good faith assumption that most developers:
 
 In order to do their best work - developers need to feel enabled to do their best work. 
 
-Having to get buy in from dozens of people becomes a major point of friction, to the point where it seems not worth trying a thing, if doesn’t have a good chance of being adopted anyway. 
+Having to get buy in from dozens of people becomes a major point of friction, to the point where it seems not worth trying a thing, if it doesn’t have a good chance of being adopted anyway. 
 
 - “In order to adopt X tool, I need to convince my two team mates” - 👍 Sounds doable
-- “In order to adopt X tool, I need to present the idea to a group of 30, where someone is likely to have an objection, there’s needs to be some rounds of approval” - 🫤 dies in bureaucracy. 
+- “In order to adopt X tool, I need to present the idea to a group of 30, where someone is likely to have an objection, there needs to be some rounds of approval” - 🫤 dies in bureaucracy. 
 
 
 
@@ -60,8 +60,8 @@ It might sound like I’m suggesting creating a bunch of silos of teams of 2-5 d
 - Which, yes, organisational structures tend to resemble that anyway 
 - But: that’s not to say that developers can’t otherwise be talking to each other. 
     - Firstly, if two systems depend on each other, the developers are talking to each other to negotiate the contract 
-    - You can build an culture of knowledge sharing and collaboration without having unclear code ownership patterns
-         - In fact, clear code ownership is may increase knowledge sharing, if someone is saying ‘hey, check out this code I wrote, I’m really proud of it'. 
+    - You can build a culture of knowledge sharing and collaboration without having unclear code ownership patterns
+         - In fact, clear code ownership may increase knowledge sharing, if someone is saying ‘hey, check out this code I wrote, I’m really proud of it’. 
 
 
 ## Solutions 
@@ -86,7 +86,7 @@ Monorepos can quickly become a sludge of dependencies and tooling at the top lev
 
 Each package in the monorepo _should_ stand in its own right. They should be able to have their own tooling, own dependency versions. 
 
-If some kind of enforcement of dependency versions and tooling is required, then this is a capability that needs to be instilled into each team, it's not something that should become the responsibility of 'the platform team' that is responsibible for common tooling to uplift. 
+If some kind of enforcement of dependency versions and tooling is required, then this is a capability that needs to be instilled into each team, it's not something that should become the responsibility of 'the platform team' that is responsible for common tooling to uplift. 
 
 
 
