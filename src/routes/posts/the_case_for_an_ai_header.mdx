@@ -39,13 +39,13 @@ Exceptions:
 ```
 
 
-This is simple enough prompt that is hard to get wrong.
+This is a simple enough prompt that it's hard to get wrong.
 
 ## But why?
 
 Mostly to improve signal when working in teams.  
 
-If a colleague creates a pull request with dozens of files of pristine, comprehensively tested code, this immediately triggers a 'this looks AI generated to me' kind of though.
+If a colleague creates a pull request with dozens of files of pristine, comprehensively tested code, this immediately triggers a 'this looks AI generated to me' kind of thought.
 
 _Which is fine_. 
 
@@ -58,7 +58,7 @@ But:
 
 ## What's wrong with it 
 
-- You could argue that if we have configured our AI to be commiting, and it has the 'Co-Authored-By:` note in the commit message that this suffices to understand where the code from, but:
+- You could argue that if we have configured our AI to be committing, and it has the `Co-Authored-By:` note in the commit message, that this suffices to understand where the code came from, but:
   - That commit message will be lost if squash merging
   - Some times commits are made manually
   - Commit messages are not nearly as readily apparent as code
@@ -68,7 +68,7 @@ But:
   - That's where diving in to the commit history for the file can help
 
 - Communicating just what the level of human overview/intent is, is messy
-  - Say you did a TDD approach where you carefully supervised the AI in creating tests cases, but the actual code, in 10 different files was purely AI generated - how exactly do you communicate this?
+  - Say you did a TDD approach where you carefully supervised the AI in creating test cases, but the actual code, in 10 different files, was purely AI generated - how exactly do you communicate this?
       - Copy paste that message to each header file?
       - Have a `HUMANS.md` file in the folder that explains it?
       - Just explain it once in the test file, and hope that the future reader knows to look there?
