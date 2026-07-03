@@ -24,11 +24,12 @@ Fast forward to yesterday, I think 'well Opus did a great job the other day, I'v
 
 When we're using AI it seems that if we're not careful it starts becoming very hacky, hard coding things, copy pasting things, adding `@ts-ignores` etc, so we update our system prompts to keep it on track - "Don't do X", "if you encounter this situation, do Y" etc. 
 
-But humans can be just as tempremental, if not more. Sometimes we're under pressure, or we're just tired, and can think 'TDD will take too long, let me just get this thing working first'*
+But humans can be just as tempremental, if not more. Sometimes we're under pressure, or we're just tired, and can think <TextHighlight comment={<><p>To be clear, jumping straight to implmentation is often warraneted, IMO. </p><p>Particularly if you're not sure if a thing is going to work, you want a quick session to prove the concept generally, but once you start refinding the details, you're going to have a much better time driving things with clear tests.</p></>}>'TDD will take too long, let me just get this thing working first'</TextHighlight>
 
-I think maybe it can be a good idea to include in our system prompts not only guard rails to stop the AI going off track, but also instructions _to guide the human_. For example if the AI recieves a prompt 'we need a ClI tool to do X' instructions to have the AI come back with 'OK, are you use you want me to just go off and do this? In the past we've establised that creating a decision tree and doing TDD is is most effective'. Or - 'I see that you just `git commit -am "fix" --no-verify` more than 100 files, do you think maybe we should take break?'
-
-There are equivilent tools in other industries - vigilance switches on trains come to mind, where the the device will make an annoying sound and the driver must press a button to prove they are still awake, otherwise the train comes to a stop. 
+Maybe we can include in our system prompts not only guard rails to stop the AI going off track, but also instructions _to guide the human_. For example if the AI recieves a prompt 'we need a ClI tool to do X' instructions to have the AI come back with 'OK, are you use you want me to just go off and do this? In the past we've establised that creating a decision tree and doing TDD is is most effective'. Or - 'I see that you just `git commit -am "fix" --no-verify` more than 100 files, do you think maybe we should take break?'
 
 Maybe I shoudn't design chatbots, because both of those sound super annoying, but that's the idea.
+
+There are equivilent tools in other industries - vigilance control devices on trains come to mind - the device will make an annoying sound and the driver must press a button to prove they are still awake, otherwise the train comes to a stop. 
+
 
