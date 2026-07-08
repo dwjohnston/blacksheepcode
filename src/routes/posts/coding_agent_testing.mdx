@@ -22,7 +22,7 @@ The idea is, the behaviour of a coding agent is a non-deterministic function of 
 
 1. The state of your codebase
 2. The state of your prompts (AGENTS.md, SKILL.md files, etc), also, the original prompt
-3. The model you are runnning
+3. The model you are running
 4. The LLM harness you are using. 
 
 ## The problem 
@@ -35,7 +35,7 @@ As I'm seeing it there's a few different strategies/styles
 
 
 1. Just one big session. 
-2. Make use of skills - skill essentially pull in new context as needed. 
+2. Make use of skills - skills essentially pull in new context as needed. 
     - Each skill does add something to context, even if not used, all of the stuff in the frontmatter will be in the context from token 0. 
 3. Make use of subagents 
     - Subagents will contain their own context. 
@@ -84,7 +84,7 @@ Some pretty easy things:
 - Assertions against the existence of specific files. 
     - eg. did they write a test? 
     - Did they write files with the right format
-- Did they do a 'as any' or '@ts-ignore'? 
+- Did they do an 'as any' or '@ts-ignore'? 
 - Did they write way too many tests?
 - Did they update project documentation? 
 
@@ -100,8 +100,8 @@ Some harder things:
 - Total token consumption 
     - I'm finding a lot of the AI providers are making this kind of information hard to find. 
 - Did the agent spawn subagents? 
-    - It can be argued that this isn't relevant - what we really care about is code correctness, and then speed and cost. If your prompts cause the agent to spawn subagents, or not, and this affects the code quality or time, then it's the impact on  code quality and time that gets measured.
-        - However, I can see that you might still want to be testing this, particularly if you were testing some kind of adverserial review type workflow, and wanting to check that the right agent model was spawned, etc. 
+    - It can be argued that this isn't relevant - what we really care about is code correctness, and then speed and cost. If your prompts cause the agent to spawn subagents, or not, and this affects the code quality or time, then it's the impact on code quality and time that gets measured.
+        - However, I can see that you might still want to be testing this, particularly if you were testing some kind of adversarial review type workflow, and wanting to check that the right agent model was spawned, etc. 
 
 
 --- 
