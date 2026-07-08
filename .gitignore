@@ -5,7 +5,7 @@ node_modules
 /.netlify
 .env
 *.log
-
+.claude/
 
 # Sentry Config File
 .sentryclirc

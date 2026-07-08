@@ -1,0 +1,118 @@
+---
+meta:
+  title: Does this tool exist? A tool for comparing/testing the difference between LLM harnesses, models and prompts
+  description: All the talk in the world about certain prompting techniques, models, or workflow strategies isn't very useful unless you can actually measure it 
+  dateCreated: 2026-07-08
+
+series: 
+  name: tools_i_want_to_exist
+  part: 3
+
+tags: 
+  - "testing"
+  - "ai"
+
+---
+
+Does this tool exist? 
+
+
+The idea is, the behaviour of a coding agent is a non-deterministic function of four things: 
+
+
+1. The state of your codebase
+2. The state of your prompts (AGENTS.md, SKILL.md files, etc), also, the original prompt
+3. The model you are running
+4. The LLM harness you are using. 
+
+## The problem 
+
+There is a lot of talk about 'do this technique, it's really helpful'. 
+
+## Context Management
+
+As I'm seeing it, there are a few different strategies/styles
+
+
+1. Just one big session. 
+2. Make use of skills - skills essentially pull in new context as needed. 
+    - Each skill does add something to context, even if not used, all of the stuff in the frontmatter will be in the context from token 0. 
+3. Make use of subagents 
+    - Subagents will contain their own context. 
+        - With subagents, is it possible to spawn subagents that retain all of the context so far vs spawn subagents with an entirely new context? 
+        - I'm not sure, good experiment. 
+
+
+And so we can play around with all these things, and it feels like we're making progress, but: 
+
+I'd liken this to fixing whatever bug, but not writing a test for it. Particularly if, say, it was a performance improvement you were doing - in order to know you have made a performance improvement, you need to have _measured_ something. 
+
+
+## The concept 
+
+Of those four variables, we hold three and modify the other. 
+
+
+The variables once again: 
+
+- State of the code base C
+- Prompt configuration P
+- Model M 
+- Harness H 
+
+The way this can be done is something like this - 
+
+1. We identify a task that we think is a good candidate for AI. 
+    - This is likely a task we have already done. 
+2. We capture a snapshot of our codebase at that time 
+    - i.e. we make note of the commit hash
+
+3. We conduct our experiment: 
+    i. Check the codebase out to the special commit to get codebase state C
+    ii. We apply prompt configuration P
+    iii. We run our task using harness H and model M 
+
+4. Then: we apply a set of objective measurements against the results: 
+
+Some very easy things to measure: 
+
+- Total time
+- Does the result compile/pass tests etc
+
+Some pretty easy things: 
+
+- Assertions against the existence of specific files. 
+    - eg. did they write a test? 
+    - Did they write files with the right format
+- Did they do an 'as any' or '@ts-ignore'? 
+- Did they write way too many tests?
+- Did they update project documentation? 
+
+
+Some harder things: 
+
+- Do the function signatures make sense? 
+- Are the functions named correctly? 
+    - For some of these, I think the easiest way to go is to have lint rules, that way, it becomes a 'did it pass linting'
+- Is the code actually correct? 
+    - The best idea I have in mind here is that as part of our prompt test, we have an actual test, where if we know the name of the file and the functions it exports, the test can run for correctness. 
+
+- Total token consumption 
+    - I'm finding a lot of the AI providers are making this kind of information hard to find. 
+- Did the agent spawn subagents? 
+    - It can be argued that this isn't relevant - what we really care about is code correctness, and then speed and cost. If your prompts cause the agent to spawn subagents, or not, and this affects the code quality or time, then it's the impact on code quality and time that gets measured.
+        - However, I can see that you might still want to be testing this, particularly if you were testing some kind of adversarial review type workflow, and wanting to check that the right agent model was spawned, etc. 
+
+
+--- 
+
+
+Does such a tool exist? 
+
+The most relevant thing I have found is PromptFoo - but as I can see it, this is more about testing autonomous agents like chatbots, where you're asserting on prompt output and tool calls. 
+
+This is otherwise my latest side project. 
+
+
+
+
