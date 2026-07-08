@@ -1,7 +1,7 @@
 ---
 meta:
   title: Does this tool exist? A tool for comparing/testing the difference between LLM harnesses, models and prompts
-  description: All the talk in the world of what certain prompting techniques, or models, workflow strategies isn't very useful unless you can actually measure it 
+  description: All the talk in the world about certain prompting techniques, models, or workflow strategies isn't very useful unless you can actually measure it 
   dateCreated: 2026-07-08
 
 series: 
@@ -31,7 +31,7 @@ There is a lot of talk about 'do this technique, it's really helpful'.
 
 ## Context Management
 
-As I'm seeing it there's a few different strategies/styles
+As I'm seeing it, there are a few different strategies/styles
 
 
 1. Just one big session. 
@@ -43,9 +43,9 @@ As I'm seeing it there's a few different strategies/styles
         - I'm not sure, good experiment. 
 
 
-And so we can play around with all these things, and it feel like we're making progress, but: 
+And so we can play around with all these things, and it feels like we're making progress, but: 
 
-I'd liken this to fixing whatever bug, but not writing a test for it. Particularly if say it was a performance improvement you were doing, in order to know you have made a performance improvement you need to have _measured_ something. 
+I'd liken this to fixing whatever bug, but not writing a test for it. Particularly if, say, it was a performance improvement you were doing - in order to know you have made a performance improvement, you need to have _measured_ something. 
 
 
 ## The concept 
@@ -65,7 +65,7 @@ The way this can be done is something like this -
 1. We identify a task that we think is a good candidate for AI. 
     - This is likely a task we have already done. 
 2. We capture a snapshot of our codebase at that time 
-    - ie. we make note of the commit hash
+    - i.e. we make note of the commit hash
 
 3. We conduct our experiment: 
     i. Check the codebase out to the special commit to get codebase state C
@@ -95,7 +95,7 @@ Some harder things:
 - Are the functions named correctly? 
     - For some of these, I think the easiest way to go is to have lint rules, that way, it becomes a 'did it pass linting'
 - Is the code actually correct? 
-    - The best idea I have in mind here is that as part of our prompt test, we have an actual test, where if know the name of the file and the functions it exports, the test can run for correctness. 
+    - The best idea I have in mind here is that as part of our prompt test, we have an actual test, where if we know the name of the file and the functions it exports, the test can run for correctness. 
 
 - Total token consumption 
     - I'm finding a lot of the AI providers are making this kind of information hard to find. 
