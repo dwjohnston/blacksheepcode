@@ -9,7 +9,10 @@ tags:
   - "ai"
 ---
 import KnowledgeHose from "@/assets/knowledge_hose.png";
+import ScreenShotGraphView from "@/assets/screenshot_graph_view.jpg";
+
 import Image from "next/image";
+import { GithubPermalinkRsc, GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
 
 I've been using AI a lot more recently, and I genuinely think it has made me a better developer. 
 
@@ -45,11 +48,52 @@ I have found AI tends to be pretty good at these early stages, and it's as the c
 
 But beyond throwaway prototypes, it's plausible to have sections of the application that have never been read by humans. I can give several examples from my geometric art application. 
 
-- AlgorithmBuilder typings
-- Mathsy parts of node implementations
-- The entire graph view (though this falls more into the 'throwaway prototype' category of unread code)
 
-But the key thing to highlight here is that _how these things are used_ is understood. 
+<details>
+<summary>Expand to see code</summary>
+
+I have not read the these typings:
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/schema/typeHelpers.ts#L141-L156"/>
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/schema/builder.ts#L54-L75"/>
+
+
+However, I did pay attention when doing TDD to create them: 
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/schema/typeHelpers.test.ts#L741-L753"/>
+
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/schema/builder.test.ts#L597-L624"/>
+
+Also, for what it's worth, I have implemented typings like this by hand before. 
+
+---
+
+I have not been reading this code: 
+
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/nodes/compute/nodes/pointsOnALineV2.ts#L161-L182"/>
+
+Verfication is done by observing the behaviour of the application. 
+
+Snapshot tests detect if behaviour is changing.
+
+---
+
+
+This component was vibe coded without any attention to the code: 
+
+<Image src={ScreenShotGraphView} alt ="Screenshot of an application showing modular synthesizer-esque modules with lines connecting them" 
+maxWidth={1000} style={{display: "block",margin: "0 auto"}}/> 
+
+I did write a test though:
+
+<GithubPermalinkRsc permalink="https://github.com/david-johnston-org/geoart-agentic/blob/fdac9be1957ceb37a370cfa3f0717e0f3e21aa8b/src/application/GraphView.browser.test.tsx#L7-L28"/>
+
+</details>
+
+The key thing to highlight here is that _how these things are used_ is understood. 
 
 We might not have read the implementation - but we've read and understood the tests. 
 
