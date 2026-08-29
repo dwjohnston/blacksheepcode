@@ -3,30 +3,29 @@ import { usePathname } from "next/navigation";
 import { PropsWithChildren } from "react";
 
 const PATHS = {
-	"/posts": "Blog",
-	"/about": "About",
-	"/open-source": "Open Source",
-	"/ai-policy": "AI Policy",
-
+  "/posts": "Blog",
+  "/about": "About",
+  "/open-source": "Open Source",
+  "/ai-policy": "AI Policy",
 };
 
 export function Nav() {
-	const pathName = usePathname();
+  const pathName = usePathname();
 
-	return (
-		<nav>
-			{Object.entries(PATHS).map((v) => {
-				const [key, value] = v;
-				return (
-					<a
-						href={key}
-						key={key}
-						className={key === pathName ? "active" : "not-active"}
-					>
-						{value}
-					</a>
-				);
-			})}
-		</nav>
-	);
+  return (
+    <nav>
+      {Object.entries(PATHS).map((v) => {
+        const [key, value] = v;
+        return (
+          <a
+            href={key}
+            key={key}
+            className={key === pathName ? "active" : "not-active"}
+          >
+            {value}
+          </a>
+        );
+      })}
+    </nav>
+  );
 }

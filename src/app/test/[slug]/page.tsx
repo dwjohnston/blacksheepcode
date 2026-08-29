@@ -1,38 +1,42 @@
 import { BlogPostFrame } from "@/components/BlogPostFrame/BlogPostFrame";
-import { getAllPostFrontmatter, getBlogContent, getMetadata } from "@/utils/blogPosts";
+import {
+  getAllPostFrontmatter,
+  getBlogContent,
+  getMetadata,
+} from "@/utils/blogPosts";
 import { notFound } from "next/navigation";
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 export async function generateStaticParams() {
-
-    const allFrontMatter = await getAllPostFrontmatter("test");
-    return allFrontMatter.map((v) => {
-
-        return { slug: v.slug.replace("test/", "") }
-    })
+  const allFrontMatter = await getAllPostFrontmatter("test");
+  return allFrontMatter.map((v) => {
+    return { slug: v.slug.replace("test/", "") };
+  });
 }
 
-export async function generateMetadata(props: { params: Promise<{
-    slug: string
-}> }) {
-    const params = await props.params;
-    return getMetadata(`/test/${params.slug}`);
+export async function generateMetadata(props: {
+  params: Promise<{
+    slug: string;
+  }>;
+}) {
+  const params = await props.params;
+  return getMetadata(`/test/${params.slug}`);
 }
 
-export default async function PageLayout(props: PropsWithChildren<{
+export default async function PageLayout(
+  props: PropsWithChildren<{
     params: Promise<{
-        slug: string
-    }>
-}>) {
+      slug: string;
+    }>;
+  }>
+) {
+  if (process.env.SHOW_TEST_PAGES !== "true") {
+    notFound();
+  }
 
-    if(process.env.SHOW_TEST_PAGES !== "true") {
-        notFound();
-    }
-
-    const params = await props.params;
-    const content = await getBlogContent( params.slug,"test");
-    return <BlogPostFrame pathname={`/test/${params.slug}`}>
-        {content}
-    </BlogPostFrame>
-
+  const params = await props.params;
+  const content = await getBlogContent(params.slug, "test");
+  return (
+    <BlogPostFrame pathname={`/test/${params.slug}`}>{content}</BlogPostFrame>
+  );
 }

@@ -1,7 +1,5 @@
-import {getRss} from "./getRss"; 
-import fs from "fs"; 
-const xml = getRss()
-
+import fs from "node:fs";
+import { getRss } from "./getRss";
+const xml = getRss();
 
 fs.writeFileSync("public/rss.xml", xml);
-

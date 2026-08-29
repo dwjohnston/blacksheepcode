@@ -1,13 +1,9 @@
-import { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 type TextHighlightProps = {
-    commentContent: React.ReactNode;
-}
+  commentContent: React.ReactNode;
+};
 
-export function TextHighlight(props: PropsWithChildren<TextHighlightProps>){
-
-    return <span className="text-highlight">
-        {props.children}
-    </span>
-
+export function TextHighlight(props: PropsWithChildren<TextHighlightProps>) {
+  return <span className="text-highlight">{props.children}</span>;
 }

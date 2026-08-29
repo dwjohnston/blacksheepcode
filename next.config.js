@@ -4,13 +4,14 @@ const { withSentryConfig } = require("@sentry/nextjs");
 const nextConfig = {
   experimental: {
     reactCompiler: {
-      compilationMode: 'annotation',
+      compilationMode: "annotation",
     },
   },
-  serverExternalPackages: ['require-in-the-middle', 'import-in-the-middle', '@opentelemetry/instrumentation'],
-
-
-
+  serverExternalPackages: [
+    "require-in-the-middle",
+    "import-in-the-middle",
+    "@opentelemetry/instrumentation",
+  ],
 
   // Ignores the opentelemetry warning
   // see: https://github.com/open-telemetry/opentelemetry-js/issues/4173
@@ -19,19 +20,13 @@ const nextConfig = {
     { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
   ) => {
     if (isServer) {
-      config.ignoreWarnings = [
-        { module: /opentelemetry/, },
-      ]
+      config.ignoreWarnings = [{ module: /opentelemetry/ }];
     }
-    return config
+    return config;
   },
 };
 
-
-
-
 // Injected content via Sentry wizard below
-
 
 module.exports = withSentryConfig(module.exports, {
   // For all available options, see:
