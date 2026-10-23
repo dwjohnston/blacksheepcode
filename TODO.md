@@ -5,3 +5,6 @@
 - Add an image panel that includes: 
     - Description, include AI disclaimer. 
 - Add .md variants of pages. 
+- Add mermaidjs renderer
+- Excalidar renderer?
+- Add in AGENTs.md files and make sure everything still works 
