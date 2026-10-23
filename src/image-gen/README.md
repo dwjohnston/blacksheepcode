@@ -34,6 +34,19 @@ This regenerates `src/assets/corporate_value_funnel.png` at 3520 × 2800 and
 [Excalidraw](https://excalidraw.com) to edit the shapes and text.
 Rendering replaces both destination files.
 
+## Render the version with siphoning
+
+```sh
+npm run render:siphoning --prefix src/image-gen
+```
+
+This uses `corporate-value-funnel-siphoning.js` and saves
+`src/assets/corporate_value_funnel_siphoning.png` and the corresponding
+`.excalidraw` file. Rose-colored arrows carry dollars out through the pyramid's
+sides from the four outer bureaucracy nodes. The middle person has no siphoning
+branch. The main flow continues to the CEO and shareholders. This version has
+separate source and output files.
+
 ## Create another diagram
 
 Copy `corporate-value-funnel.js` within this folder and change the labels,

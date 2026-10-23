@@ -1,0 +1,7 @@
+- Switch to bun
+- Switch to oxlint
+- Switch to playwright
+- Add live reload
+- Add an image panel that includes: 
+    - Description, include AI disclaimer. 
+- Add .md variants of pages. 

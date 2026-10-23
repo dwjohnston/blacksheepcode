@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Generate editable Excalidraw diagrams and export them as PNG assets.",
   "scripts": {
-    "render": "node render.mjs"
+    "render": "node render.mjs",
+    "render:siphoning": "node render.mjs --input corporate-value-funnel-siphoning.js --output ../assets/corporate_value_funnel_siphoning.png"
   },
   "engines": {
     "node": ">=20.15.0"
