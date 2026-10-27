@@ -1,0 +1,377 @@
+---
+meta:
+  title: I am the title
+  description: I am the description
+  dateCreated: 2022-11-28
+tags: 
+  - "typescript"
+
+---
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
+
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+<InfoPanel level="info">
+  <p>This post very much falls into a true purpose of this blog, which is to serve as a reference for myself to look up later.</p>
+</InfoPanel>
+
+
+
+The [`moduleResolution`](https://www.typescriptlang.org/tsconfig/#moduleResolution) property of TypeScript's tsconfig.json is likely one of the less understood options - one that people change randomly until their application works and then they don't touch again. 
+
+
+## First - forget TypeScript - let's understand how NodeJS behaves as it relates to modules 
+
+Understanding the behaviour of NodeJS and modules is the key to understanding this whole thing. 
+
+
+
+### CJS and ESM 
+
+There are other module formats - but for our purposes we can ignore them. 
+
+#### CommonJS (CJS)
+
+CJS (CommonJS) modules look like this: 
+
+```js
+module.exports = {
+  foo: () => console.log("hello world!"); 
+}
+```
+
+or 
+
+```js
+exports.foo = () => {}
+```
+
+and imported like 
+
+```js
+// package import 
+const {bar} = require("the-package"); 
+
+// Relative module import
+const {foo} = require("./the-module.js"); 
+```
+
+CJS modules are the OG module format, developed specifically for node: 
+
+> CommonJS modules are the original way to package JavaScript code for Node.js.
+
+[Link](https://nodejs.org/api/modules.html#modules-commonjs-modules)
+
+CJS modules _only_ work in a Node environment. Of course - they can be transpiled/bundled to create code that can run in a browser environment. 
+
+#### EcmaScript Modules (ESM)
+
+EcmaScript Modules are the 'modern' module format that are specced by the [EcmaScript] standard itself](https://tc39.es/ecma262/#sec-modules). That is, anything that is said to be running JavaScript, should support ESM modules. 
+
+**Node can run both ESM and CJS modules and [has done so since Node 14 (2020)](https://nodejs.org/en/blog/release/v14.0.0)**. 
+
+Node supports ESM modules as a first class citizen. 
+
+
+
+
+### File extensions - the rules are different depending on whether you are using `require` or `import`
+
+<InfoPanel level="instruction">
+  <p>For now, assume that you are running code without a package.json present. </p>
+  <p>The presence of a package.json changes Node's behaviour.</p>
+</InfoPanel>
+
+
+#### `require` - File extensions are optional 
+
+
+>If the exact filename is not found, then Node.js will attempt to load the required filename with the added extensions: .js, .json, and finally .node.
+https://nodejs.org/api/modules.html#file-modules
+
+So something like this is valid 
+
+```
+//main.js
+const {foo} = require("./foo"); // Where the file is foo.js
+```
+
+so is this: 
+
+```
+//main.js
+const {foo} = require('./foo.js");
+```
+
+But this: 
+```
+//main.js
+const {foo} = require('./foo"); // Where the file is foo.cjs
+```
+
+Is not ok, they have mismatching file extensions so an explicit file extension is required: 
+
+```
+//main.js
+const {foo} = require('./foo.cjs");
+```
+
+
+#### `import` - File extensions are always required 
+
+> A file extension must be provided when using the import keyword to resolve relative or absolute specifiers. Directory indexes (e.g. './startup/index.js') must also be fully specified.
+
+https://nodejs.org/api/esm.html#mandatory-file-extensions
+
+This is possibly the first trip up. As web developers we've been using bundlers for so long, we've just become used to dropping the file extensions - but when using `import` it is always required. 
+
+We were using bundlers _before_ ESM modules were supported by Node - and so when it comes to running ESM in Node directly, all of a sudden there are these new constraints.
+
+### `.cjs` and `.mjs` files determine accepted module syntax. 
+
+The file extensions `.cjs` (for CJS modules)  and `.mjs` (for ESM modules) _are not mere convention_. 
+
+Node uses these file extensions to determine which module format it expects the code to be written in. 
+
+eg. 
+
+```
+// alpha.cjs
+export function foo() {
+
+}
+
+```
+
+```
+node alpha.cjs
+```
+
+Will error with: 
+
+```
+export function foo() {}
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+```
+
+
+As will: 
+
+```
+// bravo.mjs
+module.exports = {
+    
+}
+```
+
+
+```
+node bravo.mjs
+```
+
+```
+module.exports = {};
+^
+
+ReferenceError: module is not defined in ES module scope
+```
+
+So will: 
+
+```
+//charlie.mjs
+const path = require("node:path");
+
+console.log(path);
+
+```
+
+```
+node charlie.mjs
+```
+
+
+```
+const path = require("node:path");
+             ^
+
+ReferenceError: require is not defined in ES module scope, you can use import instead
+```
+
+
+### The `type` property of the `package.json` determines the expected module type of `.js` files 
+
+
+<InfoPanel level="instruction">
+  <p>Now assume you are working with a package.json</p>
+</InfoPanel>
+
+> Authors can tell Node.js to interpret JavaScript as an ES module via the .mjs file extension, the package.json "type" field with a value "module", or the --input-type flag with a value of "module". These are explicit markers of code being intended to run as an ES module.
+
+> Inversely, authors can explicitly tell Node.js to interpret JavaScript as CommonJS via the .cjs file extension, the package.json "type" field with a value "commonjs", or the --input-type flag with a value of "commonjs".
+
+> When code lacks explicit markers for either module system, Node.js will inspect the source code of a module to look for ES module syntax.
+
+https://nodejs.org/api/esm.html#enabling
+
+So in the absense of a package json, we can do 
+
+```
+// delta.js
+module.exports = () => {};
+
+console.log("hello");
+
+```
+
+```
+node delta.js
+```
+
+And this be fine. 
+
+Or
+
+```
+//echo.js
+export default () => {};
+
+console.log("hello");
+
+```
+
+```
+node echo.js
+```
+
+However, in the presences of a package.json with `"type": "module"` 
+
+if we run 
+
+```
+node delta.js
+```
+
+We will get 
+```
+module.exports = () => {};
+^
+
+ReferenceError: module is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and '/Users/davidjohnston/git-workspace/module-play/01_no_package_json copy/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+```
+
+Similarly if we have a package.json with `"type": "commonjs"` and we run 
+
+```
+node echo.js 
+```
+
+We get: 
+
+```
+(node:72515) Warning: Failed to load the ES module: /Users/davidjohnston/git-workspace/module-play/02_no_package_json copy 2/echo.js. Make sure to set "type": "module" in the nearest package.json file or use the .mjs extension.
+(Use `node --trace-warnings ...` to show where the warning was created)
+/Users/davidjohnston/git-workspace/module-play/02_no_package_json copy 2/echo.js:1
+export default () => {};
+^^^^^^
+
+SyntaxError: Unexpected token 'export'
+```
+
+
+### CJS and ESM Modules are generally interoperable
+
+Take an example where we do not have a package.json and we have files of the following format:
+
+| Function Name | Module Format | Extension |
+| ------------- | ------------- | --------- |
+| f1            | ESM           | .js       |
+| f2            | ESM           | .mjs      |
+| f3            | CJS           | .js       |
+| f4            | CJS           | .mjs      |
+
+Now we run our script 
+
+```
+//main_esm.js
+import { f1 } from "./f1_esm.js";
+import { f2 } from "./f2_esm.mjs";
+import { f3 } from "./f3_cjs.js";
+import { f4 } from "./f4_cjs.cjs";
+
+f1();
+f2();
+f3();
+f4();
+
+```
+
+```
+node main_esm.js
+```
+
+This runs fine. 
+
+As does an equivilent CJS script. 
+
+In the absence of otherwise being explicitly told via `type` property in the package json - Node inspects the format of the modules being imported and treats them accordingly. 
+
+
+On the other hand, if we are in an environment where we have `"type": "module"` in our `package.json`, Node will treat the `.js` files _only_ as ESM modules and the import of `f3_cjs.js` will fail:
+
+```
+node 
+```
+
+```
+import { f3 } from "./f3_cjs.js";
+         ^^
+SyntaxError: The requested module './f3_cjs.js' does not provide an export named 'f3'
+```
+
+We get a similar - and slightly more helpful error when we try run the equivilent CJS script
+
+```
+exports.f3 = () => {
+^
+
+ReferenceError: exports is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and '/Users/davidjohnston/git-workspace/module-play/01_type_module/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+```
+
+
+
+
+### Dyanmic imports are allowed in CJS modules 
+
+### Limits of ESM and CJS interoperability 
+
+The main constraint on ESM and CJS interopability is that CJS modules can not import ESM modules that contain a top level `await`
+
+> require() only supports loading ECMAScript modules that meet the following requirements:
+
+> The module is fully synchronous (contains no top-level await); and
+
+https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require
+
+
+## Summarising 
+
+Both CJS and ESM are fully valid in Node. 
+
+`.cjs` files will always be treated as CJS modules and `.mjs` files will always be treated as ESM modules.
+
+ESM modules always need to specify file extensions for relative imports. 
+
+CJS modules can omit file extensions and Node will attempt to find files and index files 
+
+Where some confusion can arise is with `.js` files - when it depends on whether Node has been explicitly instructed what module format to use. 
+
+It might be a good convention to ban `.js` files from your codebase - remove any ambiguity. 
+
+
+
+

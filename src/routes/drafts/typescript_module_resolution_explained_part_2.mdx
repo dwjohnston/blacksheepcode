@@ -1,0 +1,82 @@
+---
+meta:
+  title: I am the title
+  description: I am the description
+  dateCreated: 2022-11-28
+tags: 
+  - "typescript"
+
+---
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
+
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+
+Now that we understand some of the nuance of Node's module resolution behaviour - let's turn to TypeScript. 
+
+[TypeScript has a good write up here.](https://www.typescriptlang.org/docs/handbook/modules/theory.html#module-resolution)
+
+>With or without modules involved, the compiler needs to know about the code’s intended runtime environment—what globals are available, for example. 
+
+1. There maybe new(ish) syntax like optional chaining (`foo?.bar`) or constructs (eg. `Promise` has 'only' had widespread support since 2015). 
+2. Module syntax itself needs to be understood by the runtime executing it - eg. these days browsers can understand `import X from "./x"` syntax - but <TextHighlight comment={<p>https://nodejs.org/api/packages.html#determining-module-system</p>}>Node will only respect this format within certain contexts.</TextHighlight>. 
+
+TypeScript uses the term 'host' - 
+
+> When the output code (whether produced by tsc or a third-party transpiler) is run directly in a runtime like Node.js, the runtime is the host.
+
+e.g. You compile some code with `tsc` and then run the outputted file with `node`. 
+
+> When there is no “output code” because a runtime consumes TypeScript files directly, the runtime is still the host.
+
+e.g. You run some code directly with [`tsx`](https://www.npmjs.com/package/tsx).
+
+> When a bundler consumes TypeScript inputs or outputs and produces a bundle, the bundler is the host, because it looked at the original set of imports/requires, looked up what files they referenced, and produced a new file or set of files where the original imports and requires are erased or transformed beyond recognition. (That bundle itself might comprise modules, and the runtime that runs it will be its host, but TypeScript doesn’t know about anything that happens post-bundler.)
+
+Hmmm. 
+
+>When loading modules in a web browser, the behaviors TypeScript needs to model are actually split between the web server and the module system running in the browser. The browser’s JavaScript engine (or a script-based module-loading framework like RequireJS) controls what module formats are accepted, while the web server decides what file to send when one module triggers a request to load another.
+
+Hmmm. 
+
+
+
+## The `module` option 
+
+https://www.typescriptlang.org/tsconfig/#module
+
+This just changes the _outputted_ module format. 
+
+One important thing to note here, is that while Node can understand ESM modules - it needs to be done right: 
+
+- Files need to be named `.cjs` or `.mjs`
+
+or: 
+
+- Package.json needs to have `type: "module"`
+
+TIL: If compiling code with one of the "node" module formats - TypeScript is still smart enough to compile ESM style modules - if they have file extensions `.mts` or `.cts`. 
+
+
+>CommonJS isn’t part of the ECMAScript specification, so runtimes, bundlers, and transpilers have been free to make up their own answers to these questions since ESM was standardized in 2015
+
+
+
+
+## `moduleResolution`
+
+Essentially 'how does TypeScript find the file you are talking about?'. 
+
+The ones we need to care about are 
+
+- Node16 (note that nodenext is identical to node16)
+- Bundler
+
+
+
+Node16 - 
+
+> In Node.js, module specifiers in import statements and dynamic import() calls are not allowed to omit file extensions or /index.js suffixes, while module specifiers in require calls are
+
+Bundler - 
+

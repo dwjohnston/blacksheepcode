@@ -1,0 +1,49 @@
+---
+meta:
+  title: I am the title
+  description: I am the description
+  dateCreated: 2022-11-28
+tags: 
+  - "typescript"
+
+---
+
+
+
+
+import { InfoPanel } from "@/components/InfoPanel/InfoPanel"
+
+import { TextHighlight } from "@blacksheepcode/react-text-highlight";
+
+
+OTHER USEFUL RESOURCES:
+https://github.com/nodejs/package-examples
+
+TODO find that history of javascript repo
+
+
+
+
+
+
+
+In the last post we got into the nuance of module resolution for relative (e.g. `"./foo.js"`) imports.
+
+Now let's turn to package resolution - the behaviour of Node as it relates to resolving imports like: 
+
+```
+import foo from "mypackage";
+```
+
+or 
+
+```
+const foo = require("mypackage");
+```
+
+This section is, in my opinion, a lot simpler. There weren't any surprises here for me. 
+
+The main reason we want to talk about this is that it's important to know about the `exports` property of the package.json. 
+
+
+## Package imports 
