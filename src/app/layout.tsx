@@ -18,6 +18,9 @@ githubPermalinkRscConfig.setConfig({
   })
 })
 
+
+
+
 export const metadata: Metadata = mergeFrontmatterAndDefaultMetadata({
   title: "Black Sheep Code",
   description: "A blog about modern web development"

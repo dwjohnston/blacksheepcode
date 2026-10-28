@@ -1,0 +1,96 @@
+---
+meta:
+  title: Stop trying to understand the code? Nah. 
+  description: If your tool is one that is being depended on - someone needs to understand it. 
+  dateCreated: 2026-10-28
+
+
+tags:  
+    - "ai"
+---
+
+import { GithubPermalinkRsc } from "react-github-permalink/dist/rsc";
+
+There seems to be quite a popular view currently that says: 
+
+> Reading the code that AI outputs is like reading the compiled assembly. That's what people did once upon a time when compilers were first invented.
+
+or
+
+> We're no longer software engineers, we're CTOs. The CTO doesn't understand every line of code in the organisation they manage either. 
+
+On the first point, I think that first point does poigantly get at a feeling of discomfort we are currently experiencing as software developers - there is an amount of having to let go.  
+
+ is that we don't trust don't the technololgy when we first use it, and as we use it more and see it being reliable then we can trust it more. 
+
+But this isn't to say that it's silly to to this period of verification - it could be considered sensible due diligence. 
+
+There's a larger point here. Yes - when I use a compiler I just trust that it works. But that's not to say that no one knows how a compiler works. _Somebody knows how the compiler works_. 
+
+When I write some high level application code, there are multiple layers of abstraction it's built on top, that I do not have a solid understanding of, and nor do I need one. I don't need to know exactly how a car works, to drive one, either. 
+
+But in the pre-AI world, all of those layers are built by one one who understands what it's doing, however flawed their understanding may be. 
+
+And yes - in the pre-AI world, there's was always a bit of not-really-understanding-the-thing-but-good-enough-to-get-the-thing-going. 
+
+But in the AI world if we're building whole layers of our application on code that no human go to understand - that that chain of understanding is broken.
+
+## There's plenty of code that it's ok not to understand 
+
+There absolutely is a place for not understanding the code. 
+
+### Throw away code 
+
+Here's some interesting code that Codex created, when I tasked it with sorting out my media server - putting everything into a consistent folder and file name format. 
+
+```python 
+for src in x['unresolved']:
+ s=Path(src); choices=[]
+ for op in vops:
+  v=Path(op['source']); c=common(s.parent,v.parent)
+  exact=v.stem.lower() in str(s).lower(); match=token(str(s)) and token(str(s))==token(v.stem)
+  single=s.parent==v.parent and len([o for o in vops if Path(o['source']).parent==v.parent and o['reason'] not in ['series extra','movie extra']])==1
+  if c>=3 and (exact or match or single): choices.append((1000*int(exact)+100*int(bool(match))+c,op))
+ if not choices: left.append(src); continue
+ choices.sort(key=lambda t:t[0],reverse=True)
+ if len(choices)>1 and choices[0][0]==choices[1][0]: left.append(src); continue
+ op=choices[0][1]; dest=op.get('destination') or op.get('keeper')
+ if dest in opmap: dest=opmap[dest].get('destination') or opmap[dest].get('keeper')
+ if not dest: left.append(src); continue
+ d=Path(dest); label=re.sub('[^a-zA-Z0-9_.-]','_',s.stem); tail='.'+label
+ lang={'english':'en','eng':'en','french':'fr','italian':'it','dutch':'nl','nor':'no','portuguese':'pt','finnish':'fi','swedish':'sv','chinese':'zh','danish':'da','german':'de','spanish':'es','arabic':'ar','czech':'cs'}
+ for n,code in lang.items():
+```
+
+Just the formatting of this makes it incomprehensible to me. 
+
+But this is throwaway code - it's used for the job and we never need to see this again. 
+
+
+### Code that from the outset we are aren't trying to understand
+
+I've been experimenting with ralph loops and autonomous agentic workflows to produce a zero player game. Perhaps a post for another time. 
+
+In these, from the outset the goal was never to pretend to understand it, this is fine. 
+
+### Well encapsulated code
+
+This is like copy pasting an email regex of stack overflow - it works, you have some tests for it, you don't need to understand it. Its blast radius is limited. 
+
+## But for code you're going to maintain - you should understand it 
+
+Here is a sample commit 
+
+<GithubPermalinkRsc permalink="https://github.com/dwjohnston/thunderjar/blob/0a37b114567d589f9de166cccc8c4c637a3115c1/scripts/release/build-versioned-docs.ts#L5-L32"/>
+
+from this pull request where I had asked AI to extend my build pipeline to: 
+
+- Add the ability to create a release candidate from current main 
+- A preview release from a given pull request
+- Have every version of docs based on tags. 
+
+The whole pull request probably works, and I could just YOLO merge it and test it works. 
+
+But it would always be something that is weighing on me. 
+
+Instead, the approach I've taken has been to update my skills and re-run the task. I'm quite confident AI will be able to do it. 
