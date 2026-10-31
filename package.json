@@ -11,7 +11,7 @@
     "types": "tsc",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "clean": "rm -rf .next src/generated/**/*",
+    "clean": "rm -rf src/generated/**/*",
     "generate:all": "bun run clean && bun run generate:mdx && bun run generate:mdxjson && bun run generate:imagebarrel && bun run generate:rss && bun run generate:sitemap",
     "generate:mdxjson": "rm -rf src/generated/frontmatter && bun utils/extractFrontMatter.bin.ts",
     "generate:imagebarrel": "bun utils/generateImageBarrelFiles.ts",
