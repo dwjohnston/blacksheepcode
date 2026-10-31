@@ -1,5 +1,3 @@
-import fs from "fs-extra";
-import path from "path";
 import remarkFrontmatter from "remark-frontmatter";
 import rehypeHighlight from "rehype-highlight";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
@@ -19,7 +17,7 @@ function extractFrontmatter(str: string) {
 export type WriteFileFn = (path: string, data: string) => Promise<void>;
 
 const defaultWriteFileFn: WriteFileFn = async (path: string, data: string) => {
-  fs.writeFile(path, data);
+  await Bun.write(path, data);
 };
 
 type ErrorMessage = {
@@ -33,57 +31,45 @@ export async function compileMDXFiles(
   writeFileFn = defaultWriteFileFn
 ): Promise<Array<ErrorMessage>> {
   const { compile } = await import("@mdx-js/mdx");
-  const entries = await fs.readdir(inputPath, { withFileTypes: true });
-
-  await fs.ensureDir(outputPath);
-
   const errors: Array<ErrorMessage> = [];
 
-  for (const entry of entries) {
-    const inputFilePath = path.join(inputPath, entry.name);
-    const outputFilePath = path.join(
-      outputPath,
-      entry.name.replace(".mdx", ".mjs")
-    );
+  const relativePaths = await Array.fromAsync(
+    new Bun.Glob("**/*.mdx").scan({ cwd: inputPath })
+  );
 
-    if (entry.isDirectory()) {
-      const result = await compileMDXFiles(
-        inputFilePath,
-        path.join(outputPath, entry.name),
-        writeFileFn
-      );
-      errors.push(...result);
-    } else if (entry.isFile() && entry.name.endsWith(".mdx")) {
-      const mdxContent = await fs.readFile(inputFilePath, "utf-8");
+  for (const relativePath of relativePaths.sort()) {
+    const inputFilePath = `${inputPath}/${relativePath}`;
+    const outputFilePath = `${outputPath}/${relativePath.replace(/\.mdx$/, ".mjs")}`;
 
-      const compiledJS = await compile(mdxContent, {
-        remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
-        rehypePlugins: [[rehypeHighlight, { detect: true }], rehypeSlug],
+    const mdxContent = await Bun.file(inputFilePath).text();
+
+    const compiledJS = await compile(mdxContent, {
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+      rehypePlugins: [[rehypeHighlight, { detect: true }], rehypeSlug],
+    });
+
+    await writeFileFn(outputFilePath, String(compiledJS));
+    const frontMatterString = extractFrontmatter(String(compiledJS));
+
+    try {
+      frontMatterSchema.parse(JSON.parse(frontMatterString ?? "null"));
+      console.log(`✅ ${outputFilePath}`);
+    } catch (err) {
+      const message = `
+              Error parsing file : '${inputFilePath}'. 
+              Failed Zod validation with: ${
+                err instanceof Error && err.message
+              }
+        
+              The object was: ${frontMatterString}
+            `;
+
+      errors.push({
+        file: outputFilePath,
+        message,
       });
-
-      await writeFileFn(outputFilePath, String(compiledJS));
-      const frontMatterString = extractFrontmatter(String(compiledJS));
-
-      try {
-        frontMatterSchema.parse(JSON.parse(frontMatterString ?? "null"));
-        console.log(`✅ ${outputFilePath}`);
-      } catch (err) {
-        const message = `
-                Error parsing file : '${inputFilePath}'. 
-                Failed Zod validation with: ${
-                  err instanceof Error && err.message
-                }
-          
-                The object was: ${frontMatterString}
-              `;
-
-        errors.push({
-          file: outputFilePath,
-          message,
-        });
-        console.log(`❌ ${outputFilePath}`);
-        console.error(message);
-      }
+      console.log(`❌ ${outputFilePath}`);
+      console.error(message);
     }
   }
 

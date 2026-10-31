@@ -1,8 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
 import type { AppendIndexFileFn, CreateSubfolderFn, WriteFileFn} from './extractFrontMatter';
 import { extractFrontMatter } from './extractFrontMatter';
-import path from "path";
-import fs from 'fs';
 
 describe(extractFrontMatter,() => {
 
@@ -16,7 +14,7 @@ describe(extractFrontMatter,() => {
 
 
             const writeFileMock = mock();
-            await extractFrontMatter(path.join(process.cwd(), "utils", "testdata", "scenario1_bluesky"),writeFile, appendFile, createSubfolder, (fileName, data) => {
+            await extractFrontMatter(`${process.cwd()}/utils/testdata/scenario1_bluesky`,writeFile, appendFile, createSubfolder, (fileName, data) => {
                 writeFileMock();
 
                 expect(fileName).toEqual("src/generated/tags.json");
@@ -64,7 +62,7 @@ describe(extractFrontMatter,() => {
                 return Promise.resolve(`generated/${subPath}`)
             })
             await expect(
-                extractFrontMatter(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"),writeFile, appendFile, createSubfolder, mock())
+                extractFrontMatter(`${process.cwd()}/utils/testdata/scenario2_validation_errors`,writeFile, appendFile, createSubfolder, mock())
             ).rejects.toThrowError(/Failed Zod validation with/);
 
         })
