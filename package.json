@@ -8,9 +8,9 @@
     "start": "netlify serve",
     "next:start": "next start",
     "lint": "oxlint",
-    "types": "tsc && tsc -p cypress/tsconfig.json",
-    "test:cypress": "cypress open",
-    "test:cypress:ci": "cypress run --browser chrome",
+    "types": "tsc",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "clean": "rm -rf .next src/generated/**/*",
     "generate:all": "bun run clean && bun run generate:mdx && bun run generate:mdxjson && bun run generate:imagebarrel && bun run generate:rss && bun run generate:sitemap",
     "generate:mdxjson": "rm -rf src/generated/frontmatter && bun utils/extractFrontMatter.bin.ts",
@@ -52,7 +52,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@testing-library/cypress": "^10.0.2",
+    "@playwright/test": "^1.64.1",
     "@types/bun": "^1.4.4",
     "@types/fs-extra": "^11.0.4",
     "@types/js-cookie": "^3.0.6",
@@ -60,7 +60,6 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
-    "cypress": "^14.5.0",
     "fs-extra": "^11.2.0",
     "oxlint": "^1.90.0",
     "sentry-upload-sourcemaps": "^8.13.0",
@@ -74,7 +73,6 @@
   "trustedDependencies": [
     "@blacksheepcode/example-react-autocomplete",
     "@sentry/cli",
-    "cypress",
     "esbuild",
     "sharp"
   ],
