@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { expectMeta, expectSocialImage, expectTitleToContain } from "./helpers";
+import { expect, expectMeta, expectSocialImage, expectTitleToContain, test } from "./helpers";
 
 test.describe("real pages", () => {
   test("code blocks exist", async ({ page }) => {

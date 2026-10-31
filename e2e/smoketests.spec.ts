@@ -1,5 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
-import { expectMeta, expectSocialImage, expectTitleToContain } from "./helpers";
+import { type Page } from "@playwright/test";
+import { expect, expectMeta, expectSocialImage, expectTitleToContain, test } from "./helpers";
 
 async function expectBasicMdx(page: Page) {
   await expect(page.getByRole("heading", { name: "This is a basic MDX test.", exact: true })).toBeVisible();
