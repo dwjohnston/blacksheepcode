@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - master
-env: 
-  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN}}
 
 jobs:
   lint-and-types:
@@ -25,6 +23,16 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      # Turbopack's persistent build cache; cuts compile time on warm runs.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+            nextjs-${{ runner.os }}-
 
       - name: Build
         run: bun run build
