@@ -30,7 +30,7 @@
     "@netlify/plugin-nextjs": "^5.15.11",
     "@next/mdx": "^14.2.4",
     "@opentelemetry/instrumentation": "^0.218.0",
-    "@sentry/nextjs": "^10.53.1",
+    "@sentry/nextjs": "^11.9.0",
     "@types/mdx": "^2.0.13",
     "front-matter": "^4.0.2",
     "human-readable-ids": "^1.0.4",
