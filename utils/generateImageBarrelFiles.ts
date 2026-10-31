@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from "path";
-import imageSize from "image-size";
+import { imageSize } from "image-size";
 
 
 const imageExtensions = [".webp", ".png", ".jpg", ".gif", ".jpeg"]; 
@@ -10,7 +10,7 @@ export function generateImageBarrelFiles(locationOfImages ="src/assets", locatio
     const lines = files.reduce((acc, cur) => {
         if (imageExtensions.includes(path.extname(cur))){
 
-            const dimensions = imageSize(`${locationOfImages}/${cur}`); 
+            const dimensions = imageSize(fs.readFileSync(`${locationOfImages}/${cur}`)); 
 
             const imageName = path.basename(cur, path.extname(cur))
 
