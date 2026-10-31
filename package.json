@@ -18,8 +18,8 @@
     "generate:rss": "bun utils/generateRss.ts",
     "generate:sitemap": "bun utils/generateSitemap.ts",
     "generate:mdx": "bun utils/transformMdx.bin.ts",
-    "test": "vitest",
-    "test:watch": "vitest --watch"
+    "test": "bun test ./utils ./src",
+    "test:watch": "bun test --watch ./utils ./src"
   },
   "dependencies": {
     "@blacksheepcode/example-react-autocomplete": "git+https://github.com/dwjohnston/example-react-autocomplete.git#c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a",
@@ -53,22 +53,19 @@
   },
   "devDependencies": {
     "@testing-library/cypress": "^10.0.2",
-    "@testing-library/react": "^16.0.0",
+    "@types/bun": "^1.4.4",
     "@types/fs-extra": "^11.0.4",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@vitejs/plugin-react": "^4.3.1",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "cypress": "^14.5.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "fs-extra": "^11.2.0",
-    "jsdom": "^24.1.0",
     "sentry-upload-sourcemaps": "^8.13.0",
-    "typescript": "^5",
-    "vitest": "^1.6.0"
+    "typescript": "^5"
   },
   "engines": {
     "bun": ">=1.4.4",
