@@ -10,4 +10,4 @@ fi
 
 deploy_url=$(echo "$output" | grep -o 'Deploy URL: https://[^ ]*' | awk '{print $3}')
 echo "Deploy URL is: $deploy_url"
-CYPRESS_BASE_URL=$deploy_url bun run test:cypress:ci
+PLAYWRIGHT_BASE_URL=$deploy_url bun run test:e2e
