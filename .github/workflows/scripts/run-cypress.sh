@@ -1,5 +1,5 @@
 #!/bin/bash
-output=$(node .github/workflows/scripts/wait-for-netlify-deploy.js)
+output=$(bun .github/workflows/scripts/wait-for-netlify-deploy.js)
 exit_code=$?
 
 # Check if the process exited with a non-zero status
@@ -10,4 +10,4 @@ fi
 
 deploy_url=$(echo "$output" | grep -o 'Deploy URL: https://[^ ]*' | awk '{print $3}')
 echo "Deploy URL is: $deploy_url"
-CYPRESS_BASE_URL=$deploy_url yarn test:cypress:ci
+CYPRESS_BASE_URL=$deploy_url bun run test:cypress:ci

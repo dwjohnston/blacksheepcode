@@ -18,22 +18,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version-file: .bun-version
 
       - name: Install dependencies
-        run: npm i
+        run: bun install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Run Lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Run Types Check
-        run: npm run types
+        run: bun run types
 
       - name: Unit Tests
-        run: npm test
+        run: bun run test
