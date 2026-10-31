@@ -1,0 +1,20 @@
+diff --git a/tsconfig.build.json b/tsconfig.build.json
+index 0f5c3941c0c011ef122d1735ee8e0a79781fc928..949ef368da46459ac7b3185d01ff633a0e161102 100644
+--- a/tsconfig.build.json
++++ b/tsconfig.build.json
+@@ -31,9 +31,12 @@
+     }
+   },
+   "include": [
+-    "src/exports.ts"
++    "src/exports.ts",
++    "src/lib/**/*.tsx"
+   ],
+   "exclude": [
+-    "node_modules"
++    "node_modules",
++    "src/**/*.test.tsx",
++    "src/**/*.stories.tsx"
+   ]
+ }
+\ No newline at end of file

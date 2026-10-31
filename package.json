@@ -3,8 +3,8 @@
   "sideEffects": false,
   "scripts": {
     "build:base": "next build",
-    "build": "npm run generate:all && npm run build:base",
-    "dev": "SHOW_TEST_PAGES=true npm run generate:all && next dev",
+    "build": "bun run generate:all && bun run build:base",
+    "dev": "SHOW_TEST_PAGES=true bun run generate:all && next dev",
     "start": "netlify serve",
     "next:start": "next start",
     "lint": "eslint .",
@@ -12,12 +12,12 @@
     "test:cypress": "cypress open",
     "test:cypress:ci": "cypress run --browser chrome",
     "clean": "rm -rf .next src/generated/**/*",
-    "generate:all": "npm run clean && npm run generate:mdx && npm run generate:mdxjson && npm run generate:imagebarrel && npm run generate:rss && npm run generate:sitemap",
-    "generate:mdxjson": "rm -rf src/generated/frontmatter && tsx utils/extractFrontMatter.bin.ts",
-    "generate:imagebarrel": "tsx utils/generateImageBarrelFiles.ts",
-    "generate:rss": "tsx utils/generateRss.ts",
-    "generate:sitemap": "tsx utils/generateSitemap.ts",
-    "generate:mdx": "tsx utils/transformMdx.bin.ts",
+    "generate:all": "bun run clean && bun run generate:mdx && bun run generate:mdxjson && bun run generate:imagebarrel && bun run generate:rss && bun run generate:sitemap",
+    "generate:mdxjson": "rm -rf src/generated/frontmatter && bun utils/extractFrontMatter.bin.ts",
+    "generate:imagebarrel": "bun utils/generateImageBarrelFiles.ts",
+    "generate:rss": "bun utils/generateRss.ts",
+    "generate:sitemap": "bun utils/generateSitemap.ts",
+    "generate:mdx": "bun utils/transformMdx.bin.ts",
     "test": "vitest",
     "test:watch": "vitest --watch"
   },
@@ -67,12 +67,22 @@
     "fs-extra": "^11.2.0",
     "jsdom": "^24.1.0",
     "sentry-upload-sourcemaps": "^8.13.0",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.15.3",
     "typescript": "^5",
     "vitest": "^1.6.0"
   },
   "engines": {
-    "node": ">=20.15.0"
+    "bun": ">=1.4.4",
+    "node": ">=22.12.0"
+  },
+  "packageManager": "bun@1.4.4",
+  "trustedDependencies": [
+    "@blacksheepcode/example-react-autocomplete",
+    "@sentry/cli",
+    "cypress",
+    "esbuild",
+    "sharp"
+  ],
+  "patchedDependencies": {
+    "example-react-autocomplete@github:dwjohnston/example-react-autocomplete#c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a": "patches/example-react-autocomplete@github%3Adwjohnston%2Fexample-react-autocomplete#c8e74acf9d10aef0dfc2b6f6d33ee811371ab99a.patch"
   }
 }
