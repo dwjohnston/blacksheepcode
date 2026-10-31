@@ -2,7 +2,6 @@
 import { expect, describe, it, mock } from 'bun:test'
 
 import { WriteFileFn, compileMDXFiles } from './transformMdx';
-import path from 'path';
 
 
 describe(compileMDXFiles, () => {
@@ -12,7 +11,7 @@ describe(compileMDXFiles, () => {
             const writeFile = mock();
 
             await compileMDXFiles(
-                path.join(process.cwd(), "utils", "testdata", "scenario1_bluesky"),
+                `${process.cwd()}/utils/testdata/scenario1_bluesky`,
                 'generated',
                 writeFile
             );
@@ -30,7 +29,7 @@ describe(compileMDXFiles, () => {
         it('Throws an error if expected front matter does not exist', async () => {
             const writeFile = mock();
 
-            const result = await compileMDXFiles(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"), 'generated', writeFile);
+            const result = await compileMDXFiles(`${process.cwd()}/utils/testdata/scenario2_validation_errors`, 'generated', writeFile);
             expect(result).toHaveLength(1);
 
             // But write file is still called for all files

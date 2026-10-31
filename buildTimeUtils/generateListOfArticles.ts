@@ -1,14 +1,12 @@
-import { readdir, writeFile, appendFile} from 'node:fs/promises';
-
 const PATH_TO_ARTICLES_COMPONENT = "app/generated/ListOfArticles.tsx"; 
 const PATH_TO_BLOG_POSTS = "app/routes/posts"
 
 async function generateListOfArticles() {
     try {
-        const files = await readdir(PATH_TO_BLOG_POSTS);
+        const files = await Array.fromAsync(new Bun.Glob("*").scan({ cwd: PATH_TO_BLOG_POSTS }));
 
 
-        await writeFile(PATH_TO_ARTICLES_COMPONENT, `
+        let output = (`
         export const ListOfArticles = () => {
 
 
@@ -31,7 +29,7 @@ async function generateListOfArticles() {
             else {
                 const fileName = file.split('.mdx')[0]; 
 
-                await appendFile(PATH_TO_ARTICLES_COMPONENT,  `
+                output += (`
                 <li>
                 <a
                     href="/posts/${fileName}"
@@ -44,10 +42,12 @@ async function generateListOfArticles() {
            
         }
 
-        appendFile(PATH_TO_ARTICLES_COMPONENT, `
+        output += (`
         </ul>
     }
     `)
+
+        await Bun.write(PATH_TO_ARTICLES_COMPONENT, output);
 
 
     } catch (err) {

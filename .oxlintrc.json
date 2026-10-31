@@ -1,12 +1,17 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "nextjs", "typescript", "jsx-a11y", "import"],
+  "plugins": [
+    "react",
+    "nextjs",
+    "typescript",
+    "jsx-a11y",
+    "import"
+  ],
   "categories": {
     "correctness": "warn"
   },
   "env": {
     "browser": true,
-    "node": true,
     "es2024": true
   },
   "rules": {
@@ -14,7 +19,242 @@
     "react-hooks/exhaustive-deps": "warn",
     "nextjs/no-sync-scripts": "error",
     "nextjs/no-html-link-for-pages": "off",
-    "import/namespace": "off"
+    "import/namespace": "off",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "assert",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "assert/strict",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "async_hooks",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "buffer",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "child_process",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "cluster",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "console",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "constants",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "crypto",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "dgram",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "diagnostics_channel",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "dns",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "dns/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "domain",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "events",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "fs",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "fs/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "http",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "http2",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "https",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "inspector",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "inspector/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "module",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "net",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "os",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "path",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "path/posix",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "path/win32",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "perf_hooks",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "process",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "punycode",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "querystring",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "readline",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "readline/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "repl",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "stream",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "stream/consumers",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "stream/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "stream/web",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "string_decoder",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "sys",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "timers",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "timers/promises",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "tls",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "trace_events",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "tty",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "url",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "util",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "util/types",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "v8",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "vm",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "wasi",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "worker_threads",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "zlib",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          },
+          {
+            "name": "fs-extra",
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          }
+        ],
+        "patterns": [
+          {
+            "group": [
+              "node:*"
+            ],
+            "message": "This project runs on Bun. Use Bun APIs (Bun.file, Bun.write, Bun.Glob, Bun.$) instead of Node built-ins."
+          }
+        ]
+      }
+    ]
   },
   "ignorePatterns": [
     "node_modules",
@@ -23,5 +263,19 @@
     ".next",
     "src/generated",
     "next-env.d.ts"
+  ],
+  "globals": {
+    "Bun": "readonly",
+    "process": "readonly"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/image-gen/**"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
   ]
 }
