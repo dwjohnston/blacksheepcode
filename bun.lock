@@ -9,7 +9,7 @@
         "@mdx-js/loader": "^3.1.1",
         "@mdx-js/mdx": "^3.1.1",
         "@mdx-js/react": "^3.1.1",
-        "@netlify/plugin-nextjs": "^5.16.5",
+        "@netlify/plugin-nextjs": "^5.16.6",
         "@next/mdx": "^16.4.5",
         "@opentelemetry/instrumentation": "^0.300.0",
         "@sentry/nextjs": "^11.10.0",
@@ -131,7 +131,7 @@
 
     "@mdx-js/react": ["@mdx-js/react@3.1.1", "", { "dependencies": { "@types/mdx": "^2.0.0" }, "peerDependencies": { "@types/react": ">=16", "react": ">=16" } }, "sha512-f++rKLQgUVYDAtECQ6fn/is15GkEH9+nZPM3MS0RcxVqoTfawHvDlSCH7JbMhAM6uJ32v3eXLvLmLvjGu7PTQw=="],
 
-    "@netlify/plugin-nextjs": ["@netlify/plugin-nextjs@5.16.5", "", {}, "sha512-pt0j/YCZr5Kn2ziGS4Ps+RvREEn5LN2M9iv9iqEgNWZGb4esu7MCMy4RIYS0UR3JuBHxVtsvPHo0gEv+RKFpag=="],
+    "@netlify/plugin-nextjs": ["@netlify/plugin-nextjs@5.16.6", "", {}, "sha512-BXy5WhogsaQOKz+C+KMlWrQupdGkV1a6TmJ6RLF6RwUMz6Oi419RejMD8yB8ttBKqImQDkOE4MmNLx3uEEKxPw=="],
 
     "@next/env": ["@next/env@16.4.5", "", {}, "sha512-JwSPwpdkZL5VMl2jA/q+JI8MZdweAL3xmw5/tb9y/TLtmS0YXZnmYDzSihwk8xTj1OL+WM53gTqaj96yuLp6Xw=="],
 
