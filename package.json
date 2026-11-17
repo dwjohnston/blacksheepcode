@@ -34,7 +34,7 @@
     "@types/mdx": "^2.0.14",
     "front-matter": "^4.0.2",
     "human-readable-ids": "^1.0.4",
-    "image-size": "^2.0.4",
+    "image-size": "^2.1.0",
     "import-in-the-middle": "^3.5.3",
     "js-cookie": "^3.0.8",
     "next": "^16.4.5",
