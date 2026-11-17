@@ -1,7 +1,4 @@
 import fm from "front-matter";
-import fs from 'fs';
-import fsAsync from "fs/promises"
-import path from 'path';
 import { FrontMatter, frontMatterSchema } from "./frontmatterTypings";
 import { getFileGitTimestamps } from "./getFileGitTimestamps";
 
@@ -9,9 +6,10 @@ import { getFileGitTimestamps } from "./getFileGitTimestamps";
 export type WriteFileFn = typeof _writeFile; 
 export type AppendIndexFileFn = typeof _appendIndexFile; 
 export type CreateSubfolderFn = typeof _generateSubfolder; 
+export type WriteFileSyncFn = (filePath: string, data: string) => unknown;
 
 async function _writeFile(filePath:string, slug: string, output: unknown) {
-  await fsAsync.writeFile(filePath, JSON.stringify({
+  await Bun.write(filePath, JSON.stringify({
     slug, 
     frontmatter: output
   }, null, 2));
@@ -20,14 +18,23 @@ async function _writeFile(filePath:string, slug: string, output: unknown) {
 
 }
 
+// Bun has no append API, so appends to the same file are serialized to avoid lost writes.
+const pendingAppends = new Map<string, Promise<unknown>>();
+
 async function _appendIndexFile(filePath:string, fileName: string) {
-  await fsAsync.appendFile(filePath, `export {default as ${fileName}} from './${fileName}.json';\n`);
+  const line = `export {default as ${fileName}} from './${fileName}.json';\n`;
+  const append = (pendingAppends.get(filePath) ?? Promise.resolve()).then(async () => {
+    const file = Bun.file(filePath);
+    const existing = await file.exists() ? await file.text() : "";
+    await Bun.write(filePath, existing + line);
+  });
+  pendingAppends.set(filePath, append);
+  await append;
 }
 
+// Bun.write creates missing parent directories, so no mkdir is needed.
 async function _generateSubfolder(subPath: string) : Promise<string> {
-  const basePath = path.join("src", "generated", "frontmatter", subPath);
-  await fsAsync.mkdir(basePath, { recursive: true }); 
-  return basePath; 
+  return `src/generated/frontmatter/${subPath}`;
 }
 
 
@@ -46,7 +53,7 @@ export async function extractFrontMatter(
   writeFrontmatterFile : WriteFileFn = _writeFile,
   appendIndexFile : AppendIndexFileFn = _appendIndexFile,
   generateSubfolder : CreateSubfolderFn = _generateSubfolder,
-  writeFileSync: typeof fs.writeFileSync = fs.writeFileSync
+  writeTagsFile: WriteFileSyncFn = Bun.write
 ) {
 
   const tagsMap = {} as Record<string, string[]>;
@@ -69,10 +76,9 @@ export async function extractFrontMatter(
   }
 
   async function processFile(inputString: string) {
-    const file = await fsAsync.readFile(inputString);
+    const fileText = await Bun.file(inputString).text();
 
     const timestamps = await getFileGitTimestamps(inputString);
-    const fileText = file.toString();
     const [subPath, fileName] = getParts(inputString);
 
     const output = fm(fileText);
@@ -112,35 +118,23 @@ export async function extractFrontMatter(
     });
 
     const basePath = await generateSubfolder(subPath);
-    await writeFrontmatterFile(path.join(basePath, fileName + ".json"), `${subPath}/${fileName}`, fmContent);
-    await appendIndexFile(path.join(basePath, 'index.js'), fileName);
+    await writeFrontmatterFile(`${basePath}/${fileName}.json`, `${subPath}/${fileName}`, fmContent);
+    await appendIndexFile(`${basePath}/index.js`, fileName);
 }
 
 
 
   async function findMdxFiles(folderPath: string) {
     const promises = [] as Array<Promise<unknown>>;
-    function traverseDir(currentPath: string) {
-      const files = fs.readdirSync(currentPath);
-
-      files.forEach((file) => {
-        const filePath = path.join(currentPath, file);
-        const fileStats = fs.statSync(filePath);
-        if (fileStats.isDirectory()) {
-          traverseDir(filePath);
-        } else if (file.endsWith('.mdx')) {
-          promises.push(processFile(filePath));
-        }
-      });
+    for await (const relativePath of new Bun.Glob("**/*.mdx").scan({ cwd: folderPath })) {
+      promises.push(processFile(`${folderPath}/${relativePath}`));
     }
-
-    traverseDir(folderPath);
     await Promise.all(promises);
   }
 
   await findMdxFiles(folderPath)
 
-  writeFileSync(path.join("src", "generated", "tags.json"), JSON.stringify(tagsMap, null, 2));
+  await writeTagsFile("src/generated/tags.json", JSON.stringify(tagsMap, null, 2));
   console.log("🏷️ Tags written to tags.json")
 }
 

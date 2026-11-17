@@ -7,8 +7,6 @@ on:
   pull_request:
     branches:
       - master
-env: 
-  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN}}
 
 jobs:
   lint-and-types:
@@ -18,22 +16,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
+          bun-version-file: .bun-version
 
       - name: Install dependencies
-        run: npm i
+        run: bun install --frozen-lockfile
+
+      # Turbopack's persistent build cache; cuts compile time on warm runs.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-${{ github.sha }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('bun.lock') }}-
+            nextjs-${{ runner.os }}-
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Run Lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Run Types Check
-        run: npm run types
+        run: bun run types
 
       - name: Unit Tests
-        run: npm test
+        run: bun run test

@@ -1,22 +1,20 @@
-import {describe, expect, it, vitest} from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 import type { AppendIndexFileFn, CreateSubfolderFn, WriteFileFn} from './extractFrontMatter';
 import { extractFrontMatter } from './extractFrontMatter';
-import path from "path";
-import fs from 'fs';
 
 describe(extractFrontMatter,() => {
 
     describe("Scenario 1 - Blue sky", () => {
         it('Runs write file  and append file for each file', async () => {
-            const writeFile = vitest.fn<Parameters<WriteFileFn>, ReturnType<WriteFileFn>>(); 
-            const appendFile = vitest.fn<Parameters<AppendIndexFileFn>, ReturnType<AppendIndexFileFn>>();
-            const createSubfolder = vitest.fn<Parameters<CreateSubfolderFn>, ReturnType<CreateSubfolderFn>>().mockImplementation((subPath) => {
+            const writeFile = mock<WriteFileFn>(); 
+            const appendFile = mock<AppendIndexFileFn>();
+            const createSubfolder = mock<CreateSubfolderFn>().mockImplementation((subPath) => {
                 return Promise.resolve(`generated/${subPath}`)
             })
 
 
-            const writeFileMock = vitest.fn();
-            await extractFrontMatter(path.join(process.cwd(), "utils", "testdata", "scenario1_bluesky"),writeFile, appendFile, createSubfolder, (fileName, data) => {
+            const writeFileMock = mock();
+            await extractFrontMatter(`${process.cwd()}/utils/testdata/scenario1_bluesky`,writeFile, appendFile, createSubfolder, (fileName, data) => {
                 writeFileMock();
 
                 expect(fileName).toEqual("src/generated/tags.json");
@@ -58,14 +56,14 @@ describe(extractFrontMatter,() => {
 
     describe("Scenario 2 - Validation Failures", () => {
         it('Throws an error if expected front matter does not exist', async () => {
-            const writeFile = vitest.fn<Parameters<WriteFileFn>, ReturnType<WriteFileFn>>(); 
-            const appendFile = vitest.fn<Parameters<AppendIndexFileFn>, ReturnType<AppendIndexFileFn>>();
-            const createSubfolder = vitest.fn<Parameters<CreateSubfolderFn>, ReturnType<CreateSubfolderFn>>().mockImplementation((subPath) => {
+            const writeFile = mock<WriteFileFn>(); 
+            const appendFile = mock<AppendIndexFileFn>();
+            const createSubfolder = mock<CreateSubfolderFn>().mockImplementation((subPath) => {
                 return Promise.resolve(`generated/${subPath}`)
             })
-            await expect(async () => {
-                 await extractFrontMatter(path.join(process.cwd(), "utils", "testdata", "scenario2_validation_errors"),writeFile, appendFile, createSubfolder, vitest.fn());  
-            }).rejects.toThrowError(/Failed Zod validation with/);
+            await expect(
+                extractFrontMatter(`${process.cwd()}/utils/testdata/scenario2_validation_errors`,writeFile, appendFile, createSubfolder, mock())
+            ).rejects.toThrowError(/Failed Zod validation with/);
 
         })
     });

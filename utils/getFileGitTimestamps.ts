@@ -3,7 +3,7 @@
  * Generated using ChatGPT
  */
 
-import { exec } from 'child_process'
+import { $ } from 'bun'
 
 
 /**
@@ -12,26 +12,21 @@ import { exec } from 'child_process'
  * @returns 
  */
 export async function getFileGitTimestamps(filePath: string)  : Promise<{createdAt: Date, lastEditedAt: Date}>{
-    return new Promise((resolve, reject) => {
-        exec(`git log --follow --format="%H %at" -- "${filePath}"`, (error, stdout, stderr) => {
-            if (error) {
-                return reject(`Error: ${stderr}`);
-            }
+    const result = await $`git log --follow --format=${"%H %at"} -- ${filePath}`.quiet().nothrow();
+    if (result.exitCode !== 0) {
+        throw `Error: ${result.stderr.toString()}`;
+    }
 
-            const commits = stdout.trim().split('\n');
-            if (commits.length === 0) {
-                return reject(`No git history found for file: ${filePath}`);
-            }
+    const commits = result.stdout.toString().trim().split('\n');
+    if (commits.length === 0) {
+        throw `No git history found for file: ${filePath}`;
+    }
 
-            const firstCommit = commits[commits.length - 1].split(' ');
-            const lastCommit = commits[0].split(' ');
+    const firstCommit = commits[commits.length - 1].split(' ');
+    const lastCommit = commits[0].split(' ');
 
-            const result = {
-                createdAt: new Date(parseInt(firstCommit[1], 10) * 1000),
-                lastEditedAt: new Date(parseInt(lastCommit[1], 10) * 1000),
-            };
-
-            resolve(result);
-        });
-    });
+    return {
+        createdAt: new Date(parseInt(firstCommit[1], 10) * 1000),
+        lastEditedAt: new Date(parseInt(lastCommit[1], 10) * 1000),
+    };
 }

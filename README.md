@@ -7,11 +7,11 @@ Markdown files, turned into a blog with NextJs.
 ## Running it yourself: 
 
 ```
-npm i
-npm run dev
+bun install
+bun run dev
 ```
 
-If you're editing blog posts, you will need to run `npm run generate:all` between changes. 
+If you're editing blog posts, you will need to run `bun run generate:all` between changes. 
 
 ## Features
 

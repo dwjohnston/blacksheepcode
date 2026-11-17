@@ -1,0 +1,60 @@
+---
+meta:
+  title: The time required to wait for a job to complete - changes the workflow for how you do it
+  description: There's a big difference between a job that takes one hour, vs a job that takes one minute vs a job that takes less than a second
+  dateCreated: 2026-05-27
+
+
+tags:  
+    - "software_engineering"
+
+---
+
+See also [this stack exchange question](https://softwareengineering.stackexchange.com/questions/459194/is-there-a-term-pithy-law-that-represents-the-idea-that-the-time-it-takes-for-an
+)
+
+<table style={{maxWidth: "600px", "margin": "0 auto"}}>
+  <thead>
+    <tr>
+      <th>Duration</th>
+      <th>Attention/Context</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1s</td>
+      <td>Unbroken attention, no context switch</td>
+    </tr>
+    <tr>
+      <td>1-10s</td>
+      <td>Attention broken simply by boredom, potential to view another browser tab, check emails</td>
+    </tr>
+    <tr>
+      <td>10s-1hr</td>
+      <td>Almost definite context switch to small tasks or non-productive tasks</td>
+    </tr>
+    <tr>
+      <td>1hr+</td>
+      <td>A context switch is required. At large waits, the context switch is actually less disruptive, because you now have time to get into that thing</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+Where I think this is most relevant when considering the time it takes for developer tooling to run - think running tests, linting either locally or in a build server. 
+
+It can be tempting to say 'well what does it matter if the tests take fifteen minutes/two minutes/30 seconds to run - you'll waste more time waiting for the elevator/making coffee/participating in the company ping pong tournament.'
+
+But the point isn't the actual time spent, the point is that the wait completely changes the way you do your work. 
+
+## Practical suggestions 
+
+- Adopt all the fast tool runners - bun, biome, typescript 7, etc. It's absolutely worth it. 
+
+- Shard your test runs on the build server. 
+
+- You can use tools like `lint-staged` to only run checks on a subset of files, but the problem with this is that your change might have broken something downstream from the file you are working on. 
+    - Instead monorepo tools like NX and Turborepo have tooling to run commands only affected packages. If you make a change to package A and package B depends on it, then the tooling will run tests against both packages. 
+    - There is similar tooling in the test runners. Bun has [`bun test --changed`](https://bun.com/blog/bun-v1.3.13#bun-test-changed) which works by using the import graph to determine which modules have changed. Be aware that if you were doing something with dynamic imports or file operations these might escape detection. 
+    - [Vitest also has a `--changed` flag.](https://vitest.dev/guide/cli.html#changed)

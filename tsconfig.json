@@ -26,7 +26,8 @@
         "./src/*"
       ]
     },
-    "target": "ES2017"
+    "target": "ES2017",
+    "types": ["bun", "node", "mdx"]
   },
   "include": [
     "next-env.d.ts",
@@ -39,7 +40,6 @@
   ],
   "exclude": [
     "node_modules",
-    ".next",
-    "cypress"
+    ".next"
   ]
 }

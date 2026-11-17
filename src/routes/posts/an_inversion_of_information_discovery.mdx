@@ -1,0 +1,75 @@
+---
+meta:
+  title: An inversion of information discovery
+  description: Our information discovery starts at a high level and then digs in. In the AI world, it might be better to have AI do deep discovery and then summarize. 
+  dateCreated: 2026-10-18
+  image: information_discovery_ai
+
+tags:
+  - "software_engineering"
+  - "ai"
+
+---
+
+import informationDiscovery from "@/assets/information_discovery_c.png";
+import informationDiscoveryAi from "@/assets/information_discovery_ai.png";
+import Image from "next/image";
+
+Once upon a time, the way I discovered technical information was like this: 
+
+1. I do a Google search, and then I pick a result from Stack Overflow or tutorial blog, or I navigate straight to that framework's documentation, and look at the 'getting started' or 'concepts' documentation section. 
+2. This gives me a high level overview of the concepts, usually with links to further details. 
+3. If I need further details then I dig into the API documentation.
+4. From there, if I need more details I'm:
+    -  I'm doing searches in the GitHub issues or pull requests
+    - Creating code reproductions to test that behaviour that I'm looking for
+5. As a failure mode, I'm looking into the framework source code to understand the thing. 
+
+That is, the model of information discovery is that we look high level first, and dig into the more details _as we need it_. 
+
+<Image src={informationDiscovery} className="blog-image" alt="Information discovery starts with a high-level overview, then goes deeper into API documentation, issues and pull requests, reproductions, and source code as needed."/>
+
+We can add a step 0 to this process: 
+
+0. I passively browse social media and see certain concepts, tools or techniques be talked about, and that might be enough for me to search those later.
+
+**With AI, this might have changed,**
+
+Part of this is not specific to AI - Google search has been in decline for a while now - but I'm finding that 'search first' is no longer reliable. 
+
+1. That surface level content is often AI generated now, and as a heuristic, I don't know if it's worth reading further into it, without knowing if there's actually anything concrete behind it. 
+2. AI is good at answering surface level questions directly.
+
+Instead, with AI, we can have the AI take the opposite approach: 
+
+1. Start deep - start with reading source code, reading academic papers, reading technical specifications. 
+2. Have the AI develop a coherent conceptual picture
+3. Finally have the AI formulate the high level overview. 
+
+Then, you can drill into the details as much or as little as needed. 
+
+<Image src={informationDiscoveryAi} className="blog-image" alt="AI investigates source code, academic papers, technical specifications, issues, and reproductions, then synthesizes a grounded overview and detailed explanations with links to primary sources."/>
+
+Of course, there's always the possibility that there's going to be a hallucination between what the AI reports to you and what it read. 
+
+To this, I say: 
+
+- Not to say that it won't happen, but I trust the models for the most part these days. 
+- More to the point, what's the alternative? We live in an AI slop world whether we like it or not. 
+
+## Practical conclusions
+
+### As a reader
+
+- Create skills with a workflow designed for 'deep knowledge first'.
+    - Such skills will likely require the higher model effort setting - and will as such be slow. So there's still something to be said for 'just tell me what you already know'. 
+
+> User: Tell me about XYZ. 
+> Agent: Ah, XYZ, XYZ is a flippty floop, zip zap. 
+> User: /deep-research I'm specifically trying to solve X. Find what you can about solving this particular problem for flippty fap and zip zap. 
+
+
+### As a documentation writer
+
+I haven't tested this hypothesis - chances are AI is still encountering your content via surface level, documentation sites, GitHub root README.md - in these, add pointers to things like tests that demonstrate the tool's specific capabilities. 
+

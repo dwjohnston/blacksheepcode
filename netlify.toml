@@ -2,8 +2,11 @@
   package = "@netlify/plugin-nextjs"
 
 [build]
-  command = "npm run build"
+  command = "bun run build"
   publish = ".next"
+
+[build.environment]
+  BUN_VERSION = "1.4.4"
 
 [[headers]]
   for = "/_next/static/*"

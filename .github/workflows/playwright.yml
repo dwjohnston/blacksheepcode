@@ -1,0 +1,40 @@
+name: Playwright
+
+on:
+  pull_request:
+    branches:
+      - master
+env: 
+  PR_NUMBER: ${{ github.event.number }}
+  BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
+  NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+  NETLIFY_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN}}
+
+  UPDATED_AT: ${{ github.event.pull_request.updated_at }}
+  COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+
+
+jobs:
+  playwright-test:
+    if: false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run Playwright
+        run: .github/workflows/scripts/run-playwright.sh
+

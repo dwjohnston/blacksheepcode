@@ -1,7 +1,6 @@
-import path from "path";
 import { compileMDXFiles } from "./transformMdx";
-const inputDir = path.join('src', 'routes');
-const outputDir = path.join('src', 'generated', 'mdx');
+const inputDir = 'src/routes';
+const outputDir = 'src/generated/mdx';
 
 compileMDXFiles(inputDir, outputDir)
     .then((v) => {
